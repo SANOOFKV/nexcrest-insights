@@ -2998,69 +2998,471 @@ body.dark-theme .telemetry-stat-box.days-left .tele-box-val {
   height: 220px;
 }
 
+.overview-team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+
 /* ==========================================================================
-   RESPONSIVENESS
+   MOBILE & TABLET RESPONSIVE SYSTEM
    ========================================================================== */
 @media (max-width: 1024px) {
+  .app-main {
+    padding: 24px 20px 48px;
+  }
   .header-container {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
   }
   .header-actions {
     justify-content: space-between;
     overflow-x: auto;
     padding-bottom: 4px;
+    gap: 10px;
   }
   .form-row {
     grid-template-columns: 1fr;
   }
   .charts-grid-2col {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
 
 @media (max-width: 768px) {
-  .hero-metric-cards-grid {
-    grid-template-columns: 1fr;
+  .app-header {
+    padding: 10px 16px;
   }
+  .app-main {
+    padding: 16px 12px 40px;
+  }
+
+  /* Section Header & Actions */
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .view-title {
+    font-size: 22px;
+  }
+  .view-subtitle {
+    font-size: 13px;
+  }
+  .header-action-buttons {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+  }
+  .header-action-buttons .export-dropdown-wrapper {
+    width: 100%;
+  }
+  .header-action-buttons .btn,
+  #btn-export-data,
+  #btn-open-assign-modal,
+  #btn-member-log-work {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .export-menu {
+    width: 100%;
+    left: 0;
+    right: 0;
+  }
+
+  /* Swipeable Tab Navigation Pills */
+  .tabs-control-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .tab-pills {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    width: 100%;
+    padding: 4px;
+    gap: 6px;
+  }
+  .tab-pills::-webkit-scrollbar {
+    display: none;
+  }
+  .tab-pill {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  /* 4 Hero Metric Cards in 2x2 Grid */
+  .hero-metric-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .hero-card {
+    padding: 14px 12px;
+    border-radius: var(--radius-md);
+  }
+  .hero-card-num {
+    font-size: 26px;
+  }
+  .hero-card-title {
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+  .hero-card-sub {
+    font-size: 11px;
+  }
+
+  /* Circular Telemetry Card */
   .telemetry-bar-card {
     flex-direction: column;
     align-items: stretch;
+    padding: 18px 16px;
+    gap: 16px;
+    margin-bottom: 18px;
   }
   .progress-ring-block {
     flex-direction: column;
     text-align: center;
+    gap: 12px;
+    align-items: center;
+  }
+  .ring-labels {
+    align-items: center;
+    text-align: center;
   }
   .telemetry-stat-pills {
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
     width: 100%;
   }
   .telemetry-stat-box {
-    flex: 1;
-    padding: 12px;
+    min-width: 0;
+    width: 100%;
+    padding: 10px 8px;
+    border-radius: var(--radius-md);
+    text-align: center;
   }
+  .telemetry-toggle-btn {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: center;
+    min-height: 40px;
+  }
+
+  /* Categories Breakdown */
   .categories-cards-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
-  .charts-grid-2col {
+  .category-summary-card {
+    padding: 16px;
+  }
+
+  /* Overview Live Team Staff Grid */
+  .overview-team-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
-  .tabs-control-bar {
+
+  /* Team Roster Grid & Toolbar */
+  .team-roster-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .roster-card-header {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
   }
+  .roster-card-header .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .roster-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+  }
+  .roster-toolbar .search-box {
+    width: 100%;
+    min-width: 100%;
+  }
+  .roster-toolbar select {
+    width: 100%;
+  }
+  .employee-card {
+    padding: 16px;
+  }
+  .employee-card-footer {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .employee-card-footer .emp-action-buttons {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+  .employee-card-footer .emp-action-buttons button {
+    flex: 1;
+    justify-content: center;
+    min-height: 38px;
+  }
+  .employee-card-footer > div:last-child {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+  }
+  .employee-card-footer .btn-emp-edit,
+  .employee-card-footer .btn-emp-delete {
+    flex: 1;
+    justify-content: center;
+    min-height: 38px;
+  }
+
+  /* Filter Controls */
   .filter-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+  }
+  .filter-controls .search-box {
+    width: 100%;
+    min-width: 100%;
+  }
+  .filter-controls .filter-group {
+    width: 100%;
     justify-content: space-between;
   }
-  .member-kpi-banner {
+  .filter-controls .filter-group select {
+    flex: 1;
+    text-align: right;
+  }
+
+  /* Table Cards & Horizontal Scroll */
+  .table-card {
+    padding: 14px 10px;
+  }
+  .card-header {
     flex-direction: column;
     align-items: stretch;
+    gap: 10px;
+  }
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+  }
+  .data-table {
+    min-width: 780px;
+  }
+
+  /* Member Portal Responsive */
+  .member-admin-pill-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    text-align: center;
+  }
+  .member-admin-pill-bar button {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .member-kpi-banner {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 14px;
+    flex-direction: initial;
+    align-items: initial;
   }
   .kpi-banner-divider {
     display: none;
   }
-  .role-switcher-bar {
+  .kpi-banner-progress {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 6px;
+  }
+  .member-category-tabs {
+    display: flex;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding-bottom: 4px;
+  }
+  .member-category-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .member-cat-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+  #member-tasks-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Modal Form on Mobile */
+  .modal-overlay {
+    padding: 10px;
+    align-items: flex-end;
+  }
+  .modal-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 94vh;
+    padding: 20px 16px;
+    margin: 0 auto;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  .modal-header h3 {
+    font-size: 16px;
+  }
+  .modal-footer {
+    flex-direction: column-reverse;
+    gap: 8px;
+    width: 100%;
+  }
+  .modal-footer .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .modal-footer.split {
+    flex-direction: column-reverse;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Ultra-Compact Top Bar for Small Screens */
+  .app-header {
+    padding: 8px 12px;
+  }
+  .brand-group {
+    justify-content: space-between;
+    width: 100%;
+    gap: 8px;
+  }
+  .brand-logo .sub-label {
+    display: none;
+  }
+  .cycle-badge select {
+    max-width: 130px;
+    font-size: 11px;
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .header-role-switcher {
+    flex: 1;
+    min-width: 0;
+  }
+  .header-role-switcher select {
+    width: 100%;
+    font-size: 11px;
+  }
+  .user-profile-menu .user-meta {
+    display: none;
+  }
+  .btn-logout span {
+    display: none;
+  }
+  .btn-logout {
+    padding: 6px 10px;
+    min-height: 36px;
+  }
+  #theme-toggle-btn {
+    width: 34px;
+    height: 34px;
+  }
+
+  /* Metric numbers */
+  .hero-metric-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .hero-card {
+    padding: 12px 10px;
+  }
+  .hero-card-num {
+    font-size: 22px;
+  }
+  .hero-card-title {
+    font-size: 9px;
+  }
+  .hero-card-sub {
+    font-size: 10px;
+  }
+
+  /* Telemetry Pills */
+  .telemetry-stat-pills {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .telemetry-stat-box {
+    padding: 8px 4px;
+  }
+  .telemetry-stat-box .tele-box-title {
+    font-size: 9px;
+  }
+  .telemetry-stat-box .tele-box-val {
+    font-size: 18px;
+  }
+
+  /* Role Login Selector */
+  .role-login-tabs {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  /* Chips */
+  .feedback-chips-list {
+    gap: 4px;
+  }
+  .feedback-chip {
+    font-size: 10px;
+    padding: 4px 8px;
+  }
+
+  /* Form Inputs (prevent iOS Safari zoom) */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-metric-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  .telemetry-stat-pills {
+    grid-template-columns: 1fr;
   }
 }
 
