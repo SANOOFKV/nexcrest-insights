@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexcrest Media & Marketing | Operations & KPI Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons & Chart.js -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="css/styles.css?v=10">
+</head>
+<body class="light-theme">
+  <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
+  <div class="ambient-glow-mesh" aria-hidden="true">
+    <div class="ambient-orb orb-teal"></div>
+    <div class="ambient-orb orb-blue"></div>
+    <div class="ambient-orb orb-purple"></div>
+    <div class="ambient-orb orb-mint"></div>
+  </div>
+
+  <!-- High-End Tactile Film Grain Glass Texture -->
+  <div class="film-grain-overlay" aria-hidden="true"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-group">
+        <div class="brand-logo">
+          <span class="logo-mark">N</span>
+          <div class="logo-text">
+            <span class="company-name">NEXCREST</span>
+            <span class="sub-label">Media & Marketing Ops</span>
+          </div>
+        </div>
+        <div class="cycle-badge">
+          <i data-lucide="calendar"></i>
+          <select id="month-selector" class="header-select" aria-label="Select Target Month">
+            <option value="2026-10">October 2026 (Active)</option>
+            <option value="2026-09">September 2026 (40 Target Archive)</option>
+            <option value="2026-11">November 2026 (Planning)</option>
+            <option value="2026-12">December 2026</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Header Actions: User Profile, Theme & Sign Out -->
+      <div class="header-actions">
+        <div class="header-role-switcher" id="header-workspace-switcher" title="Switch User Portal Workspace">
+          <i data-lucide="layers" class="switcher-icon"></i>
+          <select id="header-role-select" class="header-select" aria-label="Switch User Portal">
+            <option value="manager@nexcrest.com">👑 Marketing Manager (Command Center)</option>
+          </select>
+        </div>
+
+        <div class="user-profile-menu" id="header-user-profile-menu">
+          <button id="theme-toggle-btn" class="icon-btn theme-toggle" title="Switch Theme">
+            <i data-lucide="moon"></i>
+          </button>
+          <div class="user-avatar" id="header-user-avatar">M</div>
+          <div class="user-meta">
+            <span class="user-name" id="header-user-name">Marketing Manager</span>
+            <span class="user-role-badge" id="header-role-badge">Lead Admin</span>
+          </div>
+          <button id="logout-btn" class="btn btn-outline-sm btn-logout" title="Sign Out of Workspace">
+            <i data-lucide="log-out"></i>
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dedicated Full-Screen Login Portal (shown when not logged in) -->
+  <div id="auth-modal" class="modal-overlay hidden">
+    <div class="modal-card auth-card spotlight-card">
+      <div class="auth-header">
+        <div class="brand-logo large">
+          <span class="logo-mark">N</span>
+        </div>
+        <h2>Nexcrest Media & Marketing</h2>
+        <p class="auth-subtitle">Select your account profile or enter work credentials to sign in</p>
+      </div>
+
+      <!-- Quick Account / Portal Profile Selector (Dynamically populated with all staff including Sumesh) -->
+      <div class="role-login-tabs" id="role-login-tabs-container">
+        <!-- Injected dynamically via JavaScript -->
+      </div>
+
+      <!-- Active Profile Description Card with Circulating Laser Glow -->
+      <div class="role-desc-preview laser-border-glow spotlight-card" id="role-desc-preview">
+        <div class="role-desc-icon">
+          <i data-lucide="info" id="role-desc-icon"></i>
+        </div>
+        <div>
+          <div class="role-desc-title" id="role-desc-title">Marketing Manager Command Center</div>
+          <div class="role-desc-text" id="role-desc-text">Full administrative control: View total targets & achievement graphs (40 posts), review queue, and assign monthly quotas.</div>
+        </div>
+      </div>
+
+      <form id="auth-form" class="auth-form">
+        <div class="form-group">
+          <label for="login-email">Work Email</label>
+          <div class="input-with-icon">
+            <i data-lucide="mail"></i>
+            <input type="email" id="login-email" placeholder="name@nexcrest.com" required value="manager@nexcrest.com">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <div class="input-with-icon">
+            <i data-lucide="lock"></i>
+            <input type="password" id="login-password" placeholder="••••••••" required value="password123">
+          </div>
+        </div>
+
+        <button type="submit" id="auth-submit-btn" class="btn btn-primary btn-block">
+          <span id="auth-submit-text">Sign In as Marketing Manager</span>
+          <i data-lucide="arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="auth-security-notice">
+        <i data-lucide="lock"></i>
+        <span>Isolated profiles: Logging in shows exclusively the dashboard and deliverables for your assigned role.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Application Container -->
+  <main class="app-main">
+    <!-- VIEW 1: MARKETING MANAGER COMMAND CENTER -->
+    <section id="manager-view" class="view-section active">
+      <!-- Manager Pending Review Banner -->
+      <div id="review-alert-banner" class="alert-banner hidden">
+        <div class="alert-content">
+          <i data-lucide="bell-ring" class="alert-icon"></i>
+          <span id="alert-text">You have 3 submissions awaiting review.</span>
+        </div>
+        <button id="view-reviews-btn" class="btn btn-sm btn-light">Review Submissions</button>
+      </div>
+
+      <!-- Top Overview Stats -->
+      <div class="section-header">
+        <div>
+          <h1 class="view-title">Marketing Command Center</h1>
+          <p class="view-subtitle">Track, assign, and approve deliverables across Graphic Design, Video, and Marketing.</p>
+        </div>
+        <div class="header-action-buttons">
+          <div class="export-dropdown-wrapper">
+            <button id="btn-export-data" class="btn btn-secondary" title="Export Marketing & Operations Reports">
+              <i data-lucide="download"></i> Export Report <i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: 2px;"></i>
+            </button>
+            <div id="export-dropdown-menu" class="export-menu hidden">
+              <button type="button" id="btn-export-csv" class="dropdown-item-btn">
+                <i data-lucide="file-spreadsheet"></i> Export as CSV (Excel)
+              </button>
+              <button type="button" id="btn-export-json" class="dropdown-item-btn">
+                <i data-lucide="file-code"></i> Export as JSON Backup
+              </button>
+              <button type="button" id="btn-export-print" class="dropdown-item-btn">
+                <i data-lucide="printer"></i> Print / PDF Report
+              </button>
+            </div>
+          </div>
+          <button id="btn-open-assign-modal" class="btn btn-primary">
+            <i data-lucide="plus-circle"></i> Assign Target
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab Navigation for Manager -->
+      <div class="tabs-control-bar">
+        <div class="tab-pills">
+          <button id="tab-btn-overview" class="tab-pill active" data-manager-tab="overview">
+            <i data-lucide="layout-dashboard"></i> Overview & Graphs
+          </button>
+          <button id="tab-btn-targets" class="tab-pill" data-manager-tab="all-targets">
+            <i data-lucide="layers"></i> All Assigned Targets
+          </button>
+          <button id="tab-btn-review" class="tab-pill" data-manager-tab="review-queue">
+            <i data-lucide="inbox"></i> Review Queue 
+            <span class="pill-count" id="review-queue-count">0</span>
+          </button>
+          <button id="tab-btn-team" class="tab-pill" data-manager-tab="team-roster">
+            <i data-lucide="users"></i> Team Roster & Staff
+            <span class="pill-count" id="team-roster-count">3</span>
+          </button>
+          <button id="tab-btn-activity" class="tab-pill" data-manager-tab="activity-log">
+            <i data-lucide="clock"></i> Activity Audit Log
+          </button>
+        </div>
+
+        <!-- Filter Controls (Visible on Table Tab) -->
+        <div class="filter-controls" id="manager-table-filters" style="display: none;">
+          <div class="search-box">
+            <i data-lucide="search"></i>
+            <input type="text" id="filter-search-input" placeholder="Search targets, programs, notes...">
+          </div>
+
+          <div class="filter-group">
+            <label><i data-lucide="user"></i> Role:</label>
+            <select id="filter-role-select">
+              <option value="all">All Roles</option>
+              <option value="designer">Graphic Designer</option>
+              <option value="videographer">Videographer + Editor</option>
+              <option value="marketing">Marketing Executive</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label><i data-lucide="tag"></i> Category:</label>
+            <select id="filter-category-select">
+              <option value="all">All Categories</option>
+              <option value="Campus Happenings">Campus Happenings</option>
+              <option value="Branding">Branding</option>
+              <option value="Marketing Creatives">Marketing Creatives</option>
+              <option value="Moment Marketing">Moment Marketing</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label><i data-lucide="building"></i> Brand:</label>
+            <select id="filter-brand-select">
+              <option value="all">All Brands</option>
+              <option value="Techschool">Techschool</option>
+              <option value="IT">IT</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label><i data-lucide="activity"></i> Status:</label>
+            <select id="filter-status-select">
+              <option value="all">All Statuses</option>
+              <option value="completed">Completed / Quota Met</option>
+              <option value="in-progress">In Progress</option>
+              <option value="not-started">Not Started</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 0: OVERVIEW & GRAPHS (Matching User Reference Photo) -->
+      <div id="tab-overview" class="tab-pane active">
+        <!-- Overview Header Row -->
+        <div class="ov-header-row">
+          <div class="ov-title-group">
+            <h2 class="ov-title">Overview</h2>
+            <span class="ov-month-tag" id="ov-month-tag">October 2026</span>
+          </div>
+          <div class="ov-quick-stats">
+            <span class="ov-sync-indicator"><i data-lucide="refresh-cw"></i> Live Operations Sync</span>
+          </div>
+        </div>
+
+        <!-- 4 Hero Dark Gradient Cards (Matching User Photo) -->
+        <div class="hero-metric-cards-grid">
+          <div class="hero-card hero-monthly-target spotlight-card tilt-card">
+            <div class="hero-card-header">
+              <span class="hero-card-label">MONTHLY TARGET</span>
+              <div class="hero-card-icon"><i data-lucide="target"></i></div>
+            </div>
+            <div class="hero-card-value" id="ov-monthly-target">40</div>
+            <div class="hero-card-sub">Assigned monthly quota across all brands</div>
+          </div>
+
+          <div class="hero-card hero-reels spotlight-card tilt-card">
+            <div class="hero-card-header">
+              <span class="hero-card-label">REELS & VIDEOS</span>
+              <div class="hero-card-icon"><i data-lucide="video"></i></div>
+            </div>
+            <div class="hero-card-value" id="ov-reels-count">22</div>
+            <div class="hero-card-sub"><span id="ov-reels-published">0</span> Published of <span id="ov-reels-target">22</span> Target</div>
+          </div>
+
+          <div class="hero-card hero-posters spotlight-card tilt-card">
+            <div class="hero-card-header">
+              <span class="hero-card-label">POSTERS & CAROUSELS</span>
+              <div class="hero-card-icon"><i data-lucide="layers"></i></div>
+            </div>
+            <div class="hero-card-value" id="ov-posters-count">18</div>
+            <div class="hero-card-sub"><span id="ov-posters-published">0</span> Published of <span id="ov-posters-target">18</span> Target</div>
+          </div>
+
+          <div class="hero-card hero-published spotlight-card tilt-card">
+            <div class="hero-card-header">
+              <span class="hero-card-label">TOTAL PUBLISHED</span>
+              <div class="hero-card-icon"><i data-lucide="check-circle-2"></i></div>
+            </div>
+            <div class="hero-card-value" id="ov-published-count">40</div>
+            <div class="hero-card-sub">Verified & published deliverables</div>
+          </div>
+        </div>
+
+        <!-- Progress & Telemetry Strip (Matching User Photo) with Laser Border Glow -->
+        <div class="telemetry-bar-card laser-border-glow spotlight-card">
+          <div class="progress-ring-block">
+            <div class="progress-ring-container">
+              <svg class="progress-ring-svg" width="114" height="114" viewBox="0 0 114 114">
+                <circle class="ring-bg" cx="57" cy="57" r="47" stroke-width="10" fill="transparent"></circle>
+                <circle class="ring-fill" id="ov-ring-fill" cx="57" cy="57" r="47" stroke-width="10" fill="transparent" stroke-dasharray="295.3" stroke-dashoffset="0"></circle>
+              </svg>
+              <div class="ring-center-text">
+                <span class="ring-pct" id="ov-progress-pct">100%</span>
+              </div>
+            </div>
+            <div class="ring-labels">
+              <span class="ring-label-title">TARGET PROGRESS</span>
+              <div class="ring-label-numbers">
+                <strong id="ov-progress-ratio">40 / 40</strong>
+                <span class="ring-label-unit">Published / Posts</span>
+              </div>
+              <div class="ring-pacing-note" id="ov-pacing-text">100% Completion achieved</div>
+            </div>
+          </div>
+
+          <div class="telemetry-stat-pills">
+            <div class="telemetry-stat-box remaining">
+              <span class="tele-box-title">REMAINING</span>
+              <span class="tele-box-val" id="ov-remaining-count">0</span>
+            </div>
+            <div class="telemetry-stat-box days-left">
+              <span class="tele-box-title" id="ov-days-left-label">DAYS LEFT</span>
+              <span class="tele-box-val" id="ov-days-left">0</span>
+            </div>
+            <button type="button" id="btn-toggle-workdays-mode" class="telemetry-toggle-btn" title="Toggle between Total Calendar Days and Mon-Fri Working Days">
+              <i data-lucide="briefcase"></i> <span id="workdays-toggle-text">Working Days</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Categories Breakdown Cards (Matching User Photo) -->
+        <div class="categories-section">
+          <div class="categories-section-header">
+            <div class="cat-sec-title-wrap">
+              <i data-lucide="layout-grid"></i>
+              <h3>Categories</h3>
+            </div>
+            <span class="cat-total-badge" id="ov-cat-total-posts">40 Posts</span>
+          </div>
+
+          <div class="categories-cards-grid">
+            <!-- Category 1: Branding -->
+            <div class="category-summary-card spotlight-card tilt-card">
+              <div class="cat-card-header">
+                <h4 class="cat-name">Branding</h4>
+                <span class="cat-badge" id="cat-branding-posts">20 Posts</span>
+              </div>
+              <div class="cat-splits-row">
+                <div class="cat-split-item">
+                  <span class="split-num" id="cat-branding-reels">13</span>
+                  <span class="split-label">Reels & Videos</span>
+                </div>
+                <div class="cat-split-divider"></div>
+                <div class="cat-split-item">
+                  <span class="split-num" id="cat-branding-posters">7</span>
+                  <span class="split-label">Posters & Carousels</span>
+                </div>
+              </div>
+              <div class="cat-progress-wrap">
+                <div class="progress-bar-container" style="margin: 0;">
+                  <div class="progress-bar-fill teal" id="cat-branding-bar" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Category 2: Campus Happenings -->
+            <div class="category-summary-card spotlight-card tilt-card">
+              <div class="cat-card-header">
+                <h4 class="cat-name">Campus Happenings</h4>
+                <span class="cat-badge" id="cat-campus-posts">9 Posts</span>
+              </div>
+              <div class="cat-splits-row">
+                <div class="cat-split-item">
+                  <span class="split-num" id="cat-campus-reels">5</span>
+                  <span class="split-label">Reels & Videos</span>
+                </div>
+                <div class="cat-split-divider"></div>
+                <div class="cat-split-item">
+                  <span class="split-num" id="cat-campus-posters">4</span>
+                  <span class="split-label">Posters & Carousels</span>
+                </div>
+              </div>
+              <div class="cat-progress-wrap">
+                <div class="progress-bar-container" style="margin: 0;">
+                  <div class="progress-bar-fill purple" id="cat-campus-bar" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Category 3: Marketing Creatives -->
+            <div class="category-summary-card spotlight-card tilt-card">
+              <div class="cat-card-header">
+                <h4 class="cat-name">Marketing Creatives</h4>
+                <span class="cat-badge" id="cat-marketing-posts">8 Posts</span>
+              </div>
+              <div class="cat-splits-row">
+                <div class="cat-split-item">
+                  <span class="split-num" id="cat-marketing-reels">2</span>
+                  <span class="split-label">Reels & Videos</span>
+                </div>
+                <div class="cat-split-divider"></div>
+                <div class="cat-split-item">
+                  <span class="split-num" id="cat-marketing-posters">6</span>
+                  <span class="split-label">Posters & Carousels</span>
+                </div>
+              </div>
+              <div class="cat-progress-wrap">
+                <div class="progress-bar-container" style="margin: 0;">
+                  <div class="progress-bar-fill blue" id="cat-marketing-bar" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Category 4: Moment Marketing -->
+            <div class="category-summary-card spotlight-card tilt-card">
+              <div class="cat-card-header">
+                <h4 class="cat-name">Moment Marketing</h4>
+                <span class="cat-badge" id="cat-moment-posts">3 Posts</span>
+              </div>
+              <div class="cat-splits-row">
+                <div class="cat-split-item">
+                  <span class="split-num" id="cat-moment-reels">1</span>
+                  <span class="split-label">Reels & Videos</span>
+                </div>
+                <div class="cat-split-divider"></div>
+                <div class="cat-split-item">
+                  <span class="split-num" id="cat-moment-posters">2</span>
+                  <span class="split-label">Posters & Carousels</span>
+                </div>
+              </div>
+              <div class="cat-progress-wrap">
+                <div class="progress-bar-container" style="margin: 0;">
+                  <div class="progress-bar-fill amber" id="cat-moment-bar" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team Operations & Staff Pacing (Overview Breakdown) -->
+        <div class="team-overview-summary spotlight-card" style="margin-bottom: 28px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 22px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 38px; height: 38px; border-radius: var(--radius-sm); background: rgba(0, 139, 165, 0.15); display: flex; align-items: center; justify-content: center; color: var(--teal-primary);">
+                <i data-lucide="users"></i>
+              </div>
+              <div>
+                <h3 style="font-family: var(--font-heading); font-size: 18px; margin: 0; color: var(--text-main);">Team Operations & Staff Pacing</h3>
+                <p style="font-size: 12px; color: var(--text-muted); margin: 2px 0 0 0;">Live deliverable quota completion and individual member pacing</p>
+              </div>
+            </div>
+            <div>
+              <button type="button" id="btn-ov-goto-roster" class="btn btn-secondary btn-sm">
+                <i data-lucide="arrow-right"></i> Manage Full Roster (<span id="ov-roster-total-count">4</span>)
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Live Member Grid on Overview -->
+          <div id="overview-team-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px;">
+            <!-- Dynamically populated from authService & dataStore -->
+          </div>
+        </div>
+
+        <!-- Target vs Achievement Visual Analytics Graphs Section -->
+        <div class="analytics-graphs-section">
+          <div class="graphs-section-header">
+            <div>
+              <h3 class="graphs-section-title">Target vs Achievement Visual Analytics</h3>
+              <p class="card-subtitle">Graphical telemetry comparing allocated targets against approved achievements</p>
+            </div>
+            <div class="chart-quick-badge">
+              <i data-lucide="bar-chart-2"></i> <span>Dynamic Visual Graphs</span>
+            </div>
+          </div>
+
+          <div class="charts-grid-2col">
+            <!-- Chart 1: Target vs Achievement by Category -->
+            <div class="card chart-card spotlight-card">
+              <div class="chart-card-header">
+                <div>
+                  <h4>Category Target vs Achievement</h4>
+                  <span class="chart-sub">Target Quotas vs Verified Achievements</span>
+                </div>
+                <div class="chart-legend-custom">
+                  <span class="legend-item"><span class="legend-dot target"></span> Target</span>
+                  <span class="legend-item"><span class="legend-dot achieved"></span> Achieved</span>
+                </div>
+              </div>
+              <div class="chart-canvas-wrapper">
+                <canvas id="categoryComparisonChart" height="220"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 2: Team Member Target vs Achievement -->
+            <div class="card chart-card spotlight-card">
+              <div class="chart-card-header">
+                <div>
+                  <h4>Team Performance Target vs Achievement</h4>
+                  <span class="chart-sub">Assigned quotas vs verified completions across all team members</span>
+                </div>
+                <div class="chart-legend-custom">
+                  <span class="legend-item"><span class="legend-dot target"></span> Assigned</span>
+                  <span class="legend-item"><span class="legend-dot achieved"></span> Completed</span>
+                </div>
+              </div>
+              <div class="chart-canvas-wrapper">
+                <canvas id="rolePerformanceChart" height="220"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 3: Format Output Distribution -->
+            <div class="card chart-card spotlight-card">
+              <div class="chart-card-header">
+                <div>
+                  <h4>Deliverable Formats Distribution</h4>
+                  <span class="chart-sub">Reels & Videos vs Posters & Carousels proportion</span>
+                </div>
+              </div>
+              <div class="chart-canvas-wrapper doughnut-wrap">
+                <canvas id="formatDistributionChart" height="210"></canvas>
+              </div>
+            </div>
+
+            <!-- Chart 4: Monthly Milestone Pacing Curve -->
+            <div class="card chart-card spotlight-card">
+              <div class="chart-card-header">
+                <div>
+                  <h4>Cumulative Delivery Pacing Curve</h4>
+                  <span class="chart-sub">Ideal target pace line vs actual completion trend</span>
+                </div>
+              </div>
+              <div class="chart-canvas-wrapper">
+                <canvas id="monthlyPacingChart" height="210"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 1: Target Deliverables Table -->
+      <div id="tab-all-targets" class="tab-pane hidden">
+        <div class="card table-card">
+          <div class="card-header">
+            <div>
+              <h3>Deliverables Breakdown by Brand & Category</h3>
+              <p class="card-subtitle">Exact target quotas assigned to team members for the selected month.</p>
+            </div>
+            <div class="card-actions">
+              <span class="badge-info" id="table-row-count">Showing 9 deliverables</span>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th class="sortable-th" data-sort-col="assignee">
+                    <div class="th-content">
+                      <span>Assignee</span>
+                      <i data-lucide="arrow-up-down" class="sort-icon"></i>
+                    </div>
+                  </th>
+                  <th class="sortable-th" data-sort-col="brand">
+                    <div class="th-content">
+                      <span>Brand</span>
+                      <i data-lucide="arrow-up-down" class="sort-icon"></i>
+                    </div>
+                  </th>
+                  <th class="sortable-th" data-sort-col="category">
+                    <div class="th-content">
+                      <span>Category</span>
+                      <i data-lucide="arrow-up-down" class="sort-icon"></i>
+                    </div>
+                  </th>
+                  <th class="sortable-th active-sort" data-sort-col="program">
+                    <div class="th-content">
+                      <span>Content / Program</span>
+                      <i data-lucide="arrow-up" class="sort-icon"></i>
+                    </div>
+                  </th>
+                  <th class="sortable-th" data-sort-col="format">
+                    <div class="th-content">
+                      <span>Format</span>
+                      <i data-lucide="arrow-up-down" class="sort-icon"></i>
+                    </div>
+                  </th>
+                  <th class="text-center sortable-th" data-sort-col="targetQty">
+                    <div class="th-content center">
+                      <span>Target Qty</span>
+                      <i data-lucide="arrow-up-down" class="sort-icon"></i>
+                    </div>
+                  </th>
+                  <th class="text-center sortable-th" data-sort-col="completed">
+                    <div class="th-content center">
+                      <span>Completed</span>
+                      <i data-lucide="arrow-up-down" class="sort-icon"></i>
+                    </div>
+                  </th>
+                  <th class="text-center sortable-th" data-sort-col="pending">
+                    <div class="th-content center">
+                      <span>Pending Review</span>
+                      <i data-lucide="arrow-up-down" class="sort-icon"></i>
+                    </div>
+                  </th>
+                  <th class="sortable-th" data-sort-col="pct">
+                    <div class="th-content">
+                      <span>Progress</span>
+                      <i data-lucide="arrow-up-down" class="sort-icon"></i>
+                    </div>
+                  </th>
+                  <th class="sortable-th" data-sort-col="status">
+                    <div class="th-content">
+                      <span>Status</span>
+                      <i data-lucide="arrow-up-down" class="sort-icon"></i>
+                    </div>
+                  </th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="manager-targets-table-body">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Review Queue -->
+      <div id="tab-review-queue" class="tab-pane hidden">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>Work Approvals & Quality Review</h3>
+              <p class="card-subtitle">Inspect submitted asset links (Drive, Figma, Frame.io) and approve or request revisions.</p>
+            </div>
+            <button id="btn-batch-approve" class="btn btn-outline-sm">
+              <i data-lucide="check-check"></i> Approve All Filtered
+            </button>
+          </div>
+
+          <div id="review-cards-list" class="submissions-list">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: Activity Log -->
+      <div id="tab-activity-log" class="tab-pane hidden">
+        <div class="card">
+          <div class="card-header">
+            <h3>Complete Audit & Submission History</h3>
+            <span class="card-subtitle">Chronological record of every work logged by team members.</span>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Team Member</th>
+                  <th>Deliverable</th>
+                  <th>Asset Title / Note</th>
+                  <th>Proof Link</th>
+                  <th>Review Status</th>
+                  <th>Feedback / Remarks</th>
+                </tr>
+              </thead>
+              <tbody id="activity-log-table-body">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: Team Roster & Employees -->
+      <div id="tab-team-roster" class="tab-pane hidden">
+        <div class="card team-roster-card">
+          <div class="card-header roster-card-header">
+            <div>
+              <h3>Team Roster & Operational Staff</h3>
+              <p class="card-subtitle">Manage onboarded employees, track individual monthly pacing, and assign deliverables.</p>
+            </div>
+            <button id="btn-roster-add-emp" class="btn btn-primary">
+              <i data-lucide="user-plus"></i> + Add Employee
+            </button>
+          </div>
+
+          <!-- Roster Search & Filter Controls -->
+          <div class="roster-toolbar">
+            <div class="search-box">
+              <i data-lucide="search"></i>
+              <input type="text" id="roster-search-input" placeholder="Search by name, email, role, or title...">
+            </div>
+            <div class="filter-group">
+              <label><i data-lucide="filter"></i> Department:</label>
+              <select id="roster-role-filter">
+                <option value="all">All Departments</option>
+                <option value="designer">Graphic Designers</option>
+                <option value="videographer">Videographers & Editors</option>
+                <option value="marketing">Marketing Executives</option>
+                <option value="content">Content Writers</option>
+                <option value="motion">Motion & 3D Designers</option>
+                <option value="community">Community Managers</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Team Cards Grid -->
+          <div id="team-roster-grid" class="team-roster-grid">
+            <!-- Dynamically populated via JavaScript -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: TEAM MEMBER DASHBOARD (Graphic Designer / Videographer / Marketing Exec) -->
+    <section id="member-view" class="view-section hidden">
+      <!-- Prominent Member Admin Bar -->
+      <div class="member-admin-pill-bar" style="margin-bottom: 20px; background: rgba(0, 139, 165, 0.08); border: 1px solid rgba(0, 139, 165, 0.25); border-radius: var(--radius-md); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 13px; color: var(--text-main);">Viewing workspace as:</span>
+          <strong id="member-banner-user-name" style="color: var(--teal-primary);">Graphic Designer</strong>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button type="button" id="btn-member-switch-admin" class="btn btn-primary btn-sm">
+            <i data-lucide="shield"></i> Switch to Admin Command Center
+          </button>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div>
+          <div class="role-badge-tag" id="member-role-tag">Graphic Designer</div>
+          <h1 class="view-title" id="member-dashboard-title">Graphic Designer Dashboard</h1>
+          <p class="view-subtitle" id="member-dashboard-subtitle">Track your monthly target quota, submit completed designs, and view feedback.</p>
+        </div>
+        <div class="header-action-buttons">
+          <button id="btn-switch-to-manager" class="btn btn-outline-sm" title="Return to Marketing Manager Command Center">
+            <i data-lucide="shield"></i> Switch to Admin
+          </button>
+          <button id="btn-member-log-work" class="btn btn-primary">
+            <i data-lucide="upload-cloud"></i> + Submit Deliverable
+          </button>
+        </div>
+      </div>
+
+      <!-- Member Personal KPI Banner with Laser Border Glow -->
+      <div class="member-kpi-banner laser-border-glow spotlight-card">
+        <div class="kpi-banner-metric">
+          <span class="kpi-banner-label">Monthly Target</span>
+          <span class="kpi-banner-val" id="member-kpi-target">25</span>
+        </div>
+        <div class="kpi-banner-divider"></div>
+        <div class="kpi-banner-metric">
+          <span class="kpi-banner-label">Approved & Completed</span>
+          <span class="kpi-banner-val success" id="member-kpi-completed">0</span>
+        </div>
+        <div class="kpi-banner-divider"></div>
+        <div class="kpi-banner-metric">
+          <span class="kpi-banner-label">Under Manager Review</span>
+          <span class="kpi-banner-val warning" id="member-kpi-review">0</span>
+        </div>
+        <div class="kpi-banner-divider"></div>
+        <div class="kpi-banner-metric">
+          <span class="kpi-banner-label">Remaining Quota</span>
+          <span class="kpi-banner-val accent" id="member-kpi-remaining">25</span>
+        </div>
+        <div class="kpi-banner-progress">
+          <div class="kpi-banner-progress-text">
+            <span>Quota Completion</span>
+            <span id="member-kpi-pct">0%</span>
+          </div>
+          <div class="progress-bar-container large">
+            <div class="progress-bar-fill teal" id="member-kpi-progress-bar" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories Filter for Member -->
+      <div class="member-category-tabs">
+        <button class="member-cat-btn active" data-category="all">
+          <i data-lucide="grid"></i> All Tasks (<span id="count-all-tasks">0</span>)
+        </button>
+        <button class="member-cat-btn" data-category="Campus Happenings">
+          <i data-lucide="sparkles"></i> Campus Happenings (<span id="count-campus-tasks">0</span>)
+        </button>
+        <button class="member-cat-btn" data-category="Branding">
+          <i data-lucide="award"></i> Branding (<span id="count-branding-tasks">0</span>)
+        </button>
+        <button class="member-cat-btn" data-category="Marketing Creatives">
+          <i data-lucide="megaphone"></i> Marketing Creatives (<span id="count-marketing-tasks">0</span>)
+        </button>
+        <button class="member-cat-btn" data-category="Moment Marketing">
+          <i data-lucide="zap"></i> Moment Marketing (<span id="count-moment-tasks">0</span>)
+        </button>
+      </div>
+
+      <!-- Member Deliverables Cards Grid -->
+      <div class="deliverables-cards-grid" id="member-deliverables-grid">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Member Recent Submissions -->
+      <div class="card mt-6">
+        <div class="card-header">
+          <h3>Your Recent Submissions & Manager Feedback</h3>
+          <span class="card-subtitle">Live status of works you have marked and submitted</span>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Submitted Date</th>
+                <th>Content / Program</th>
+                <th>Format</th>
+                <th>Deliverable Link</th>
+                <th>Note</th>
+                <th>Manager Status</th>
+                <th>Remarks / Feedback</th>
+              </tr>
+            </thead>
+            <tbody id="member-submissions-table-body">
+              <!-- Injected via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL 1: Assign New Target (Manager Only) -->
+  <div id="assign-target-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <i data-lucide="target" class="modal-icon"></i>
+          <div>
+            <h3>Assign Target Deliverable</h3>
+            <p>Add a new deliverable quota to a team member's monthly plan</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="assign-target-modal">&times;</button>
+      </div>
+
+      <form id="assign-target-form" class="modal-form">
+        <input type="hidden" id="edit-target-id" value="">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="target-assignee">Assignee / Employee *</label>
+            <select id="target-assignee" required>
+              <!-- Injected dynamically with departments + all onboarded employees -->
+              <option value="designer">Graphic Designer</option>
+              <option value="videographer">Videographer + Editor</option>
+              <option value="marketing">Marketing Executive</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="target-brand">Brand *</label>
+            <select id="target-brand" required>
+              <option value="Techschool">Techschool</option>
+              <option value="IT">IT</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="target-category">Category *</label>
+            <select id="target-category" required>
+              <option value="Campus Events">Campus Events</option>
+              <option value="Branding">Branding</option>
+              <option value="Marketing">Marketing</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="target-format">Format / Deliverable Type *</label>
+            <input type="text" id="target-format" placeholder="e.g. Carousel, Poster, 9:16 Reel, Ad Campaign" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="target-program">Content / Program Title *</label>
+          <input type="text" id="target-program" placeholder="e.g. NexTalk Series, Let's Talk, Informative Contents" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="target-qty">Target Quantity (Quota) *</label>
+            <input type="number" id="target-qty" min="1" max="100" value="1" required>
+          </div>
+          <div class="form-group">
+            <label for="target-notes">Guidelines / Instructions (Optional)</label>
+            <input type="text" id="target-notes" placeholder="e.g. High resolution 1080x1350, follow brand colors">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="assign-target-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="check"></i> Save & Assign Target
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Add / Onboard New Employee (Manager Only) -->
+  <div id="add-employee-modal" class="modal-overlay hidden">
+    <div class="modal-card spotlight-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <i data-lucide="user-plus" class="modal-icon"></i>
+          <div>
+            <h3>Onboard New Team Member</h3>
+            <p>Add an employee to assign deliverables, track monthly pacing, and review submissions</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="add-employee-modal">&times;</button>
+      </div>
+
+      <form id="add-employee-form" class="modal-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="new-emp-name">Full Name *</label>
+            <div class="input-with-icon">
+              <i data-lucide="user"></i>
+              <input type="text" id="new-emp-name" placeholder="e.g. Sarah Jenkins" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="new-emp-email">Work Email *</label>
+            <div class="input-with-icon">
+              <i data-lucide="mail"></i>
+              <input type="email" id="new-emp-email" placeholder="sarah@nexcrest.com" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="new-emp-role">Department Track *</label>
+            <select id="new-emp-role" required>
+              <option value="designer">Graphic Designer</option>
+              <option value="videographer">Videographer + Editor</option>
+              <option value="marketing">Marketing Executive</option>
+              <option value="content">Content Writer & Copywriter</option>
+              <option value="motion">Motion & 3D Designer</option>
+              <option value="community">Community & Social Media Lead</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="new-emp-title">Job Title / Designation *</label>
+            <div class="input-with-icon">
+              <i data-lucide="briefcase"></i>
+              <input type="text" id="new-emp-title" placeholder="e.g. Senior Brand Designer" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="new-emp-brand">Brand Assignment</label>
+            <select id="new-emp-brand">
+              <option value="Both">Both Brands (Techschool & IT)</option>
+              <option value="Techschool">Techschool</option>
+              <option value="IT">IT</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="new-emp-password">Portal Access Password</label>
+            <div class="input-with-icon">
+              <i data-lucide="lock"></i>
+              <input type="password" id="new-emp-password" value="password123" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="add-employee-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="user-check"></i> Onboard & Save Employee
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Delete Employee Confirmation -->
+  <div id="delete-employee-modal" class="modal-overlay hidden">
+    <div class="modal-card spotlight-card" style="max-width: 460px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div style="width: 38px; height: 38px; border-radius: var(--radius-sm); background: rgba(225, 29, 72, 0.15); display: flex; align-items: center; justify-content: center; color: var(--rose-danger); margin-right: 12px;">
+            <i data-lucide="trash-2" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-family: var(--font-heading); font-size: 18px; color: var(--text-main);">Delete Employee</h3>
+            <p style="margin: 3px 0 0 0; font-size: 12px; color: var(--text-muted);">Remove team member from workspace</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="delete-employee-modal">&times;</button>
+      </div>
+
+      <div style="padding: 16px 0; font-size: 14px; line-height: 1.6; color: var(--text-main);">
+        <p>Are you sure you want to remove <strong id="delete-emp-name-display" style="color: var(--teal-primary);">Employee</strong> from the team roster?</p>
+        <div style="margin-top: 12px; padding: 10px 14px; background: rgba(225, 29, 72, 0.08); border: 1px solid rgba(225, 29, 72, 0.2); border-radius: var(--radius-sm); font-size: 12px; color: #FDA4AF; display: flex; gap: 8px; align-items: flex-start;">
+          <i data-lucide="alert-triangle" style="width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px;"></i>
+          <span>Their portal login access will be removed immediately and their status will be revoked from the team quota.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <button type="button" class="btn btn-secondary" data-close-modal="delete-employee-modal">Cancel</button>
+        <button type="button" id="btn-confirm-delete-employee" class="btn btn-danger" style="background: var(--rose-danger); border-color: var(--rose-danger); color: #FFFFFF; font-weight: 600;">
+          <i data-lucide="trash-2"></i> Delete Employee
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Edit Employee Profile (Manager Only) -->
+  <div id="edit-employee-modal" class="modal-overlay hidden">
+    <div class="modal-card spotlight-card" style="max-width: 560px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div style="width: 38px; height: 38px; border-radius: var(--radius-sm); background: rgba(0, 139, 165, 0.15); display: flex; align-items: center; justify-content: center; color: var(--teal-primary); margin-right: 12px;">
+            <i data-lucide="edit-3" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-family: var(--font-heading); font-size: 18px; color: var(--text-main);">Edit Team Member</h3>
+            <p style="margin: 3px 0 0 0; font-size: 12px; color: var(--text-muted);">Update staff role, title, brand focus, or access credentials</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="edit-employee-modal">&times;</button>
+      </div>
+
+      <form id="edit-employee-form" class="modal-form">
+        <input type="hidden" id="edit-emp-email-orig" value="">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-emp-name">Full Name *</label>
+            <div class="input-with-icon">
+              <i data-lucide="user"></i>
+              <input type="text" id="edit-emp-name" placeholder="Full Name" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="edit-emp-email-display">Work Email (Account ID)</label>
+            <div class="input-with-icon">
+              <i data-lucide="mail"></i>
+              <input type="email" id="edit-emp-email-display" disabled style="opacity: 0.65; cursor: not-allowed; background: rgba(0,0,0,0.25);">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-emp-role">Operational Role *</label>
+            <select id="edit-emp-role" required>
+              <option value="designer">Graphic Designer</option>
+              <option value="videographer">Videographer + Video Editor</option>
+              <option value="marketing">Marketing Executive</option>
+              <option value="manager">Marketing Operations Lead</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-emp-brand">Assigned Brand Focus</label>
+            <select id="edit-emp-brand">
+              <option value="All Nexcrest Brands">All Nexcrest Brands</option>
+              <option value="AIMER Business School">AIMER Business School</option>
+              <option value="AIMER Global">AIMER Global</option>
+              <option value="Nexcrest Ventures">Nexcrest Ventures</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="edit-emp-title">Job Title / Designation *</label>
+            <div class="input-with-icon">
+              <i data-lucide="briefcase"></i>
+              <input type="text" id="edit-emp-title" placeholder="e.g. Senior Brand Designer" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="edit-emp-password">Reset Password / PIN</label>
+            <div class="input-with-icon">
+              <i data-lucide="key"></i>
+              <input type="password" id="edit-emp-password" placeholder="Leave blank to keep current">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+          <button type="button" class="btn btn-secondary" data-close-modal="edit-employee-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="check"></i> Save Profile Updates
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Submit / Log Completed Work (Team Member or Manager) -->
+  <div id="log-work-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <i data-lucide="upload-cloud" class="modal-icon"></i>
+          <div>
+            <h3>Submit Deliverable for Review</h3>
+            <p>Attach deliverable proof link and mark your work completed</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="log-work-modal">&times;</button>
+      </div>
+
+      <form id="log-work-form" class="modal-form">
+        <div class="form-group">
+          <label for="log-target-select">Select Deliverable Item *</label>
+          <select id="log-target-select" required>
+            <!-- Injected dynamically based on current user's assigned targets -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="log-work-title">Asset Title / Content Topic *</label>
+          <input type="text" id="log-work-title" placeholder="e.g. NexTalk Ep.4 Carousel Design / AI Tools Reel Edit" required>
+        </div>
+
+        <div class="form-group">
+          <label for="log-work-url">Deliverable Link (Drive / Figma / Frame.io / Social Post) *</label>
+          <div class="input-with-icon">
+            <i data-lucide="link"></i>
+            <input type="url" id="log-work-url" placeholder="https://drive.google.com/... or https://figma.com/file/..." required>
+          </div>
+          <span class="field-hint">Must be a valid viewable link for the manager to review.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="log-work-notes">Notes / Captions / Highlights (Optional)</label>
+          <textarea id="log-work-notes" rows="3" placeholder="Provide any context, hashtags, or revision notes..."></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="log-work-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="send"></i> Submit for Approval
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: Manager Review & Approval Modal -->
+  <div id="review-action-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <i data-lucide="check-square" class="modal-icon"></i>
+          <div>
+            <h3>Review Deliverable</h3>
+            <p id="review-modal-subtitle">Evaluate asset quality and approve or send feedback</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="review-action-modal">&times;</button>
+      </div>
+
+      <div class="review-details-box">
+        <div class="review-meta-grid">
+          <div>
+            <span class="meta-label">Assignee:</span>
+            <strong id="review-modal-author">Graphic Designer</strong>
+          </div>
+          <div>
+            <span class="meta-label">Program:</span>
+            <strong id="review-modal-program">NexTalk Series</strong>
+          </div>
+          <div>
+            <span class="meta-label">Format:</span>
+            <span class="badge-format" id="review-modal-format">Carousel</span>
+          </div>
+          <div>
+            <span class="meta-label">Submitted:</span>
+            <span id="review-modal-date">Today, 2:40 PM</span>
+          </div>
+        </div>
+
+        <div class="review-link-preview">
+          <span class="meta-label">Deliverable URL:</span>
+          <a id="review-modal-link" href="#" target="_blank" class="deliverable-external-link">
+            <i data-lucide="external-link"></i> <span id="review-modal-url-text">Open Submitted Work</span>
+          </a>
+        </div>
+
+        <div class="review-notes-box">
+          <span class="meta-label">Member Notes:</span>
+          <p id="review-modal-notes" class="notes-text">No notes provided.</p>
+        </div>
+      </div>
+
+      <form id="review-decision-form" class="modal-form">
+        <input type="hidden" id="review-submission-id" value="">
+        <div class="form-group">
+          <label for="review-feedback-input">Manager Feedback / Remarks</label>
+          <div class="feedback-chips-container">
+            <span class="chips-label">Quick Suggestions:</span>
+            <div class="feedback-chips-list">
+              <button type="button" class="feedback-chip" data-chip="Approved on first review! Exceptional execution.">👍 Approved</button>
+              <button type="button" class="feedback-chip" data-chip="Please update to official AIMER brand colors (#008BA5).">🎨 Brand Colors</button>
+              <button type="button" class="feedback-chip" data-chip="Aspect ratio needs to be 9:16 for Reels / Stories.">📐 9:16 Ratio</button>
+              <button type="button" class="feedback-chip" data-chip="Spelling/typography review needed on slide text.">✏️ Typo Fix</button>
+              <button type="button" class="feedback-chip" data-chip="Please grant access permissions on Google Drive / Figma file.">🔗 File Permissions</button>
+            </div>
+          </div>
+          <textarea id="review-feedback-input" rows="2" placeholder="e.g. Great work, color palette approved! OR Please fix typography on slide 3"></textarea>
+        </div>
+
+        <div class="modal-footer split">
+          <button type="button" id="btn-request-rework" class="btn btn-danger">
+            <i data-lucide="rotate-ccw"></i> Request Revision
+          </button>
+          <button type="button" id="btn-approve-work" class="btn btn-success">
+            <i data-lucide="check-circle-2"></i> Approve & Count as Done
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/data.js?v=11"></script>
+  <script src="js/auth.js?v=11"></script>
+  <script src="js/app.js?v=11"></script>
+</body>
+</html>
