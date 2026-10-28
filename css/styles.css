@@ -23,7 +23,9 @@
   /* Glassmorphism Tokens (Light Theme) */
   --glass-bg: rgba(255, 255, 255, 0.78);
   --glass-bg-elevated: rgba(255, 255, 255, 0.88);
-  --glass-border: rgba(255, 255, 255, 0.8);
+  --glass-card: rgba(255, 255, 255, 0.95);
+  --glass-card-elevated: #FFFFFF;
+  --glass-border: rgba(226, 232, 240, 0.85);
   --glass-border-subtle: rgba(226, 232, 240, 0.7);
   --glass-highlight: inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
   --glass-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.05), 0 2px 8px rgba(0, 0, 0, 0.02);
@@ -115,6 +117,8 @@ body.dark-theme {
   /* Glassmorphism Tokens (Dark Theme) */
   --glass-bg: rgba(22, 25, 34, 0.75);
   --glass-bg-elevated: rgba(30, 34, 46, 0.80);
+  --glass-card: rgba(22, 25, 34, 0.85);
+  --glass-card-elevated: rgba(26, 30, 42, 0.95);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-border-subtle: rgba(239, 36, 36, 0.18);
   --glass-highlight: inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
@@ -5784,6 +5788,431 @@ body.dark-theme .role-login-tab.active {
 body.dark-theme .role-login-tab:hover {
   background: rgba(239, 36, 36, 0.14);
   color: #FFFFFF;
+}
+
+/* ==========================================================================
+   ROBUST HIGH-CONTRAST LIGHT THEME DESIGN SYSTEM (NEXCREST INSIGHTS)
+   Ensures WCAG AAA crystal-clear visibility, sharp borders, and tactile readability
+   across all modals, user profile management, tables, inputs, and cards
+   ========================================================================== */
+
+/* 1. Modal Overlay & Modal Cards in Light Theme */
+body.light-theme .modal-overlay {
+  background: rgba(15, 23, 42, 0.40);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+body.light-theme .modal-card {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 25px 70px -10px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
+}
+
+body.light-theme .modal-header {
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+body.light-theme .modal-header h3,
+body.light-theme .modal-header-title h3,
+body.light-theme .modal-title-group h3 {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .modal-title-group p {
+  color: #475569 !important;
+}
+
+body.light-theme .btn-close-modal,
+body.light-theme .modal-close-btn {
+  color: #475569 !important;
+}
+
+body.light-theme .btn-close-modal:hover,
+body.light-theme .modal-close-btn:hover {
+  background: rgba(0, 0, 0, 0.06) !important;
+  color: #0F172A !important;
+}
+
+body.light-theme .modal-footer {
+  border-top: 1px solid #E2E8F0 !important;
+}
+
+/* 2. User Profile Management Panel in Light Theme (Complete Visibility) */
+body.light-theme .profile-summary-header {
+  background: #FFF5F5 !important;
+  border: 1.5px solid rgba(239, 36, 36, 0.25) !important;
+}
+
+body.light-theme .profile-summary-info h4 {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .profile-email-meta {
+  color: #475569 !important;
+  font-weight: 500 !important;
+}
+
+body.light-theme .profile-email-meta i,
+body.light-theme .profile-email-meta svg {
+  color: #EF2424 !important;
+}
+
+body.light-theme .profile-brand-badge {
+  background: rgba(239, 36, 36, 0.10) !important;
+  border: 1px solid rgba(239, 36, 36, 0.30) !important;
+  color: #DC2626 !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme .profile-lock-tag {
+  background: #DCFCE7 !important;
+  border: 1px solid #86EFAC !important;
+  color: #059669 !important;
+}
+
+body.light-theme .profile-modal-tabs {
+  border-bottom: 1.5px solid #E2E8F0 !important;
+}
+
+body.light-theme .profile-tab-btn {
+  color: #475569 !important;
+  background: #F1F5F9 !important;
+  border: 1px solid #CBD5E1 !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme .profile-tab-btn:hover {
+  color: #0F172A !important;
+  background: #E2E8F0 !important;
+}
+
+body.light-theme .profile-tab-btn.active {
+  color: #FFFFFF !important;
+  background: linear-gradient(135deg, #EF2424, #B11414) !important;
+  border-color: rgba(239, 36, 36, 0.5) !important;
+  box-shadow: 0 4px 14px rgba(239, 36, 36, 0.3) !important;
+}
+
+/* 3. Global Form Controls & Inputs in Light Theme */
+body.light-theme .form-group label,
+body.light-theme .modal-card label {
+  color: #1E293B !important;
+  font-weight: 600 !important;
+}
+
+body.light-theme input,
+body.light-theme select,
+body.light-theme textarea,
+body.light-theme .form-group input,
+body.light-theme .form-group select,
+body.light-theme .form-group textarea,
+body.light-theme .modal-card input,
+body.light-theme .modal-card select,
+body.light-theme .modal-card textarea {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1.5px solid #CBD5E1 !important;
+}
+
+body.light-theme select option,
+body.light-theme .modal-card select option {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+}
+
+body.light-theme input:focus,
+body.light-theme select:focus,
+body.light-theme textarea:focus,
+body.light-theme .modal-card input:focus,
+body.light-theme .modal-card select:focus,
+body.light-theme .modal-card textarea:focus {
+  border-color: #EF2424 !important;
+  box-shadow: 0 0 0 3px rgba(239, 36, 36, 0.16) !important;
+  background: #FFFFFF !important;
+}
+
+body.light-theme input::placeholder,
+body.light-theme textarea::placeholder {
+  color: #94A3B8 !important;
+}
+
+body.light-theme input:disabled,
+body.light-theme input:read-only,
+body.light-theme .modal-card input:disabled,
+body.light-theme .modal-card input:read-only {
+  background: #F8FAFC !important;
+  color: #334155 !important;
+  border-color: #E2E8F0 !important;
+  opacity: 1 !important;
+}
+
+body.light-theme .input-with-icon svg,
+body.light-theme .input-with-icon-right .input-left-icon {
+  color: #64748B !important;
+}
+
+body.light-theme .btn-toggle-pass-visibility {
+  color: #64748B !important;
+}
+
+body.light-theme .btn-toggle-pass-visibility:hover {
+  color: #EF2424 !important;
+}
+
+body.light-theme .field-hint,
+body.light-theme small {
+  color: #64748B !important;
+}
+
+/* 4. Secondary & Outline Buttons in Light Theme */
+body.light-theme .btn-outline,
+body.light-theme .btn-outline-sm {
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #334155 !important;
+}
+
+body.light-theme .btn-outline:hover,
+body.light-theme .btn-outline-sm:hover {
+  background: #F1F5F9 !important;
+  border-color: #94A3B8 !important;
+  color: #0F172A !important;
+}
+
+body.light-theme .btn-secondary {
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #334155 !important;
+}
+
+body.light-theme .btn-secondary:hover {
+  background: #F1F5F9 !important;
+  border-color: #EF2424 !important;
+  color: #EF2424 !important;
+}
+
+/* 5. Mobile Sync Card in Light Theme */
+body.light-theme .mobile-sync-card {
+  background: #F8FAFC !important;
+  border: 1.5px dashed #CBD5E1 !important;
+}
+
+body.light-theme .sync-title {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .sync-subtitle {
+  color: #475569 !important;
+}
+
+body.light-theme .sync-icon {
+  color: #EF2424 !important;
+}
+
+body.light-theme .btn-sync-action {
+  background: #FFFFFF !important;
+  border: 1.5px solid #CBD5E1 !important;
+  color: #0F172A !important;
+}
+
+body.light-theme .btn-sync-action:hover {
+  background: #F1F5F9 !important;
+  border-color: #EF2424 !important;
+  color: #EF2424 !important;
+}
+
+/* 6. Data Tables & Badges in Light Theme */
+body.light-theme .data-table th {
+  color: #334155 !important;
+  background: #F1F5F9 !important;
+  border-bottom: 2px solid #CBD5E1 !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .data-table td {
+  color: #0F172A !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+body.light-theme .data-table tr:hover td {
+  background: rgba(239, 36, 36, 0.04) !important;
+}
+
+body.light-theme .badge-info {
+  background: #F1F5F9 !important;
+  color: #334155 !important;
+  border: 1px solid #CBD5E1 !important;
+}
+
+body.light-theme .feedback-table-text {
+  color: #475569 !important;
+}
+
+/* 7. Dropdown Menu Items in Light Theme */
+body.light-theme .export-menu {
+  background: #FFFFFF !important;
+  border: 1px solid #CBD5E1 !important;
+  box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.16) !important;
+}
+
+body.light-theme .dropdown-item-btn {
+  color: #1E293B !important;
+}
+
+body.light-theme .dropdown-item-btn:hover {
+  background: #FFF1F1 !important;
+  color: #EF2424 !important;
+}
+
+/* 8. Review Modal & Audit Logs in Light Theme */
+body.light-theme .review-meta-grid {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+  color: #0F172A !important;
+}
+
+body.light-theme .meta-label {
+  color: #64748B !important;
+}
+
+body.light-theme .review-notes-box {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+body.light-theme .notes-text {
+  color: #0F172A !important;
+}
+
+body.light-theme .review-link-preview {
+  background: rgba(239, 36, 36, 0.06) !important;
+  border: 1px solid rgba(239, 36, 36, 0.20) !important;
+}
+
+body.light-theme .deliverable-external-link {
+  color: #DC2626 !important;
+}
+
+body.light-theme .deliverable-external-link:hover {
+  color: #991B1B !important;
+}
+
+/* 9. Employee Roster Cards in Light Theme */
+body.light-theme .employee-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.light-theme .emp-card-name {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .emp-card-email {
+  color: #475569 !important;
+}
+
+body.light-theme .btn-action-edit,
+body.light-theme .btn-action-log {
+  background: #FFFFFF !important;
+  border: 1px solid #CBD5E1 !important;
+  color: #334155 !important;
+}
+
+body.light-theme .btn-action-edit:hover,
+body.light-theme .btn-action-log:hover {
+  background: #FFF1F1 !important;
+  border-color: #EF2424 !important;
+  color: #EF2424 !important;
+}
+
+body.light-theme .btn-action-delete {
+  background: rgba(239, 68, 68, 0.08) !important;
+  border: 1px solid rgba(239, 68, 68, 0.25) !important;
+  color: #DC2626 !important;
+}
+
+body.light-theme .btn-action-delete:hover {
+  background: #EF4444 !important;
+  color: #FFFFFF !important;
+}
+
+/* 10. Overview Category Breakdown in Light Theme */
+body.light-theme .category-summary-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.light-theme .cat-splits-row {
+  background: #F8FAFC !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+body.light-theme .cat-name {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .split-num {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .split-label {
+  color: #64748B !important;
+}
+
+body.light-theme .cat-badge {
+  background: #F1F5F9 !important;
+  color: #334155 !important;
+  border: 1px solid #CBD5E1 !important;
+}
+
+body.light-theme .cat-total-badge {
+  background: rgba(239, 36, 36, 0.10) !important;
+  border: 1px solid rgba(239, 36, 36, 0.28) !important;
+  color: #DC2626 !important;
+}
+
+/* 11. Member Deliverables Cards in Light Theme */
+body.light-theme .deliverable-card {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.light-theme .del-card-title {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .del-card-desc {
+  color: #475569 !important;
+}
+
+body.light-theme .del-progress-metric {
+  color: #334155 !important;
+}
+
+body.light-theme .card {
+  background: #FFFFFF !important;
+  border: 1px solid #E2E8F0 !important;
+}
+
+body.light-theme .card-header h3 {
+  color: #0F172A !important;
+  font-weight: 700 !important;
+}
+
+body.light-theme .card-subtitle {
+  color: #475569 !important;
 }
 
 
