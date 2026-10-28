@@ -235,8 +235,6 @@ document.addEventListener('DOMContentLoaded', () => {
     authErrorNotice: document.getElementById('auth-error-notice'),
     authErrorText: document.getElementById('auth-error-text'),
     roleLoginTabs: document.querySelectorAll('.role-login-tab'),
-    roleDescTitle: document.getElementById('role-desc-title'),
-    roleDescText: document.getElementById('role-desc-text'),
     authSubmitText: document.getElementById('auth-submit-text')
   };
 
@@ -1820,12 +1818,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (role === 'manager') {
-          if (elements.roleDescTitle) elements.roleDescTitle.textContent = 'Marketing Manager Command Center';
-          if (elements.roleDescText) elements.roleDescText.textContent = 'Full administrative control. Please enter your password to sign in.';
           if (elements.authSubmitText) elements.authSubmitText.textContent = 'Sign In as Marketing Manager';
         } else {
-          if (elements.roleDescTitle) elements.roleDescTitle.textContent = `${name}'s Deliverables Studio`;
-          if (elements.roleDescText) elements.roleDescText.textContent = `Independent portal for ${title}. Please enter your password to sign in.`;
           if (elements.authSubmitText) elements.authSubmitText.textContent = `Sign In as ${name}`;
         }
         refreshIcons();
