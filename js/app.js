@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
     headerUserName: document.getElementById('header-user-name'),
     headerRoleBadge: document.getElementById('header-role-badge'),
     logoutBtn: document.getElementById('logout-btn'),
-    themeToggleBtn: document.getElementById('theme-toggle-btn'),
     btnMemberOpenProfile: document.getElementById('btn-member-open-profile'),
 
     // Views
@@ -232,8 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
     authErrorNotice: document.getElementById('auth-error-notice'),
     authErrorText: document.getElementById('auth-error-text'),
     roleLoginTabs: document.querySelectorAll('.role-login-tab'),
-    authSubmitText: document.getElementById('auth-submit-text'),
-    authThemeToggleBtn: document.getElementById('auth-theme-toggle-btn')
+    authSubmitText: document.getElementById('auth-submit-text')
   };
 
   // Helper: Toast Notifications
@@ -516,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 4. Magnetic Elastic Buttons & Pills
   function initMagneticButtons() {
     const magneticElements = document.querySelectorAll(
-      '.btn-primary, .role-login-tab, .member-cat-btn, .theme-toggle, .btn-logout, .tab-pill'
+      '.btn-primary, .role-login-tab, .member-cat-btn, .btn-logout, .tab-pill'
     );
 
     magneticElements.forEach(el => {
@@ -765,9 +763,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderCharts(ov) {
     if (!window.Chart) return;
 
-    const isDark = document.body.classList.contains('dark-theme');
-    const textColor = isDark ? '#E2E8F0' : '#475569';
-    const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+    // Pure Light Theme Chart Styling
+    const textColor = '#475569';
+    const gridColor = 'rgba(0, 0, 0, 0.06)';
 
     // Chart 1: Category Target vs Achievement Bar Chart
     const ctxCat = document.getElementById('categoryComparisonChart');
@@ -778,9 +776,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const catTargets = catLabels.map(k => ov.categories[k] ? ov.categories[k].total : 0);
       const catAchieved = catLabels.map(k => ov.categories[k] ? ov.categories[k].published : 0);
 
-      const targetColor = isDark ? '#FF5A3C' : '#EF2424';
-      const achievedColor = isDark ? '#34D399' : '#10B981';
-      const secondaryColor = isDark ? '#FF7A7A' : '#B11414';
+      const targetColor = '#EF2424';
+      const achievedColor = '#10B981';
+      const secondaryColor = '#B11414';
 
       state.charts.category = new Chart(ctxCat, {
         type: 'bar',
@@ -809,7 +807,7 @@ document.addEventListener('DOMContentLoaded', () => {
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: isDark ? '#161922' : '#0F172A',
+              backgroundColor: '#0F172A',
               titleColor: '#FFFFFF',
               bodyColor: '#E2E8F0',
               padding: 10,
@@ -846,8 +844,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
       });
 
-      const roleTargetColor = isDark ? '#FF6B6B' : '#EF2424';
-      const roleAchievedColor = isDark ? '#34D399' : '#10B981';
+      const roleTargetColor = '#EF2424';
+      const roleAchievedColor = '#10B981';
 
       state.charts.role = new Chart(ctxRole, {
         type: 'bar',
@@ -876,7 +874,7 @@ document.addEventListener('DOMContentLoaded', () => {
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: isDark ? '#161922' : '#0F172A',
+              backgroundColor: '#0F172A',
               padding: 10,
               cornerRadius: 8,
               callbacks: {
@@ -916,7 +914,7 @@ document.addEventListener('DOMContentLoaded', () => {
           datasets: [
             {
               data: [reelsVal, postersVal],
-              backgroundColor: isDark ? ['#EF2424', '#FF6B6B'] : ['#EF2424', '#B11414'],
+              backgroundColor: ['#EF2424', '#B11414'],
               borderWidth: 0,
               hoverOffset: 6
             }
@@ -931,7 +929,7 @@ document.addEventListener('DOMContentLoaded', () => {
               labels: { color: textColor, font: { family: 'Inter', size: 12, weight: '600' }, padding: 14 }
             },
             tooltip: {
-              backgroundColor: isDark ? '#161922' : '#0F172A',
+              backgroundColor: '#0F172A',
               padding: 10,
               cornerRadius: 8
             }
@@ -980,11 +978,11 @@ document.addEventListener('DOMContentLoaded', () => {
             {
               label: 'Actual Achievements',
               data: actualCurve,
-              borderColor: isDark ? '#EF2424' : '#B11414',
-              backgroundColor: isDark ? 'rgba(239, 36, 36, 0.20)' : 'rgba(239, 36, 36, 0.12)',
+              borderColor: '#B11414',
+              backgroundColor: 'rgba(239, 36, 36, 0.12)',
               tension: 0.3,
               pointRadius: 6,
-              pointBackgroundColor: isDark ? '#EF2424' : '#B11414',
+              pointBackgroundColor: '#B11414',
               fill: true
             }
           ]
@@ -998,7 +996,7 @@ document.addEventListener('DOMContentLoaded', () => {
               labels: { color: textColor, font: { family: 'Inter', size: 11, weight: '600' } }
             },
             tooltip: {
-              backgroundColor: isDark ? '#161922' : '#0F172A',
+              backgroundColor: '#0F172A',
               padding: 10,
               cornerRadius: 8
             }
@@ -2933,59 +2931,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderApp();
   });
 
-  // Theme Management (High-End Light theme by default)
-  const THEME_KEY = 'nexcrest_theme_mode';
+  // Exclusive System Theme: High-End Light Theme Only (Dark theme removed entirely)
   function initTheme() {
-    const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
-    applyTheme(savedTheme);
-  }
-
-  function applyTheme(theme) {
-    if (theme === 'dark') {
-      document.body.classList.remove('light-theme');
-      document.body.classList.add('dark-theme');
-      if (elements.themeToggleBtn) {
-        elements.themeToggleBtn.innerHTML = '<i data-lucide="sun"></i>';
-        elements.themeToggleBtn.setAttribute('title', 'Switch to Light Theme');
-      }
-      if (elements.authThemeToggleBtn) {
-        elements.authThemeToggleBtn.innerHTML = '<i data-lucide="sun"></i>';
-        elements.authThemeToggleBtn.setAttribute('title', 'Switch to Light Theme');
-      }
-    } else {
-      document.body.classList.remove('dark-theme');
-      document.body.classList.add('light-theme');
-      if (elements.themeToggleBtn) {
-        elements.themeToggleBtn.innerHTML = '<i data-lucide="moon"></i>';
-        elements.themeToggleBtn.setAttribute('title', 'Switch to Dark Theme');
-      }
-      if (elements.authThemeToggleBtn) {
-        elements.authThemeToggleBtn.innerHTML = '<i data-lucide="moon"></i>';
-        elements.authThemeToggleBtn.setAttribute('title', 'Switch to Dark Theme');
-      }
-    }
-    localStorage.setItem(THEME_KEY, theme);
-    if (state.user && state.user.role === 'manager' && state.activeManagerTab === 'overview') {
-      const ov = window.dataStore.getDashboardOverview();
-      renderCharts(ov);
-    }
-    refreshIcons();
-  }
-
-  if (elements.themeToggleBtn) {
-    elements.themeToggleBtn.addEventListener('click', () => {
-      const isCurrentlyDark = document.body.classList.contains('dark-theme');
-      applyTheme(isCurrentlyDark ? 'light' : 'dark');
-      showToast(`Switched to ${isCurrentlyDark ? 'Light' : 'Dark'} Theme`, 'info');
-    });
-  }
-
-  if (elements.authThemeToggleBtn) {
-    elements.authThemeToggleBtn.addEventListener('click', () => {
-      const isCurrentlyDark = document.body.classList.contains('dark-theme');
-      applyTheme(isCurrentlyDark ? 'light' : 'dark');
-      showToast(`Switched to ${isCurrentlyDark ? 'Light' : 'Dark'} Theme`, 'info');
-    });
+    try {
+      localStorage.removeItem('nexcrest_theme_mode');
+    } catch (e) {}
+    document.body.classList.remove('dark-theme');
+    document.body.classList.add('light-theme');
   }
 
   // Reactive Auth Sync

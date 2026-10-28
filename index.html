@@ -7,8 +7,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Nexcrest Insights">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#FBF7F7" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#07131D" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#FBF7F7">
   <title>Nexcrest Insights | Operations & KPI Command Center</title>
   <link rel="apple-touch-icon" href="assets/nexcrest_icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,7 +17,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=32">
+  <link rel="stylesheet" href="css/styles.css?v=33">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -55,12 +54,9 @@
         </div>
       </div>
 
-      <!-- Header Actions: User Profile, Theme & Sign Out -->
+      <!-- Header Actions: User Profile & Sign Out -->
       <div class="header-actions">
         <div class="user-profile-menu" id="header-user-profile-menu" style="display: none;">
-          <button id="theme-toggle-btn" class="icon-btn theme-toggle" title="Switch Theme">
-            <i data-lucide="moon"></i>
-          </button>
           <button type="button" id="btn-open-user-profile" class="user-profile-chip-btn" title="My Profile & Security Settings">
             <div class="user-avatar" id="header-user-avatar">M</div>
             <div class="user-meta">
@@ -82,15 +78,12 @@
   <div id="auth-modal" class="modal-overlay">
     <div class="auth-backdrop-glow"></div>
     <div class="modal-card auth-card spotlight-card">
-      <!-- Portal Top Utility Bar (Live Status & Theme Toggle) -->
+      <!-- Portal Top Utility Bar (Live Status) -->
       <div class="auth-card-topbar">
         <span class="auth-portal-badge">
           <span class="auth-badge-dot"></span>
           Enterprise Ops
         </span>
-        <button type="button" class="auth-theme-toggle-btn" id="auth-theme-toggle-btn" title="Toggle Light / Dark Mode" aria-label="Toggle Light / Dark Mode">
-          <i data-lucide="sun"></i>
-        </button>
       </div>
 
       <!-- Auth Branding Header -->
