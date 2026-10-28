@@ -502,11 +502,11 @@ body.dark-theme .btn-logout:hover {
 .user-profile-chip-btn {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  padding: 4px 8px 4px 4px;
+  border-radius: var(--radius-full);
+  padding: 3px 10px 3px 3px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
@@ -514,16 +514,7 @@ body.dark-theme .btn-logout:hover {
 
 .user-profile-chip-btn:hover {
   background: rgba(239, 36, 36, 0.08);
-  border-color: rgba(239, 36, 36, 0.25);
-}
-
-.user-profile-chip-btn:hover .profile-settings-icon {
-  color: var(--teal-primary) !important;
-  transform: rotate(45deg);
-}
-
-.user-profile-chip-btn .profile-settings-icon {
-  transition: transform 0.25s ease, color 0.2s ease;
+  border-color: rgba(239, 36, 36, 0.2);
 }
 
 .user-avatar {
