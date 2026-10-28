@@ -10,7 +10,7 @@
   <!-- Lucide Icons & Chart.js -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="css/styles.css?v=14">
+  <link rel="stylesheet" href="css/styles.css?v=15">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -21,6 +21,9 @@
     <div class="ambient-orb orb-mint"></div>
   </div>
 
+  <!-- High-Tech Hexagon Network Texture -->
+  <div class="hexagon-network-overlay" aria-hidden="true"></div>
+
   <!-- High-End Tactile Film Grain Glass Texture -->
   <div class="film-grain-overlay" aria-hidden="true"></div>
 
@@ -29,10 +32,10 @@
     <div class="header-container">
       <div class="brand-group">
         <div class="brand-logo">
-          <span class="logo-mark">N</span>
+          <img src="assets/logo-cropped.png" alt="Nexcrest Tech School" class="brand-logo-img" style="height: 38px; width: auto; object-fit: contain;">
           <div class="logo-text">
             <span class="company-name">NEXCREST</span>
-            <span class="sub-label">Media & Marketing Ops</span>
+            <span class="sub-label">Tech School Media Ops</span>
           </div>
         </div>
         <div class="cycle-badge">
@@ -73,11 +76,11 @@
   <div id="auth-modal" class="modal-overlay hidden">
     <div class="modal-card auth-card spotlight-card">
       <div class="auth-header">
-        <div class="brand-logo large">
-          <span class="logo-mark">N</span>
+        <div class="brand-logo large" style="background: transparent; border: none; box-shadow: none; padding: 0;">
+          <img src="assets/logo-cropped.png" alt="Nexcrest Tech School" style="height: 56px; width: auto; object-fit: contain; margin: 0 auto 12px auto; display: block;">
         </div>
-        <h2>Nexcrest Media & Marketing</h2>
-        <p class="auth-subtitle">Select your account profile or enter work credentials to sign in</p>
+        <h2>Nexcrest Tech School</h2>
+        <p class="auth-subtitle">Media, Marketing & Operations Command Center</p>
       </div>
 
       <!-- Quick Account / Portal Profile Selector (Dynamically populated with all staff including Sumesh) -->
@@ -1070,10 +1073,9 @@
           <div class="form-group">
             <label for="edit-emp-brand">Assigned Brand Focus</label>
             <select id="edit-emp-brand">
-              <option value="All Nexcrest Brands">All Nexcrest Brands</option>
-              <option value="AIMER Business School">AIMER Business School</option>
-              <option value="AIMER Global">AIMER Global</option>
-              <option value="Nexcrest Ventures">Nexcrest Ventures</option>
+              <option value="Nexcrest Tech School">Nexcrest Tech School</option>
+              <option value="Nexcrest IT Services">Nexcrest IT Services</option>
+              <option value="Both (Tech School & IT)">Both (Tech School & IT)</option>
             </select>
           </div>
         </div>
@@ -1211,7 +1213,7 @@
             <span class="chips-label">Quick Suggestions:</span>
             <div class="feedback-chips-list">
               <button type="button" class="feedback-chip" data-chip="Approved on first review! Exceptional execution.">👍 Approved</button>
-              <button type="button" class="feedback-chip" data-chip="Please update to official AIMER brand colors (#008BA5).">🎨 Brand Colors</button>
+              <button type="button" class="feedback-chip" data-chip="Please update to official Nexcrest Tech School brand colors (#EF2424 Crimson).">🎨 Brand Colors</button>
               <button type="button" class="feedback-chip" data-chip="Aspect ratio needs to be 9:16 for Reels / Stories.">📐 9:16 Ratio</button>
               <button type="button" class="feedback-chip" data-chip="Spelling/typography review needed on slide text.">✏️ Typo Fix</button>
               <button type="button" class="feedback-chip" data-chip="Please grant access permissions on Google Drive / Figma file.">🔗 File Permissions</button>
@@ -1364,8 +1366,8 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Logic Scripts -->
-  <script src="js/data.js?v=14"></script>
-  <script src="js/auth.js?v=14"></script>
-  <script src="js/app.js?v=14"></script>
+  <script src="js/data.js?v=15"></script>
+  <script src="js/auth.js?v=15"></script>
+  <script src="js/app.js?v=15"></script>
 </body>
 </html>

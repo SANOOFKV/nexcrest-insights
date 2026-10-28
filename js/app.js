@@ -787,9 +787,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const catTargets = catLabels.map(k => ov.categories[k] ? ov.categories[k].total : 0);
       const catAchieved = catLabels.map(k => ov.categories[k] ? ov.categories[k].published : 0);
 
-      const targetColor = isDark ? '#00A3C4' : '#008BA5';
+      const targetColor = isDark ? '#FF5A3C' : '#EF2424';
       const achievedColor = isDark ? '#34D399' : '#10B981';
-      const secondaryColor = isDark ? '#45B2C3' : '#2B557A';
+      const secondaryColor = isDark ? '#FF7A7A' : '#B11414';
 
       state.charts.category = new Chart(ctxCat, {
         type: 'bar',
@@ -925,7 +925,7 @@ document.addEventListener('DOMContentLoaded', () => {
           datasets: [
             {
               data: [reelsVal, postersVal],
-              backgroundColor: isDark ? ['#00A3C4', '#45B2C3'] : ['#008BA5', '#2B557A'],
+              backgroundColor: isDark ? ['#EF2424', '#FF6B6B'] : ['#EF2424', '#B11414'],
               borderWidth: 0,
               hoverOffset: 6
             }
@@ -940,7 +940,7 @@ document.addEventListener('DOMContentLoaded', () => {
               labels: { color: textColor, font: { family: 'Inter', size: 12, weight: '600' }, padding: 14 }
             },
             tooltip: {
-              backgroundColor: isDark ? '#0D1E2C' : '#0F172A',
+              backgroundColor: isDark ? '#161922' : '#0F172A',
               padding: 10,
               cornerRadius: 8
             }
@@ -989,11 +989,11 @@ document.addEventListener('DOMContentLoaded', () => {
             {
               label: 'Actual Achievements',
               data: actualCurve,
-              borderColor: isDark ? '#00A3C4' : '#008BA5',
-              backgroundColor: isDark ? 'rgba(0, 163, 196, 0.15)' : 'rgba(0, 139, 165, 0.12)',
+              borderColor: isDark ? '#EF2424' : '#B11414',
+              backgroundColor: isDark ? 'rgba(239, 36, 36, 0.20)' : 'rgba(239, 36, 36, 0.12)',
               tension: 0.3,
               pointRadius: 6,
-              pointBackgroundColor: isDark ? '#00A3C4' : '#008BA5',
+              pointBackgroundColor: isDark ? '#EF2424' : '#B11414',
               fill: true
             }
           ]
@@ -1007,7 +1007,7 @@ document.addEventListener('DOMContentLoaded', () => {
               labels: { color: textColor, font: { family: 'Inter', size: 11, weight: '600' } }
             },
             tooltip: {
-              backgroundColor: isDark ? '#0D1E2C' : '#0F172A',
+              backgroundColor: isDark ? '#161922' : '#0F172A',
               padding: 10,
               cornerRadius: 8
             }
@@ -1271,7 +1271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.reviewCardsList.innerHTML = pendingSubs.map(sub => `
       <div class="submission-item-card" data-sub-id="${sub.id}">
         <div class="sub-info-group">
-          <div class="sub-avatar" style="background: ${sub.assignee === 'designer' ? 'linear-gradient(135deg, #7C3AED, #A78BFA)' : sub.assignee === 'videographer' ? 'linear-gradient(135deg, #1D4ED8, #38BDF8)' : 'linear-gradient(135deg, #008BA5, #2B557A)'}">
+          <div class="sub-avatar" style="background: ${sub.assignee === 'designer' ? 'linear-gradient(135deg, #7C3AED, #A78BFA)' : sub.assignee === 'videographer' ? 'linear-gradient(135deg, #1D4ED8, #38BDF8)' : 'linear-gradient(135deg, #EF2424, #B11414)'}">
             ${escapeHtml((sub.authorName || sub.assignee || 'U').substring(0, 2).toUpperCase())}
           </div>
           <div class="sub-details">

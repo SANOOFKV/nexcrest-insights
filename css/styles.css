@@ -6,35 +6,42 @@
 
 :root, body.light-theme {
   /* High-End Light Theme Tokens */
-  --bg-dark: #F8FAFC;             /* Clean, airy canvas */
-  --bg-canvas: #F8FAFC;
-  --bg-surface: rgba(255, 255, 255, 0.85);
-  --bg-card: rgba(255, 255, 255, 0.72);
-  --bg-card-hover: rgba(255, 255, 255, 0.88);
-  --bg-card-elevated: rgba(241, 245, 249, 0.75);
-  --bg-input: rgba(255, 255, 255, 0.9);
-  --bg-table-header: rgba(241, 245, 249, 0.75);
-  --bg-table-row-hover: rgba(0, 139, 165, 0.03);
+  --bg-dark: #FBF7F7;             /* Clean, warm high-tech canvas */
+  --bg-canvas: #FBF7F7;
+  --bg-surface: rgba(255, 255, 255, 0.88);
+  --bg-card: rgba(255, 255, 255, 0.78);
+  --bg-card-hover: rgba(255, 255, 255, 0.92);
+  --bg-card-elevated: rgba(248, 244, 244, 0.82);
+  --bg-input: rgba(255, 255, 255, 0.95);
+  --bg-table-header: rgba(248, 244, 244, 0.80);
+  --bg-table-row-hover: rgba(239, 36, 36, 0.03);
   
-  --border-subtle: rgba(226, 232, 240, 0.8);
+  --border-subtle: rgba(226, 232, 240, 0.85);
   --border-light: #CBD5E1;
-  --border-focus: #008BA5;
+  --border-focus: #EF2424;
 
   /* Glassmorphism Tokens (Light Theme) */
-  --glass-bg: rgba(255, 255, 255, 0.72);
-  --glass-bg-elevated: rgba(255, 255, 255, 0.85);
+  --glass-bg: rgba(255, 255, 255, 0.78);
+  --glass-bg-elevated: rgba(255, 255, 255, 0.88);
   --glass-border: rgba(255, 255, 255, 0.8);
   --glass-border-subtle: rgba(226, 232, 240, 0.7);
   --glass-highlight: inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
   --glass-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.05), 0 2px 8px rgba(0, 0, 0, 0.02);
-  --glass-shadow-hover: 0 18px 40px -4px rgba(15, 23, 42, 0.1), 0 4px 12px rgba(0, 0, 0, 0.03);
+  --glass-shadow-hover: 0 18px 40px -4px rgba(239, 36, 36, 0.12), 0 4px 12px rgba(0, 0, 0, 0.03);
   --glass-blur: blur(20px) saturate(180%);
 
-  /* Brand Accents */
-  --teal-primary: #008BA5;
-  --teal-light: #0284C7;
-  --teal-glow: rgba(0, 139, 165, 0.18);
-  --teal-subtle: rgba(0, 139, 165, 0.08);
+  /* Official Nexcrest Tech School Brand Tokens */
+  --brand-primary: #EF2424;
+  --brand-dark: #B11414;
+  --brand-light: #FF5A3C;
+  --brand-glow: rgba(239, 36, 36, 0.22);
+  --brand-subtle: rgba(239, 36, 36, 0.08);
+
+  /* Brand Accents mapped to Nexcrest Identity */
+  --teal-primary: #EF2424;
+  --teal-light: #FF5A3C;
+  --teal-glow: rgba(239, 36, 36, 0.22);
+  --teal-subtle: rgba(239, 36, 36, 0.08);
   
   --blue-primary: #2563EB;
   --blue-light: #3B82F6;
@@ -54,19 +61,19 @@
   --amber-glow: rgba(245, 158, 11, 0.16);
   --amber-subtle: #FEF3C7;
 
-  --rose-danger: #E11D48;
-  --rose-light: #F43F5E;
-  --rose-glow: rgba(225, 29, 72, 0.16);
-  --rose-subtle: #FFE4E6;
+  --rose-danger: #EF2424;
+  --rose-light: #FF5A3C;
+  --rose-glow: rgba(239, 36, 36, 0.20);
+  --rose-subtle: #FFF1F1;
 
   /* Typography Colors */
-  --text-main: #0F172A;           /* Deep obsidian slate */
-  --text-muted: #475569;          /* Readable refined slate */
-  --text-dim: #64748B;            /* Subtle captions & hints */
+  --text-main: #0B0A0F;           /* Deep tech obsidian */
+  --text-muted: #4B5563;          /* Refined slate */
+  --text-dim: #6B7280;            /* Subtle captions & hints */
   --text-inverted: #FFFFFF;
   
   /* Fonts */
-  --font-heading: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Space Grotesk', 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   
   /* Radii & Shadows */
@@ -78,9 +85,9 @@
   
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
   --shadow-card: 0 10px 30px -4px rgba(15, 23, 42, 0.05), 0 2px 8px rgba(0, 0, 0, 0.02);
-  --shadow-hover: 0 20px 42px -6px rgba(15, 23, 42, 0.1), 0 4px 14px rgba(0, 0, 0, 0.03);
+  --shadow-hover: 0 20px 42px -6px rgba(239, 36, 36, 0.12), 0 4px 14px rgba(0, 0, 0, 0.03);
   --shadow-modal: 0 30px 70px -10px rgba(15, 23, 42, 0.25), 0 10px 24px -5px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 4px 20px var(--teal-glow);
+  --shadow-glow: 0 4px 20px var(--brand-glow);
   --transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Dot Grid Overlay */
@@ -91,33 +98,40 @@
    DARK THEME TOKENS (Toggleable)
    ========================================================================== */
 body.dark-theme {
-  --bg-dark: #060D17;
-  --bg-canvas: #060D17;
-  --bg-surface: rgba(11, 25, 41, 0.85);
-  --bg-card: rgba(16, 36, 58, 0.68);
-  --bg-card-hover: rgba(22, 50, 80, 0.8);
-  --bg-card-elevated: rgba(22, 50, 80, 0.75);
-  --bg-input: rgba(11, 25, 41, 0.9);
-  --bg-table-header: rgba(6, 13, 23, 0.7);
+  --bg-dark: #0B0A0F;
+  --bg-canvas: #0B0A0F;
+  --bg-surface: rgba(17, 19, 25, 0.88);
+  --bg-card: rgba(22, 25, 34, 0.75);
+  --bg-card-hover: rgba(30, 34, 46, 0.85);
+  --bg-card-elevated: rgba(30, 34, 46, 0.80);
+  --bg-input: rgba(17, 19, 25, 0.95);
+  --bg-table-header: rgba(11, 10, 15, 0.85);
   --bg-table-row-hover: rgba(255, 255, 255, 0.03);
 
-  --border-subtle: rgba(25, 56, 84, 0.8);
-  --border-light: rgba(36, 76, 112, 0.8);
-  --border-focus: #00A3C4;
+  --border-subtle: rgba(239, 36, 36, 0.18);
+  --border-light: rgba(255, 255, 255, 0.10);
+  --border-focus: #EF2424;
 
   /* Glassmorphism Tokens (Dark Theme) */
-  --glass-bg: rgba(16, 36, 58, 0.68);
-  --glass-bg-elevated: rgba(22, 50, 80, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-border-subtle: rgba(36, 76, 112, 0.55);
-  --glass-highlight: inset 0 1px 1px 0 rgba(255, 255, 255, 0.14);
-  --glass-shadow: 0 16px 42px -4px rgba(0, 0, 0, 0.5);
-  --glass-shadow-hover: 0 24px 54px -4px rgba(0, 0, 0, 0.65), 0 0 24px var(--teal-glow);
+  --glass-bg: rgba(22, 25, 34, 0.75);
+  --glass-bg-elevated: rgba(30, 34, 46, 0.80);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-subtle: rgba(239, 36, 36, 0.18);
+  --glass-highlight: inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 16px 42px -4px rgba(0, 0, 0, 0.6);
+  --glass-shadow-hover: 0 24px 54px -4px rgba(0, 0, 0, 0.75), 0 0 24px var(--brand-glow);
   --glass-blur: blur(24px) saturate(190%);
 
-  --teal-primary: #00A3C4;
-  --teal-light: #22D3EE;
-  --teal-glow: rgba(0, 163, 196, 0.28);
+  --brand-primary: #EF2424;
+  --brand-dark: #B11414;
+  --brand-light: #FF6B6B;
+  --brand-glow: rgba(239, 36, 36, 0.35);
+  --brand-subtle: rgba(239, 36, 36, 0.15);
+
+  --teal-primary: #EF2424;
+  --teal-light: #FF6B6B;
+  --teal-glow: rgba(239, 36, 36, 0.35);
+  --teal-subtle: rgba(239, 36, 36, 0.15);
   --teal-subtle: rgba(0, 163, 196, 0.15);
 
   --blue-primary: #2563EB;
@@ -568,14 +582,14 @@ body.dark-theme .btn-logout:hover {
   width: 34px;
   height: 34px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, #0284C7, #008BA5);
+  background: linear-gradient(135deg, #EF2424, #B11414);
   color: #FFFFFF;
   font-weight: 700;
   font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 139, 165, 0.25);
+  box-shadow: 0 2px 6px rgba(239, 36, 36, 0.3);
 }
 
 .user-meta {
@@ -973,7 +987,7 @@ body.dark-theme .btn-danger {
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--teal-primary), #0284C7);
+  background: linear-gradient(90deg, #EF2424, #FF5A3C);
   border-radius: var(--radius-full);
   transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -991,7 +1005,7 @@ body.dark-theme .btn-danger {
 }
 
 .progress-bar-fill.teal {
-  background: linear-gradient(90deg, var(--teal-primary), #0284C7);
+  background: linear-gradient(90deg, #EF2424, #FF5A3C);
 }
 
 .stat-footer {
@@ -2500,8 +2514,8 @@ body.dark-theme .hero-card .hero-card-sub {
 }
 
 body.dark-theme .hero-monthly-target {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 60%), linear-gradient(135deg, #07131D 0%, #0D2434 100%);
-  border: 1px solid rgba(0, 163, 196, 0.4);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 60%), linear-gradient(135deg, #161922 0%, #2A1111 100%);
+  border: 1px solid rgba(239, 36, 36, 0.4);
 }
 
 body.dark-theme .hero-reels {
@@ -3747,9 +3761,9 @@ body.dark-theme .laser-border-glow::before {
   background: conic-gradient(
     from 0deg,
     transparent 0deg 280deg,
-    rgba(0, 163, 196, 0.45) 310deg,
-    #00A3C4 345deg,
-    #CEF3E4 358deg,
+    rgba(239, 36, 36, 0.45) 310deg,
+    #EF2424 345deg,
+    #FFB3B3 358deg,
     transparent 360deg
   );
 }
@@ -3860,14 +3874,14 @@ body.dark-theme .spotlight-border {
   left: 0;
   width: 3px;
   height: 100%;
-  background: linear-gradient(180deg, #008BA5, #CEF3E4, #008BA5);
+  background: linear-gradient(180deg, #EF2424, #FFB3B3, #EF2424);
   box-shadow: 0 0 12px var(--teal-primary);
   animation: pulseLaser 2.5s ease-in-out infinite;
 }
 
 @keyframes pulseLaser {
   0%, 100% { opacity: 0.6; box-shadow: 0 0 8px var(--teal-primary); }
-  50% { opacity: 1; box-shadow: 0 0 16px #CEF3E4; }
+  50% { opacity: 1; box-shadow: 0 0 16px rgba(239, 36, 36, 0.4); }
 }
 
 /* ==========================================================================
@@ -3875,10 +3889,10 @@ body.dark-theme .spotlight-border {
    ========================================================================== */
 
 .btn-accent {
-  background: linear-gradient(135deg, #008BA5 0%, #2B557A 100%);
+  background: linear-gradient(135deg, #EF2424 0%, #B11414 100%);
   color: #FFFFFF !important;
-  border: 1px solid rgba(0, 139, 165, 0.4);
-  box-shadow: 0 4px 14px rgba(0, 139, 165, 0.25);
+  border: 1px solid rgba(239, 36, 36, 0.4);
+  box-shadow: 0 4px 18px rgba(239, 36, 36, 0.35);
   font-weight: 600;
   border-radius: var(--radius-md);
   padding: 8px 16px;
@@ -3891,8 +3905,8 @@ body.dark-theme .spotlight-border {
 
 .btn-accent:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 139, 165, 0.4);
-  background: linear-gradient(135deg, #009cb9 0%, #346794 100%);
+  box-shadow: 0 6px 24px rgba(239, 36, 36, 0.55);
+  background: linear-gradient(135deg, #FF3838 0%, #C81E1E 100%);
 }
 
 .team-roster-card {
@@ -3962,7 +3976,7 @@ body.dark-theme .spotlight-border {
   width: 52px;
   height: 52px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, #008BA5 0%, #2B557A 100%);
+  background: linear-gradient(135deg, #EF2424 0%, #B11414 100%);
   color: #FFFFFF;
   display: flex;
   align-items: center;
@@ -3972,7 +3986,7 @@ body.dark-theme .spotlight-border {
   font-size: 18px;
   letter-spacing: -0.5px;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 139, 165, 0.3);
+  box-shadow: 0 4px 12px rgba(239, 36, 36, 0.35);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
@@ -4223,31 +4237,31 @@ body.dark-theme .spotlight-border {
 
 /* Dark Theme Overrides for Roster */
 body.dark-theme .employee-card {
-  background: rgba(19, 39, 55, 0.85);
-  border-color: #1F3748;
+  background: rgba(22, 25, 34, 0.85);
+  border-color: rgba(239, 36, 36, 0.20);
 }
 
 body.dark-theme .employee-card:hover {
-  border-color: #008BA5;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 24px rgba(0, 139, 165, 0.25);
+  border-color: #EF2424;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 24px rgba(239, 36, 36, 0.35);
 }
 
 body.dark-theme .employee-email-row,
 body.dark-theme .employee-stats-strip,
 body.dark-theme .roster-toolbar {
-  background: rgba(13, 30, 44, 0.85);
-  border-color: #1F3748;
+  background: rgba(17, 19, 25, 0.85);
+  border-color: rgba(239, 36, 36, 0.18);
 }
 
 body.dark-theme .btn-emp-portal {
-  background: #132737;
-  border-color: #1F3748;
+  background: #161922;
+  border-color: rgba(239, 36, 36, 0.25);
   color: #F6F6F6;
 }
 
 body.dark-theme .btn-emp-portal:hover {
-  border-color: #008BA5;
-  color: #45B2C3;
+  border-color: #EF2424;
+  color: #FF6B6B;
 }
 
 /* Overview Screen Team Summary Card Styling */
@@ -4270,18 +4284,18 @@ body.dark-theme .btn-emp-portal:hover {
 }
 
 body.dark-theme .team-overview-summary {
-  background: #132737 !important;
-  border-color: #1F3748 !important;
+  background: #161922 !important;
+  border-color: rgba(239, 36, 36, 0.22) !important;
 }
 
 body.dark-theme .ov-employee-card {
-  background: #0D1E2C !important;
-  border-color: #1F3748 !important;
+  background: #111319 !important;
+  border-color: rgba(239, 36, 36, 0.18) !important;
 }
 
 body.dark-theme .ov-employee-card:hover {
-  border-color: #008BA5 !important;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4), 0 0 16px rgba(0, 139, 165, 0.25) !important;
+  border-color: #EF2424 !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 16px rgba(239, 36, 36, 0.35) !important;
 }
 
 /* Export Dropdown Menu */
@@ -4336,13 +4350,13 @@ body.dark-theme .ov-employee-card:hover {
 }
 
 .dropdown-item-btn:hover {
-  background: rgba(0, 139, 165, 0.12);
+  background: rgba(239, 36, 36, 0.12);
   color: var(--teal-primary);
 }
 
 body.dark-theme .export-menu {
-  background: #132737;
-  border-color: #1F3748;
+  background: #161922;
+  border-color: rgba(239, 36, 36, 0.25);
 }
 
 /* Print Friendly Styles */
@@ -4509,15 +4523,15 @@ body.dark-theme .export-menu {
 }
 
 /* =========================================================================
-   USER PROFILE & SECURITY SETTINGS MODAL (AIMER BRAND DESIGN SYSTEM)
+   USER PROFILE & SECURITY SETTINGS MODAL (NEXCREST TECH SCHOOL BRAND)
    ========================================================================= */
 .profile-summary-header {
   display: flex;
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: rgba(0, 139, 165, 0.06);
-  border: 1px solid rgba(0, 139, 165, 0.18);
+  background: rgba(239, 36, 36, 0.06);
+  border: 1px solid rgba(239, 36, 36, 0.20);
   border-radius: var(--radius-lg);
   margin-bottom: 20px;
 }
@@ -4526,7 +4540,7 @@ body.dark-theme .export-menu {
   width: 56px;
   height: 56px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, #0284C7, #008BA5);
+  background: linear-gradient(135deg, #EF2424, #B11414);
   color: #FFFFFF;
   font-family: var(--font-heading);
   font-size: 22px;
@@ -4534,7 +4548,7 @@ body.dark-theme .export-menu {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(0, 139, 165, 0.35);
+  box-shadow: 0 4px 14px rgba(239, 36, 36, 0.35);
   flex-shrink: 0;
   border: 2px solid rgba(255, 255, 255, 0.2);
 }
@@ -4642,14 +4656,14 @@ body.dark-theme .export-menu {
 
 .profile-tab-btn:hover {
   color: var(--text-main);
-  background: rgba(0, 139, 165, 0.08);
+  background: rgba(239, 36, 36, 0.08);
 }
 
 .profile-tab-btn.active {
   color: #FFFFFF;
-  background: linear-gradient(135deg, #008BA5, #2B557A);
-  border-color: rgba(0, 139, 165, 0.4);
-  box-shadow: 0 2px 8px rgba(0, 139, 165, 0.25);
+  background: linear-gradient(135deg, #EF2424, #B11414);
+  border-color: rgba(239, 36, 36, 0.4);
+  box-shadow: 0 2px 10px rgba(239, 36, 36, 0.35);
 }
 
 .profile-tab-panel {
@@ -4752,6 +4766,23 @@ body.dark-theme .form-error-notice {
     width: 100%;
   }
 }
+
+/* High-Tech Hexagon Network Background Texture */
+.hexagon-network-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: url('../assets/hexagon-network-bg.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.05;
+  z-index: 0;
+}
+
+body.dark-theme .hexagon-network-overlay {
+  opacity: 0.12;
+}
+
 
 
 
