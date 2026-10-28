@@ -17,7 +17,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=33">
+  <link rel="stylesheet" href="css/styles.css?v=34">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -57,15 +57,14 @@
       <!-- Header Actions: User Profile & Sign Out -->
       <div class="header-actions">
         <div class="user-profile-menu" id="header-user-profile-menu" style="display: none;">
-          <button type="button" id="btn-open-user-profile" class="user-profile-chip-btn" title="My Profile & Security Settings">
+          <button type="button" id="btn-open-user-profile" class="user-profile-chip-btn" title="Profile Settings">
             <div class="user-avatar" id="header-user-avatar">M</div>
             <div class="user-meta">
               <span class="user-name" id="header-user-name">Marketing Manager</span>
-              <span class="user-role-badge" id="header-role-badge">Lead Admin</span>
             </div>
             <i data-lucide="settings" class="profile-settings-icon" style="width: 15px; height: 15px; margin-left: 2px; color: var(--text-muted);"></i>
           </button>
-          <button id="logout-btn" class="btn btn-outline-sm btn-logout" title="Sign Out of Workspace">
+          <button id="logout-btn" class="btn btn-outline-sm btn-logout" title="Sign Out">
             <i data-lucide="log-out"></i>
             <span>Sign Out</span>
           </button>
@@ -78,28 +77,18 @@
   <div id="auth-modal" class="modal-overlay">
     <div class="auth-backdrop-glow"></div>
     <div class="modal-card auth-card spotlight-card">
-      <!-- Portal Top Utility Bar (Live Status) -->
-      <div class="auth-card-topbar">
-        <span class="auth-portal-badge">
-          <span class="auth-badge-dot"></span>
-          Enterprise Ops
-        </span>
-      </div>
-
       <!-- Auth Branding Header -->
       <div class="auth-header">
         <div class="auth-brand-emblem-wrap">
           <img src="assets/nexcrest_icon.png" alt="Nexcrest Insights" class="auth-brand-emblem-img">
         </div>
         <h2 class="auth-title">Nexcrest Insights</h2>
-        <p class="auth-subtitle">Operations, KPI & Performance Command Center</p>
       </div>
 
       <!-- Quick Account / Portal Profile Selector -->
       <div class="auth-profiles-section">
         <div class="auth-section-header">
-          <span class="auth-section-title">Select Team Account</span>
-          <span class="auth-section-hint">Tap to switch profile</span>
+          <span class="auth-section-title">Select Account</span>
         </div>
         <div class="role-login-tabs" id="role-login-tabs-container">
           <!-- Injected dynamically via JavaScript -->
@@ -108,7 +97,7 @@
 
       <form id="auth-form" class="auth-form">
         <div class="form-group auth-form-group">
-          <label for="login-email" class="auth-label">Work Email</label>
+          <label for="login-email" class="auth-label">Email</label>
           <div class="input-with-icon auth-input-wrap">
             <i data-lucide="mail" class="auth-input-icon"></i>
             <input type="email" id="login-email" class="auth-input" placeholder="name@nexcrest.com" required value="manager@nexcrest.com" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username">
@@ -121,7 +110,7 @@
           </div>
           <div class="input-with-icon-right auth-input-wrap" id="login-password-wrapper">
             <i data-lucide="lock" class="input-left-icon auth-input-icon"></i>
-            <input type="password" id="login-password" class="auth-input" placeholder="Enter password for Marketing Manager" required autocomplete="current-password" value="" autocapitalize="none" autocorrect="off" spellcheck="false">
+            <input type="password" id="login-password" class="auth-input" placeholder="Enter password" required autocomplete="current-password" value="" autocapitalize="none" autocorrect="off" spellcheck="false">
             <button type="button" class="btn-toggle-pass-visibility auth-pass-toggle" data-target="login-password" title="Toggle password visibility" aria-label="Toggle password visibility">
               <i data-lucide="eye"></i>
             </button>
@@ -135,16 +124,10 @@
         </div>
 
         <button type="submit" id="auth-submit-btn" class="btn btn-primary btn-block auth-submit-btn">
-          <span id="auth-submit-text">Sign In to Command Center</span>
+          <span id="auth-submit-text">Sign In</span>
           <i data-lucide="arrow-right"></i>
         </button>
       </form>
-
-      <!-- Security Trust Footnote -->
-      <div class="auth-footer-note">
-        <i data-lucide="shield-check"></i>
-        <span>256-Bit Encrypted Session • Real-Time Cloud Sync</span>
-      </div>
     </div>
   </div>
 
@@ -190,21 +173,21 @@
       <div class="tabs-control-bar">
         <div class="tab-pills">
           <button id="tab-btn-overview" class="tab-pill active" data-manager-tab="overview">
-            <i data-lucide="layout-dashboard"></i> Overview & Graphs
+            <i data-lucide="layout-dashboard"></i> Overview
           </button>
           <button id="tab-btn-targets" class="tab-pill" data-manager-tab="all-targets">
-            <i data-lucide="layers"></i> All Assigned Targets
+            <i data-lucide="layers"></i> Targets
           </button>
           <button id="tab-btn-review" class="tab-pill" data-manager-tab="review-queue">
-            <i data-lucide="inbox"></i> Review Queue 
+            <i data-lucide="inbox"></i> Reviews 
             <span class="pill-count" id="review-queue-count">0</span>
           </button>
           <button id="tab-btn-team" class="tab-pill" data-manager-tab="team-roster">
-            <i data-lucide="users"></i> Team Roster & Staff
+            <i data-lucide="users"></i> Team
             <span class="pill-count" id="team-roster-count">3</span>
           </button>
           <button id="tab-btn-activity" class="tab-pill" data-manager-tab="activity-log">
-            <i data-lucide="clock"></i> Activity Audit Log
+            <i data-lucide="clock"></i> Activity
           </button>
         </div>
 
@@ -212,7 +195,7 @@
         <div class="filter-controls" id="manager-table-filters" style="display: none;">
           <div class="search-box">
             <i data-lucide="search"></i>
-            <input type="text" id="filter-search-input" placeholder="Search targets, programs, notes...">
+            <input type="text" id="filter-search-input" placeholder="Search targets...">
           </div>
 
           <div class="filter-group">
@@ -257,7 +240,7 @@
         </div>
       </div>
 
-      <!-- TAB 0: OVERVIEW & GRAPHS (Matching User Reference Photo) -->
+      <!-- TAB 0: OVERVIEW -->
       <div id="tab-overview" class="tab-pane active">
         <!-- Overview Header Row -->
         <div class="ov-header-row">
@@ -265,12 +248,9 @@
             <h2 class="ov-title">Overview</h2>
             <span class="ov-month-tag" id="ov-month-tag">October 2026</span>
           </div>
-          <div class="ov-quick-stats">
-            <span class="ov-sync-indicator"><i data-lucide="refresh-cw"></i> Live Operations Sync</span>
-          </div>
         </div>
 
-        <!-- 4 Hero Dark Gradient Cards (Matching User Photo) -->
+        <!-- 4 Hero Metric Cards -->
         <div class="hero-metric-cards-grid">
           <div class="hero-card hero-monthly-target spotlight-card tilt-card">
             <div class="hero-card-header">
@@ -278,7 +258,6 @@
               <div class="hero-card-icon"><i data-lucide="target"></i></div>
             </div>
             <div class="hero-card-value" id="ov-monthly-target">40</div>
-            <div class="hero-card-sub">Assigned monthly quota across all brands</div>
           </div>
 
           <div class="hero-card hero-reels spotlight-card tilt-card">
@@ -287,7 +266,7 @@
               <div class="hero-card-icon"><i data-lucide="video"></i></div>
             </div>
             <div class="hero-card-value" id="ov-reels-count">22</div>
-            <div class="hero-card-sub"><span id="ov-reels-published">0</span> Published of <span id="ov-reels-target">22</span> Target</div>
+            <div class="hero-card-sub"><span id="ov-reels-published">0</span> / <span id="ov-reels-target">22</span></div>
           </div>
 
           <div class="hero-card hero-posters spotlight-card tilt-card">
@@ -296,7 +275,7 @@
               <div class="hero-card-icon"><i data-lucide="layers"></i></div>
             </div>
             <div class="hero-card-value" id="ov-posters-count">18</div>
-            <div class="hero-card-sub"><span id="ov-posters-published">0</span> Published of <span id="ov-posters-target">18</span> Target</div>
+            <div class="hero-card-sub"><span id="ov-posters-published">0</span> / <span id="ov-posters-target">18</span></div>
           </div>
 
           <div class="hero-card hero-published spotlight-card tilt-card">
@@ -305,11 +284,10 @@
               <div class="hero-card-icon"><i data-lucide="check-circle-2"></i></div>
             </div>
             <div class="hero-card-value" id="ov-published-count">40</div>
-            <div class="hero-card-sub">Verified & published deliverables</div>
           </div>
         </div>
 
-        <!-- Progress & Telemetry Strip (Matching User Photo) with Laser Border Glow -->
+        <!-- Progress & Telemetry Strip with Laser Border Glow -->
         <div class="telemetry-bar-card laser-border-glow spotlight-card">
           <div class="progress-ring-block">
             <div class="progress-ring-container">
@@ -322,12 +300,10 @@
               </div>
             </div>
             <div class="ring-labels">
-              <span class="ring-label-title">TARGET PROGRESS</span>
+              <span class="ring-label-title">PROGRESS</span>
               <div class="ring-label-numbers">
                 <strong id="ov-progress-ratio">40 / 40</strong>
-                <span class="ring-label-unit">Published / Posts</span>
               </div>
-              <div class="ring-pacing-note" id="ov-pacing-text">100% Completion achieved</div>
             </div>
           </div>
 
@@ -340,7 +316,7 @@
               <span class="tele-box-title" id="ov-days-left-label">DAYS LEFT</span>
               <span class="tele-box-val" id="ov-days-left">0</span>
             </div>
-            <button type="button" id="btn-toggle-workdays-mode" class="telemetry-toggle-btn" title="Toggle between Total Calendar Days and Mon-Fri Working Days">
+            <button type="button" id="btn-toggle-workdays-mode" class="telemetry-toggle-btn" title="Toggle Working Days">
               <i data-lucide="briefcase"></i> <span id="workdays-toggle-text">Working Days</span>
             </button>
           </div>
@@ -455,15 +431,11 @@
           </div>
         </div>
 
-        <!-- Target vs Achievement Visual Analytics Graphs Section -->
+        <!-- Performance Analytics Graphs Section -->
         <div class="analytics-graphs-section">
           <div class="graphs-section-header">
             <div>
-              <h3 class="graphs-section-title">Target vs Achievement Visual Analytics</h3>
-              <p class="card-subtitle">Graphical telemetry comparing allocated targets against approved achievements</p>
-            </div>
-            <div class="chart-quick-badge">
-              <i data-lucide="bar-chart-2"></i> <span>Dynamic Visual Graphs</span>
+              <h3 class="graphs-section-title">Performance Analytics</h3>
             </div>
           </div>
 
@@ -472,8 +444,7 @@
             <div class="card chart-card spotlight-card">
               <div class="chart-card-header">
                 <div>
-                  <h4>Category Target vs Achievement</h4>
-                  <span class="chart-sub">Target Quotas vs Verified Achievements</span>
+                  <h4>Category Targets</h4>
                 </div>
                 <div class="chart-legend-custom">
                   <span class="legend-item"><span class="legend-dot target"></span> Target</span>
@@ -489,8 +460,7 @@
             <div class="card chart-card spotlight-card">
               <div class="chart-card-header">
                 <div>
-                  <h4>Team Performance Target vs Achievement</h4>
-                  <span class="chart-sub">Assigned quotas vs verified completions across all team members</span>
+                  <h4>Team Performance</h4>
                 </div>
                 <div class="chart-legend-custom">
                   <span class="legend-item"><span class="legend-dot target"></span> Assigned</span>
@@ -506,8 +476,7 @@
             <div class="card chart-card spotlight-card">
               <div class="chart-card-header">
                 <div>
-                  <h4>Deliverable Formats Distribution</h4>
-                  <span class="chart-sub">Reels & Videos vs Posters & Carousels proportion</span>
+                  <h4>Deliverable Formats</h4>
                 </div>
               </div>
               <div class="chart-canvas-wrapper doughnut-wrap">
@@ -519,8 +488,7 @@
             <div class="card chart-card spotlight-card">
               <div class="chart-card-header">
                 <div>
-                  <h4>Cumulative Delivery Pacing Curve</h4>
-                  <span class="chart-sub">Ideal target pace line vs actual completion trend</span>
+                  <h4>Milestone Pacing</h4>
                 </div>
               </div>
               <div class="chart-canvas-wrapper">
@@ -536,11 +504,10 @@
         <div class="card table-card">
           <div class="card-header">
             <div>
-              <h3>Deliverables Breakdown by Brand & Category</h3>
-              <p class="card-subtitle">Exact target quotas assigned to team members for the selected month.</p>
+              <h3>Assigned Targets</h3>
             </div>
             <div class="card-actions">
-              <span class="badge-info" id="table-row-count">Showing 9 deliverables</span>
+              <span class="badge-info" id="table-row-count">9 items</span>
             </div>
           </div>
 
@@ -580,7 +547,7 @@
                   </th>
                   <th class="text-center sortable-th" data-sort-col="targetQty">
                     <div class="th-content center">
-                      <span>Target Qty</span>
+                      <span>Target</span>
                       <i data-lucide="arrow-up-down" class="sort-icon"></i>
                     </div>
                   </th>
@@ -592,7 +559,7 @@
                   </th>
                   <th class="text-center sortable-th" data-sort-col="pending">
                     <div class="th-content center">
-                      <span>Pending Review</span>
+                      <span>Pending</span>
                       <i data-lucide="arrow-up-down" class="sort-icon"></i>
                     </div>
                   </th>
@@ -624,11 +591,10 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <h3>Work Approvals & Quality Review</h3>
-              <p class="card-subtitle">Inspect submitted asset links (Drive, Figma, Frame.io) and approve or request revisions.</p>
+              <h3>Pending Reviews</h3>
             </div>
             <button id="btn-batch-approve" class="btn btn-outline-sm">
-              <i data-lucide="check-check"></i> Approve All Filtered
+              <i data-lucide="check-check"></i> Approve All
             </button>
           </div>
 
@@ -642,20 +608,19 @@
       <div id="tab-activity-log" class="tab-pane hidden">
         <div class="card">
           <div class="card-header">
-            <h3>Complete Audit & Submission History</h3>
-            <span class="card-subtitle">Chronological record of every work logged by team members.</span>
+            <h3>Activity Log</h3>
           </div>
           <div class="table-responsive">
             <table class="data-table">
               <thead>
                 <tr>
                   <th>Timestamp</th>
-                  <th>Team Member</th>
+                  <th>Member</th>
                   <th>Deliverable</th>
-                  <th>Asset Title / Note</th>
+                  <th>Asset</th>
                   <th>Proof Link</th>
-                  <th>Review Status</th>
-                  <th>Feedback / Remarks</th>
+                  <th>Status</th>
+                  <th>Feedback</th>
                 </tr>
               </thead>
               <tbody id="activity-log-table-body">
@@ -666,16 +631,15 @@
         </div>
       </div>
 
-      <!-- TAB 4: Team Roster & Employees -->
+      <!-- TAB 4: Team Roster -->
       <div id="tab-team-roster" class="tab-pane hidden">
         <div class="card team-roster-card">
           <div class="card-header roster-card-header">
             <div>
-              <h3>Team Roster & Operational Staff</h3>
-              <p class="card-subtitle">Manage onboarded employees, track individual monthly pacing, and assign deliverables.</p>
+              <h3>Team Members</h3>
             </div>
             <button id="btn-roster-add-emp" class="btn btn-primary">
-              <i data-lucide="user-plus"></i> + Add Employee
+              <i data-lucide="user-plus"></i> + Add Member
             </button>
           </div>
 
@@ -683,7 +647,7 @@
           <div class="roster-toolbar">
             <div class="search-box">
               <i data-lucide="search"></i>
-              <input type="text" id="roster-search-input" placeholder="Search by name, email, role, or title...">
+              <input type="text" id="roster-search-input" placeholder="Search team...">
             </div>
             <div class="filter-group">
               <label><i data-lucide="filter"></i> Department:</label>
@@ -712,11 +676,11 @@
       <!-- Member Actions Bar -->
       <div class="section-header" style="justify-content: flex-end; margin-bottom: 20px; gap: 12px;">
         <div class="header-action-buttons" style="display: flex; gap: 10px;">
-          <button type="button" id="btn-member-open-profile" class="btn btn-outline-sm" title="Manage Profile & Change Password">
+          <button type="button" id="btn-member-open-profile" class="btn btn-outline-sm" title="Profile & Security">
             <i data-lucide="shield-check"></i> Profile & Security
           </button>
           <button id="btn-member-log-work" class="btn btn-primary">
-            <i data-lucide="upload-cloud"></i> + Submit Deliverable
+            <i data-lucide="upload-cloud"></i> + Submit Work
           </button>
         </div>
       </div>
@@ -724,27 +688,27 @@
       <!-- Member Personal KPI Banner with Laser Border Glow -->
       <div class="member-kpi-banner laser-border-glow spotlight-card">
         <div class="kpi-banner-metric">
-          <span class="kpi-banner-label">Monthly Target</span>
+          <span class="kpi-banner-label">Target</span>
           <span class="kpi-banner-val" id="member-kpi-target">25</span>
         </div>
         <div class="kpi-banner-divider"></div>
         <div class="kpi-banner-metric">
-          <span class="kpi-banner-label">Approved & Completed</span>
+          <span class="kpi-banner-label">Completed</span>
           <span class="kpi-banner-val success" id="member-kpi-completed">0</span>
         </div>
         <div class="kpi-banner-divider"></div>
         <div class="kpi-banner-metric">
-          <span class="kpi-banner-label">Under Manager Review</span>
+          <span class="kpi-banner-label">In Review</span>
           <span class="kpi-banner-val warning" id="member-kpi-review">0</span>
         </div>
         <div class="kpi-banner-divider"></div>
         <div class="kpi-banner-metric">
-          <span class="kpi-banner-label">Remaining Quota</span>
+          <span class="kpi-banner-label">Remaining</span>
           <span class="kpi-banner-val accent" id="member-kpi-remaining">25</span>
         </div>
         <div class="kpi-banner-progress">
           <div class="kpi-banner-progress-text">
-            <span>Quota Completion</span>
+            <span>Progress</span>
             <span id="member-kpi-pct">0%</span>
           </div>
           <div class="progress-bar-container large">
@@ -780,20 +744,19 @@
       <!-- Member Recent Submissions -->
       <div class="card mt-6">
         <div class="card-header">
-          <h3>Your Recent Submissions & Manager Feedback</h3>
-          <span class="card-subtitle">Live status of works you have marked and submitted</span>
+          <h3>Recent Submissions</h3>
         </div>
         <div class="table-responsive">
           <table class="data-table">
             <thead>
               <tr>
-                <th>Submitted Date</th>
-                <th>Content / Program</th>
+                <th>Date</th>
+                <th>Deliverable</th>
                 <th>Format</th>
-                <th>Deliverable Link</th>
+                <th>Link</th>
                 <th>Note</th>
-                <th>Manager Status</th>
-                <th>Remarks / Feedback</th>
+                <th>Status</th>
+                <th>Feedback</th>
               </tr>
             </thead>
             <tbody id="member-submissions-table-body">
@@ -812,8 +775,7 @@
         <div class="modal-title-group">
           <i data-lucide="target" class="modal-icon"></i>
           <div>
-            <h3>Assign Target Deliverable</h3>
-            <p>Add a new deliverable quota to a team member's monthly plan</p>
+            <h3>Assign Target</h3>
           </div>
         </div>
         <button class="modal-close-btn" data-close-modal="assign-target-modal">&times;</button>
@@ -823,7 +785,7 @@
         <input type="hidden" id="edit-target-id" value="">
         <div class="form-row">
           <div class="form-group">
-            <label for="target-assignee">Assignee / Employee *</label>
+            <label for="target-assignee">Assignee *</label>
             <select id="target-assignee" required>
               <!-- Injected dynamically with departments + all onboarded employees -->
               <option value="designer">Graphic Designer</option>
@@ -851,31 +813,31 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="target-format">Format / Deliverable Type *</label>
-            <input type="text" id="target-format" placeholder="e.g. Carousel, Poster, 9:16 Reel, Ad Campaign" required>
+            <label for="target-format">Format *</label>
+            <input type="text" id="target-format" placeholder="e.g. Carousel, Poster, 9:16 Reel" required>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="target-program">Content / Program Title *</label>
-          <input type="text" id="target-program" placeholder="e.g. NexTalk Series, Let's Talk, Informative Contents" required>
+          <label for="target-program">Title *</label>
+          <input type="text" id="target-program" placeholder="e.g. NexTalk Series, Let's Talk" required>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="target-qty">Target Quantity (Quota) *</label>
+            <label for="target-qty">Target Qty *</label>
             <input type="number" id="target-qty" min="1" max="100" value="1" required>
           </div>
           <div class="form-group">
-            <label for="target-notes">Guidelines / Instructions (Optional)</label>
-            <input type="text" id="target-notes" placeholder="e.g. High resolution 1080x1350, follow brand colors">
+            <label for="target-notes">Notes (Optional)</label>
+            <input type="text" id="target-notes" placeholder="e.g. 1080x1350, follow brand colors">
           </div>
         </div>
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-close-modal="assign-target-modal">Cancel</button>
           <button type="submit" class="btn btn-primary">
-            <i data-lucide="check"></i> Save & Assign Target
+            <i data-lucide="check"></i> Assign Target
           </button>
         </div>
       </form>
@@ -889,8 +851,7 @@
         <div class="modal-title-group">
           <i data-lucide="user-plus" class="modal-icon"></i>
           <div>
-            <h3>Onboard New Team Member</h3>
-            <p>Add an employee to assign deliverables, track monthly pacing, and review submissions</p>
+            <h3>Add Team Member</h3>
           </div>
         </div>
         <button class="modal-close-btn" data-close-modal="add-employee-modal">&times;</button>
@@ -902,11 +863,11 @@
             <label for="new-emp-name">Full Name *</label>
             <div class="input-with-icon">
               <i data-lucide="user"></i>
-              <input type="text" id="new-emp-name" placeholder="e.g. Sarah Jenkins" required>
+              <input type="text" id="new-emp-name" placeholder="Full name" required>
             </div>
           </div>
           <div class="form-group">
-            <label for="new-emp-email">Work Email *</label>
+            <label for="new-emp-email">Email *</label>
             <div class="input-with-icon">
               <i data-lucide="mail"></i>
               <input type="email" id="new-emp-email" placeholder="sarah@nexcrest.com" required>
@@ -916,7 +877,7 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label for="new-emp-role">Department Track *</label>
+            <label for="new-emp-role">Department *</label>
             <select id="new-emp-role" required>
               <option value="designer">Graphic Designer</option>
               <option value="videographer">Videographer + Editor</option>
@@ -927,7 +888,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="new-emp-title">Job Title / Designation *</label>
+            <label for="new-emp-title">Job Title *</label>
             <div class="input-with-icon">
               <i data-lucide="briefcase"></i>
               <input type="text" id="new-emp-title" placeholder="e.g. Senior Brand Designer" required>
@@ -937,7 +898,7 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label for="new-emp-brand">Brand Assignment</label>
+            <label for="new-emp-brand">Brand</label>
             <select id="new-emp-brand">
               <option value="Both">Both (Insights & IT)</option>
               <option value="Insights">Nexcrest Insights</option>
@@ -945,7 +906,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="new-emp-password">Portal Access Password</label>
+            <label for="new-emp-password">Password</label>
             <div class="input-with-icon">
               <i data-lucide="lock"></i>
               <input type="password" id="new-emp-password" value="password123" required>
@@ -956,7 +917,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-close-modal="add-employee-modal">Cancel</button>
           <button type="submit" class="btn btn-primary">
-            <i data-lucide="user-check"></i> Onboard & Save Employee
+            <i data-lucide="user-plus"></i> Add Member
           </button>
         </div>
       </form>
@@ -973,7 +934,6 @@
           </div>
           <div>
             <h3 style="margin: 0; font-family: var(--font-heading); font-size: 18px; color: var(--text-main);">Delete Employee</h3>
-            <p style="margin: 3px 0 0 0; font-size: 12px; color: var(--text-muted);">Remove team member from workspace</p>
           </div>
         </div>
         <button class="modal-close-btn" data-close-modal="delete-employee-modal">&times;</button>
@@ -983,7 +943,7 @@
         <p>Are you sure you want to remove <strong id="delete-emp-name-display" style="color: var(--teal-primary);">Employee</strong> from the team roster?</p>
         <div class="delete-warning-callout">
           <i data-lucide="alert-triangle"></i>
-          <span>Their portal login access will be removed immediately and their status will be revoked from the team quota.</span>
+          <span>Login access and assigned deliverables will be revoked.</span>
         </div>
       </div>
 
@@ -1006,7 +966,6 @@
           </div>
           <div>
             <h3 style="margin: 0; font-family: var(--font-heading); font-size: 18px; color: var(--text-main);">Edit Team Member</h3>
-            <p style="margin: 3px 0 0 0; font-size: 12px; color: var(--text-muted);">Update staff role, title, brand focus, or access credentials</p>
           </div>
         </div>
         <button class="modal-close-btn" data-close-modal="edit-employee-modal">&times;</button>
@@ -1024,7 +983,7 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="edit-emp-email-display">Work Email (Account ID)</label>
+            <label for="edit-emp-email-display">Email</label>
             <div class="input-with-icon">
               <i data-lucide="mail"></i>
               <input type="email" id="edit-emp-email-display" disabled style="opacity: 0.65; cursor: not-allowed; background: rgba(0,0,0,0.25);">
@@ -1034,7 +993,7 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label for="edit-emp-role">Operational Role *</label>
+            <label for="edit-emp-role">Role *</label>
             <select id="edit-emp-role" required>
               <option value="designer">Graphic Designer</option>
               <option value="videographer">Videographer + Video Editor</option>
@@ -1043,7 +1002,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="edit-emp-brand">Assigned Brand Focus</label>
+            <label for="edit-emp-brand">Brand</label>
             <select id="edit-emp-brand">
               <option value="Nexcrest Insights">Nexcrest Insights</option>
               <option value="Nexcrest IT Services">Nexcrest IT Services</option>
@@ -1054,14 +1013,14 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label for="edit-emp-title">Job Title / Designation *</label>
+            <label for="edit-emp-title">Job Title *</label>
             <div class="input-with-icon">
               <i data-lucide="briefcase"></i>
               <input type="text" id="edit-emp-title" placeholder="e.g. Senior Brand Designer" required>
             </div>
           </div>
           <div class="form-group">
-            <label for="edit-emp-password">Reset Password / PIN</label>
+            <label for="edit-emp-password">Reset Password</label>
             <div class="input-with-icon">
               <i data-lucide="key"></i>
               <input type="password" id="edit-emp-password" placeholder="Leave blank to keep current">
@@ -1072,7 +1031,7 @@
         <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
           <button type="button" class="btn btn-secondary" data-close-modal="edit-employee-modal">Cancel</button>
           <button type="submit" class="btn btn-primary">
-            <i data-lucide="check"></i> Save Profile Updates
+            <i data-lucide="check"></i> Save Changes
           </button>
         </div>
       </form>
@@ -1086,8 +1045,7 @@
         <div class="modal-title-group">
           <i data-lucide="upload-cloud" class="modal-icon"></i>
           <div>
-            <h3>Submit Deliverable for Review</h3>
-            <p>Attach deliverable proof link and mark your work completed</p>
+            <h3>Submit Deliverable</h3>
           </div>
         </div>
         <button class="modal-close-btn" data-close-modal="log-work-modal">&times;</button>
@@ -1095,35 +1053,34 @@
 
       <form id="log-work-form" class="modal-form">
         <div class="form-group">
-          <label for="log-target-select">Select Deliverable Item *</label>
+          <label for="log-target-select">Deliverable *</label>
           <select id="log-target-select" required>
             <!-- Injected dynamically based on current user's assigned targets -->
           </select>
         </div>
 
         <div class="form-group">
-          <label for="log-work-title">Asset Title / Content Topic *</label>
-          <input type="text" id="log-work-title" placeholder="e.g. NexTalk Ep.4 Carousel Design / AI Tools Reel Edit" required>
+          <label for="log-work-title">Asset Title *</label>
+          <input type="text" id="log-work-title" placeholder="e.g. NexTalk Ep.4 Carousel Design" required>
         </div>
 
         <div class="form-group">
-          <label for="log-work-url">Deliverable Link (Drive / Figma / Frame.io / Social Post) *</label>
+          <label for="log-work-url">Link *</label>
           <div class="input-with-icon">
             <i data-lucide="link"></i>
-            <input type="url" id="log-work-url" placeholder="https://drive.google.com/... or https://figma.com/file/..." required>
+            <input type="url" id="log-work-url" placeholder="https://drive.google.com/... or https://figma.com/..." required>
           </div>
-          <span class="field-hint">Must be a valid viewable link for the manager to review.</span>
         </div>
 
         <div class="form-group">
-          <label for="log-work-notes">Notes / Captions / Highlights (Optional)</label>
-          <textarea id="log-work-notes" rows="3" placeholder="Provide any context, hashtags, or revision notes..."></textarea>
+          <label for="log-work-notes">Notes (Optional)</label>
+          <textarea id="log-work-notes" rows="3" placeholder="Provide any context or revision notes..."></textarea>
         </div>
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-close-modal="log-work-modal">Cancel</button>
           <button type="submit" class="btn btn-primary">
-            <i data-lucide="send"></i> Submit for Approval
+            <i data-lucide="send"></i> Submit
           </button>
         </div>
       </form>
@@ -1138,7 +1095,6 @@
           <i data-lucide="check-square" class="modal-icon"></i>
           <div>
             <h3>Review Deliverable</h3>
-            <p id="review-modal-subtitle">Evaluate asset quality and approve or send feedback</p>
           </div>
         </div>
         <button class="modal-close-btn" data-close-modal="review-action-modal">&times;</button>
@@ -1180,7 +1136,7 @@
       <form id="review-decision-form" class="modal-form">
         <input type="hidden" id="review-submission-id" value="">
         <div class="form-group">
-          <label for="review-feedback-input">Manager Feedback / Remarks</label>
+          <label for="review-feedback-input">Feedback</label>
           <div class="feedback-chips-container">
             <span class="chips-label">Quick Suggestions:</span>
             <div class="feedback-chips-list">
@@ -1191,7 +1147,7 @@
               <button type="button" class="feedback-chip" data-chip="Please grant access permissions on Google Drive / Figma file.">🔗 File Permissions</button>
             </div>
           </div>
-          <textarea id="review-feedback-input" rows="2" placeholder="e.g. Great work, color palette approved! OR Please fix typography on slide 3"></textarea>
+          <textarea id="review-feedback-input" rows="2" placeholder="e.g. Great work, color palette approved!"></textarea>
         </div>
 
         <div class="modal-footer split">
@@ -1199,7 +1155,7 @@
             <i data-lucide="rotate-ccw"></i> Request Revision
           </button>
           <button type="button" id="btn-approve-work" class="btn btn-success">
-            <i data-lucide="check-circle-2"></i> Approve & Count as Done
+            <i data-lucide="check-circle-2"></i> Approve
           </button>
         </div>
       </form>
@@ -1212,7 +1168,7 @@
       <div class="modal-header">
         <div class="modal-header-title">
           <i data-lucide="shield-check" class="modal-title-icon" style="color: var(--teal-primary);"></i>
-          <h3>My Profile & Security Settings</h3>
+          <h3>Profile Settings</h3>
         </div>
         <button type="button" class="btn-close-modal" id="btn-close-profile-modal" aria-label="Close modal">
           <i data-lucide="x"></i>
@@ -1266,12 +1222,11 @@
           </div>
 
           <div class="form-group">
-            <label>Assigned Brand Focus</label>
+            <label>Brand</label>
             <div class="input-with-icon">
               <i data-lucide="tag"></i>
               <input type="text" id="profile-edit-brand-readonly" readonly disabled style="opacity: 0.8; cursor: not-allowed;">
             </div>
-            <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px; display: block;">Brand assignments are configured by system administration.</small>
           </div>
 
           <div class="modal-footer">
@@ -1306,7 +1261,6 @@
                 <i data-lucide="eye"></i>
               </button>
             </div>
-            <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px; display: block;">Must be at least 6 characters long and different from current password.</small>
           </div>
 
           <div class="form-group">
@@ -1335,13 +1289,13 @@
           <div class="sync-header">
             <i data-lucide="smartphone" class="sync-icon"></i>
             <div>
-              <div class="sync-title">Sync Password to Mobile Device</div>
-              <div class="sync-subtitle">Because passwords are stored locally on each device, copy this instant link to synchronize your password with your mobile phone.</div>
+              <div class="sync-title">Sync to Mobile</div>
+              <div class="sync-subtitle">Sync your login session with your mobile device.</div>
             </div>
           </div>
           <button type="button" id="btn-copy-sync-link" class="btn btn-outline btn-block">
             <i data-lucide="copy"></i>
-            <span>Copy Mobile Sync Link</span>
+            <span>Copy Sync Link</span>
           </button>
         </div>
       </div>
@@ -1355,7 +1309,7 @@
       <div class="modal-header">
         <div class="modal-header-title">
           <i data-lucide="calendar" class="modal-title-icon" style="color: var(--teal-primary);"></i>
-          <h3>Archive & Cycle Calendar</h3>
+          <h3>Cycle Calendar</h3>
         </div>
         <button type="button" class="btn-close-modal" id="btn-close-calendar-modal" aria-label="Close calendar modal">
           <i data-lucide="x"></i>
@@ -1375,8 +1329,6 @@
             <i data-lucide="chevron-right"></i>
           </button>
         </div>
-
-        <p class="cal-modal-hint">Select any past month to inspect historical archives or choose upcoming planning cycles:</p>
 
         <!-- 12-Month Grid -->
         <div class="calendar-months-grid" id="calendar-months-grid">
@@ -1403,9 +1355,9 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=29"></script>
-  <script src="js/data.js?v=29"></script>
-  <script src="js/auth.js?v=29"></script>
-  <script src="js/app.js?v=29"></script>
+  <script src="js/firebase-config.js?v=34"></script>
+  <script src="js/data.js?v=34"></script>
+  <script src="js/auth.js?v=34"></script>
+  <script src="js/app.js?v=34"></script>
 </body>
 </html>

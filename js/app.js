@@ -570,7 +570,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (elements.headerUserProfileMenu) elements.headerUserProfileMenu.style.display = 'flex';
 
     elements.headerUserName.textContent = user.name;
-    elements.headerRoleBadge.textContent = user.title;
+    if (elements.headerRoleBadge) elements.headerRoleBadge.textContent = user.title;
     elements.headerUserAvatar.textContent = user.avatar || user.name.charAt(0);
 
     // Strict Role Dashboard Isolation:
@@ -1114,7 +1114,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    elements.tableRowCount.textContent = `Showing ${targets.length} deliverables`;
+    elements.tableRowCount.textContent = `${targets.length} items`;
 
     if (targets.length === 0) {
       const allActiveTargets = window.dataStore.getTargets();
@@ -1125,7 +1125,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <tr>
             <td colspan="11" class="text-center" style="padding: 36px; color: var(--text-muted);">
               <i data-lucide="search-x" style="width: 32px; height: 32px; margin-bottom: 8px; opacity: 0.6;"></i>
-              <div>No deliverables match the selected filter/search criteria.</div>
+              <div>No deliverables match the filters.</div>
             </td>
           </tr>
         `;
@@ -1136,8 +1136,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <td colspan="11">
               <div class="empty-cycle-banner">
                 <i data-lucide="calendar-plus" style="width: 42px; height: 42px; color: var(--teal-primary);"></i>
-                <h4>No Target Quotas Assigned for ${escapeHtml(activeMonth)}</h4>
-                <p>Would you like to duplicate and clone the standard operational quotas into this cycle?</p>
+                <h4>No Targets Assigned for ${escapeHtml(activeMonth)}</h4>
+                <p>Clone standard quotas for this cycle?</p>
                 <button id="btn-clone-quotas" class="btn btn-primary">
                   <i data-lucide="copy"></i> Clone Standard Quotas (${escapeHtml(activeMonth)})
                 </button>
@@ -1496,8 +1496,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <div class="employee-pacing-section">
             <div class="emp-pacing-header">
-              <span>Monthly Completion</span>
-              <span>${stats.totalCompleted} / ${stats.totalTarget} items</span>
+              <span>Completion</span>
+              <span>${stats.totalCompleted} / ${stats.totalTarget}</span>
             </div>
             <div class="progress-bar-container" style="margin: 0;">
               <div class="progress-bar-fill ${isAhead ? 'mint' : 'teal'}" style="width: ${stats.pct}%;"></div>
@@ -1507,8 +1507,8 @@ document.addEventListener('DOMContentLoaded', () => {
           <!-- Card Actions Footer -->
           <div class="employee-card-footer">
             <div class="emp-action-buttons">
-              <button type="button" class="btn-emp-assign btn-card-assign-task" data-emp-email="${escapeHtml(emp.email)}" data-emp-role="${escapeHtml(emp.role)}" data-emp-name="${escapeHtml(emp.name)}" title="Assign Target Deliverable">
-                <i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i> Assign Task
+              <button type="button" class="btn-emp-assign btn-card-assign-task" data-emp-email="${escapeHtml(emp.email)}" data-emp-role="${escapeHtml(emp.role)}" data-emp-name="${escapeHtml(emp.name)}" title="Assign Target">
+                <i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i> Assign Target
               </button>
             </div>
             <div style="display: flex; gap: 6px; align-items: center;">
@@ -1594,18 +1594,18 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
 
               <h3 class="del-card-title">${escapeHtml(target.program)}</h3>
-              <p class="del-card-desc">${target.notes ? escapeHtml(target.notes) : 'Standard high-quality monthly deliverable'}</p>
+              ${target.notes ? `<p class="del-card-desc">${escapeHtml(target.notes)}</p>` : ''}
             </div>
 
             <div>
               <div class="del-progress-metric">
-                <span>Monthly Target: <strong>${prog.target}</strong></span>
+                <span>Target: <strong>${prog.target}</strong></span>
                 <span>Approved: <strong style="color: var(--mint-light);">${prog.completed}</strong></span>
               </div>
               <div class="progress-bar-container">
                 <div class="progress-bar-fill" style="width: ${prog.pct}%"></div>
               </div>
-              ${prog.pending > 0 ? `<div style="font-size: 11px; color: var(--amber-light); margin-top: 4px;">⏳ ${prog.pending} submission awaiting manager approval</div>` : ''}
+              ${prog.pending > 0 ? `<div style="font-size: 11px; color: var(--amber-light); margin-top: 4px;">⏳ ${prog.pending} in review</div>` : ''}
 
               <div class="del-card-actions">
                 <button class="btn btn-primary btn-sm btn-block btn-open-log-modal" data-target-id="${target.id}">
@@ -1624,7 +1624,7 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.memberSubmissionsTableBody.innerHTML = `
         <tr>
           <td colspan="7" class="text-center" style="padding: 24px; color: var(--text-muted);">
-            You have not submitted any deliverables for this month yet. Click "+ Submit Deliverable" to log your work!
+            No submissions yet this month.
           </td>
         </tr>
       `;
@@ -1719,16 +1719,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (elements.loginEmail) elements.loginEmail.value = email;
         if (elements.loginPassword) {
           elements.loginPassword.value = '';
-          elements.loginPassword.placeholder = `Enter password for ${name}`;
+          elements.loginPassword.placeholder = 'Enter password';
           elements.loginPassword.focus();
         }
 
         if (elements.authSubmitText) {
-          if (role === 'manager') {
-            elements.authSubmitText.textContent = 'Sign In to Command Center';
-          } else {
-            elements.authSubmitText.textContent = `Sign In as ${name}`;
-          }
+          elements.authSubmitText.textContent = 'Sign In';
         }
         refreshIcons();
       });
