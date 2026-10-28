@@ -3493,15 +3493,17 @@ html, body {
     padding: 24px 20px 48px;
   }
   .header-container {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
   }
   .header-actions {
-    justify-content: space-between;
-    overflow-x: auto;
-    padding-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     gap: 10px;
+    margin-left: auto;
   }
   .form-row {
     grid-template-columns: 1fr;
@@ -3537,6 +3539,57 @@ html, body {
     -webkit-backdrop-filter: blur(18px);
     padding: max(10px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 10px max(14px, env(safe-area-inset-left));
     border-bottom: 1px solid var(--border-subtle);
+  }
+  .header-container {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+  .brand-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: auto !important;
+    flex-shrink: 0;
+  }
+  .header-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    width: auto !important;
+    margin-left: auto !important;
+    padding-bottom: 0 !important;
+    overflow: visible !important;
+    flex-shrink: 0;
+  }
+  .user-profile-menu {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0;
+  }
+  .user-profile-chip-btn {
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer;
+  }
+  .user-profile-chip-btn .user-meta {
+    display: none !important;
+  }
+  .user-avatar {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .cycle-calendar-btn {
+    width: 36px !important;
+    height: 36px !important;
+    flex-shrink: 0;
   }
   .app-main {
     padding: 14px max(12px, env(safe-area-inset-left)) max(40px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-right));
@@ -4024,42 +4077,87 @@ html, body {
 @media (max-width: 480px) {
   /* Ultra-Compact Top Bar for Small Screens */
   .app-header {
-    padding: 8px 12px;
+    padding: 8px max(12px, env(safe-area-inset-right)) 8px max(12px, env(safe-area-inset-left));
+  }
+  .header-container {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: 8px !important;
   }
   .brand-group {
-    justify-content: space-between;
-    width: 100%;
-    gap: 8px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: auto !important;
+    flex-shrink: 0;
   }
-  .brand-logo .sub-label {
-    display: none;
+  .brand-logo {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
   }
-  .cycle-calendar-btn {
-    width: 34px;
-    height: 34px;
+  .brand-logo-img {
+    height: 34px !important;
+    width: 34px !important;
+  }
+  .company-name {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
   }
   .header-actions {
-    width: 100%;
-    justify-content: space-between;
-    gap: 6px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    width: auto !important;
+    margin-left: auto !important;
+    overflow: visible !important;
+    padding-bottom: 0 !important;
+    flex-shrink: 0;
   }
-  .header-role-switcher {
-    flex: 1;
-    min-width: 0;
+  .cycle-calendar-btn {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 9px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
   }
-  .header-role-switcher select {
-    width: 100%;
-    font-size: 11px;
+  .cycle-calendar-btn svg {
+    width: 17px !important;
+    height: 17px !important;
   }
-  .user-profile-menu .user-meta {
-    display: none;
+  .user-profile-menu {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0;
   }
-  .btn-logout span {
-    display: none;
+  .user-profile-chip-btn {
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer;
   }
-  .btn-logout {
-    padding: 6px 10px;
-    min-height: 36px;
+  .user-profile-chip-btn .user-meta {
+    display: none !important;
+  }
+  .user-profile-chip-btn .user-avatar {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    border-radius: 50% !important;
+    box-shadow: 0 2px 8px rgba(239, 36, 36, 0.28) !important;
+    border: 2px solid #FFFFFF !important;
   }
 
   /* Metric numbers */

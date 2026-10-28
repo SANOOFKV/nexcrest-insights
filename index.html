@@ -17,7 +17,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=40">
+  <link rel="stylesheet" href="css/styles.css?v=41">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -44,13 +44,13 @@
             <span class="company-name">Nexcrest Insights</span>
           </div>
         </div>
-        <button type="button" id="btn-calendar-picker" class="cycle-calendar-btn" title="Cycle Calendar" aria-label="Cycle Calendar">
-          <i data-lucide="calendar"></i>
-        </button>
       </div>
 
-      <!-- Header Actions: User Profile -->
+      <!-- Header Actions: Calendar & User Profile -->
       <div class="header-actions">
+        <button type="button" id="btn-calendar-picker" class="cycle-calendar-btn" title="Cycle Calendar" aria-label="Cycle Calendar" style="display: none;">
+          <i data-lucide="calendar"></i>
+        </button>
         <div class="user-profile-menu" id="header-user-profile-menu" style="display: none;">
           <button type="button" id="btn-open-user-profile" class="user-profile-chip-btn" title="Profile Settings">
             <div class="user-avatar" id="header-user-avatar">M</div>
@@ -1353,6 +1353,6 @@
   <script src="js/firebase-config.js?v=39"></script>
   <script src="js/data.js?v=39"></script>
   <script src="js/auth.js?v=39"></script>
-  <script src="js/app.js?v=40"></script>
+  <script src="js/app.js?v=41"></script>
 </body>
 </html>

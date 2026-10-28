@@ -558,6 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!user) {
       elements.authModal.classList.remove('hidden');
       if (elements.headerUserProfileMenu) elements.headerUserProfileMenu.style.display = 'none';
+      if (elements.btnCalendarPicker) elements.btnCalendarPicker.style.display = 'none';
       if (elements.reviewAlertBanner) elements.reviewAlertBanner.classList.add('hidden');
       elements.managerView.classList.remove('active');
       elements.managerView.classList.add('hidden');
@@ -568,6 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     elements.authModal.classList.add('hidden');
     if (elements.headerUserProfileMenu) elements.headerUserProfileMenu.style.display = 'flex';
+    if (elements.btnCalendarPicker) elements.btnCalendarPicker.style.display = 'inline-flex';
 
     elements.headerUserName.textContent = user.name;
     if (elements.headerRoleBadge) elements.headerRoleBadge.textContent = user.title;
