@@ -695,6 +695,16 @@ body.dark-theme .btn-logout:hover {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Tactile Spring Micro-Interactions for Buttons and Touch Targets */
+button:active:not(:disabled),
+.btn:active:not(:disabled),
+.role-login-tab:active,
+.member-cat-btn:active,
+.tab-pill:active {
+  transform: scale(0.96);
+  transition: transform 0.08s ease;
+}
+
 .section-header {
   display: flex;
   align-items: flex-start;
@@ -3369,41 +3379,50 @@ html, body {
   }
 
   .app-header {
-    padding: 10px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    padding: max(10px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 10px max(14px, env(safe-area-inset-left));
+    border-bottom: 1px solid var(--border-subtle);
   }
   .app-main {
-    padding: 14px 10px 40px;
+    padding: 14px max(12px, env(safe-area-inset-left)) max(40px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-right));
   }
 
-  /* Section Header & Actions (Overview, Targets, Review, Roster, Audit, Member Studio) */
+  /* Section Header & Compact 2-Column Responsive Actions */
   .section-header {
     flex-direction: column;
     align-items: stretch;
-    gap: 14px;
-    margin-bottom: 18px;
+    gap: 12px;
+    margin-bottom: 16px;
   }
   .view-title {
-    font-size: 22px;
+    font-size: 20px;
   }
   .view-subtitle {
     font-size: 13px;
   }
   .header-action-buttons {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    gap: 8px;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    width: 100% !important;
+    gap: 8px !important;
   }
   .header-action-buttons .export-dropdown-wrapper {
-    width: 100%;
+    width: 100% !important;
   }
   .header-action-buttons .btn,
   #btn-export-data,
   #btn-open-assign-modal,
-  #btn-member-log-work {
-    width: 100%;
-    justify-content: center;
-    min-height: 44px;
+  #btn-member-log-work,
+  #btn-member-open-profile {
+    width: 100% !important;
+    justify-content: center !important;
+    min-height: 42px !important;
+    padding: 8px 10px !important;
+    font-size: 13px !important;
   }
   .export-menu {
     width: 100%;
@@ -3436,21 +3455,28 @@ html, body {
     display: flex;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
     flex-wrap: nowrap;
     scrollbar-width: none;
     -ms-overflow-style: none;
     width: 100%;
-    padding: 4px;
-    gap: 6px;
+    padding: 6px 4px;
+    gap: 8px;
   }
   .tab-pills::-webkit-scrollbar {
     display: none;
   }
   .tab-pill {
+    scroll-snap-align: start;
     flex-shrink: 0;
     white-space: nowrap;
-    padding: 8px 12px;
-    font-size: 12px;
+    padding: 9px 14px;
+    font-size: 13px;
+    border-radius: var(--radius-full);
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+  .tab-pill:active {
+    transform: scale(0.95);
   }
 
   /* 4 Hero Metric Cards in 2x2 Grid */
@@ -3675,14 +3701,31 @@ html, body {
     width: 100%;
   }
   .table-responsive {
+    position: relative;
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
     border-radius: var(--radius-md);
     border: 1px solid var(--border-subtle);
+    box-shadow: inset -8px 0 8px -6px rgba(0, 0, 0, 0.12);
   }
   .data-table {
-    min-width: 780px;
+    min-width: 760px;
+  }
+  .data-table th:first-child,
+  .data-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--bg-card);
+    box-shadow: 2px 0 6px -2px rgba(0, 0, 0, 0.12);
+  }
+  body.dark-theme .data-table th:first-child {
+    background: #10121A;
+  }
+  body.dark-theme .data-table td:first-child {
+    background: #131722;
   }
 
   /* Member Portal Responsive */
@@ -3762,14 +3805,15 @@ html, body {
   .modal-card {
     width: 100% !important;
     max-width: 100% !important;
-    max-height: 90vh !important;
-    padding: 22px 16px 28px !important;
+    max-height: 92dvh !important;
+    padding: 22px 16px max(28px, env(safe-area-inset-bottom)) !important;
     margin: 0 !important;
     border-bottom-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
     border-top-left-radius: 20px !important;
     border-top-right-radius: 20px !important;
     overflow-y: auto !important;
+    overscroll-behavior: contain !important;
     -webkit-overflow-scrolling: touch;
   }
   .modal-card::before {
