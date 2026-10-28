@@ -18,7 +18,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=31">
+  <link rel="stylesheet" href="css/styles.css?v=32">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -80,35 +80,56 @@
 
   <!-- Dedicated Full-Screen Login Portal (shown by default when not logged in) -->
   <div id="auth-modal" class="modal-overlay">
+    <div class="auth-backdrop-glow"></div>
     <div class="modal-card auth-card spotlight-card">
-      <div class="auth-header">
-        <div class="brand-logo large" style="background: transparent; border: none; box-shadow: none; padding: 0;">
-          <img src="assets/nexcrest_icon.png" alt="Nexcrest Insights" style="height: 64px; width: 64px; object-fit: contain; margin: 0 auto 14px auto; display: block; border-radius: 12px; filter: drop-shadow(0 4px 16px rgba(239, 36, 36, 0.4));">
-        </div>
-        <h2>Nexcrest Insights</h2>
-        <p class="auth-subtitle">Operations, KPI & Marketing Command Center</p>
+      <!-- Portal Top Utility Bar (Live Status & Theme Toggle) -->
+      <div class="auth-card-topbar">
+        <span class="auth-portal-badge">
+          <span class="auth-badge-dot"></span>
+          Enterprise Ops
+        </span>
+        <button type="button" class="auth-theme-toggle-btn" id="auth-theme-toggle-btn" title="Toggle Light / Dark Mode" aria-label="Toggle Light / Dark Mode">
+          <i data-lucide="sun"></i>
+        </button>
       </div>
 
-      <!-- Quick Account / Portal Profile Selector (Dynamically populated with all staff including Sumesh) -->
-      <div class="role-login-tabs" id="role-login-tabs-container">
-        <!-- Injected dynamically via JavaScript -->
+      <!-- Auth Branding Header -->
+      <div class="auth-header">
+        <div class="auth-brand-emblem-wrap">
+          <img src="assets/nexcrest_icon.png" alt="Nexcrest Insights" class="auth-brand-emblem-img">
+        </div>
+        <h2 class="auth-title">Nexcrest Insights</h2>
+        <p class="auth-subtitle">Operations, KPI & Performance Command Center</p>
+      </div>
+
+      <!-- Quick Account / Portal Profile Selector -->
+      <div class="auth-profiles-section">
+        <div class="auth-section-header">
+          <span class="auth-section-title">Select Team Account</span>
+          <span class="auth-section-hint">Tap to switch profile</span>
+        </div>
+        <div class="role-login-tabs" id="role-login-tabs-container">
+          <!-- Injected dynamically via JavaScript -->
+        </div>
       </div>
 
       <form id="auth-form" class="auth-form">
-        <div class="form-group">
-          <label for="login-email">Work Email</label>
-          <div class="input-with-icon">
-            <i data-lucide="mail"></i>
-            <input type="email" id="login-email" placeholder="name@nexcrest.com" required value="manager@nexcrest.com" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username">
+        <div class="form-group auth-form-group">
+          <label for="login-email" class="auth-label">Work Email</label>
+          <div class="input-with-icon auth-input-wrap">
+            <i data-lucide="mail" class="auth-input-icon"></i>
+            <input type="email" id="login-email" class="auth-input" placeholder="name@nexcrest.com" required value="manager@nexcrest.com" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username">
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="login-password">Password</label>
-          <div class="input-with-icon-right" id="login-password-wrapper">
-            <i data-lucide="lock" class="input-left-icon"></i>
-            <input type="password" id="login-password" placeholder="Enter account password" required autocomplete="current-password" value="" autocapitalize="none" autocorrect="off" spellcheck="false">
-            <button type="button" class="btn-toggle-pass-visibility" data-target="login-password" title="Toggle password visibility" aria-label="Toggle password visibility">
+        <div class="form-group auth-form-group">
+          <div class="auth-label-row">
+            <label for="login-password" class="auth-label">Password</label>
+          </div>
+          <div class="input-with-icon-right auth-input-wrap" id="login-password-wrapper">
+            <i data-lucide="lock" class="input-left-icon auth-input-icon"></i>
+            <input type="password" id="login-password" class="auth-input" placeholder="Enter password for Marketing Manager" required autocomplete="current-password" value="" autocapitalize="none" autocorrect="off" spellcheck="false">
+            <button type="button" class="btn-toggle-pass-visibility auth-pass-toggle" data-target="login-password" title="Toggle password visibility" aria-label="Toggle password visibility">
               <i data-lucide="eye"></i>
             </button>
           </div>
@@ -120,11 +141,17 @@
           <span id="auth-error-text">Incorrect password. Please try again.</span>
         </div>
 
-        <button type="submit" id="auth-submit-btn" class="btn btn-primary btn-block">
-          <span id="auth-submit-text">Sign In to Workspace</span>
+        <button type="submit" id="auth-submit-btn" class="btn btn-primary btn-block auth-submit-btn">
+          <span id="auth-submit-text">Sign In to Command Center</span>
           <i data-lucide="arrow-right"></i>
         </button>
       </form>
+
+      <!-- Security Trust Footnote -->
+      <div class="auth-footer-note">
+        <i data-lucide="shield-check"></i>
+        <span>256-Bit Encrypted Session • Real-Time Cloud Sync</span>
+      </div>
     </div>
   </div>
 

@@ -232,7 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
     authErrorNotice: document.getElementById('auth-error-notice'),
     authErrorText: document.getElementById('auth-error-text'),
     roleLoginTabs: document.querySelectorAll('.role-login-tab'),
-    authSubmitText: document.getElementById('auth-submit-text')
+    authSubmitText: document.getElementById('auth-submit-text'),
+    authThemeToggleBtn: document.getElementById('auth-theme-toggle-btn')
   };
 
   // Helper: Toast Notifications
@@ -1662,7 +1663,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!container) return;
 
     const allUsers = window.authService.getAllUsers();
-    const normActive = (activeEmail || (elements.loginEmail ? elements.loginEmail.value : 'manager@nexcrest.com')).toLowerCase();
+    const currentEmail = elements.loginEmail ? elements.loginEmail.value : 'manager@nexcrest.com';
+    const normActive = (activeEmail || currentEmail || 'manager@nexcrest.com').toLowerCase();
 
     container.innerHTML = allUsers.map(u => {
       const isMgr = u.role === 'manager';
@@ -1675,10 +1677,20 @@ document.addEventListener('DOMContentLoaded', () => {
       else if (u.role === 'content') icon = 'file-text';
       else if (u.role === 'motion') icon = 'film';
 
+      const roleDisplay = u.title || (u.role.charAt(0).toUpperCase() + u.role.slice(1));
+
       return `
-        <button type="button" class="role-login-tab ${isActive ? 'active' : ''}" data-email="${escapeHtml(u.email)}" data-name="${escapeHtml(u.name)}" data-role="${escapeHtml(u.role)}" data-title="${escapeHtml(u.title || u.name)}">
-          <i data-lucide="${icon}"></i>
-          <span>${escapeHtml(u.name)}</span>
+        <button type="button" class="role-login-tab ${isActive ? 'active' : ''}" data-email="${escapeHtml(u.email)}" data-name="${escapeHtml(u.name)}" data-role="${escapeHtml(u.role)}" data-title="${escapeHtml(roleDisplay)}" aria-pressed="${isActive ? 'true' : 'false'}">
+          <div class="role-tab-badge role-badge-${escapeHtml(u.role)}">
+            <i data-lucide="${icon}"></i>
+          </div>
+          <div class="role-tab-info">
+            <div class="role-tab-name">${escapeHtml(u.name)}</div>
+            <div class="role-tab-role">${escapeHtml(roleDisplay)}</div>
+          </div>
+          <div class="role-tab-indicator">
+            <i data-lucide="check"></i>
+          </div>
         </button>
       `;
     }).join('');
@@ -1690,13 +1702,21 @@ document.addEventListener('DOMContentLoaded', () => {
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
         clearAuthError();
-        tabs.forEach(t => t.classList.remove('active'));
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-pressed', 'false');
+        });
         tab.classList.add('active');
+        tab.setAttribute('aria-pressed', 'true');
+
+        // Smooth scroll tab into view on mobile
+        if (typeof tab.scrollIntoView === 'function') {
+          tab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
 
         const email = tab.dataset.email;
         const name = tab.dataset.name;
         const role = tab.dataset.role;
-        const title = tab.dataset.title;
 
         if (elements.loginEmail) elements.loginEmail.value = email;
         if (elements.loginPassword) {
@@ -1705,10 +1725,12 @@ document.addEventListener('DOMContentLoaded', () => {
           elements.loginPassword.focus();
         }
 
-        if (role === 'manager') {
-          if (elements.authSubmitText) elements.authSubmitText.textContent = 'Sign In as Marketing Manager';
-        } else {
-          if (elements.authSubmitText) elements.authSubmitText.textContent = `Sign In as ${name}`;
+        if (elements.authSubmitText) {
+          if (role === 'manager') {
+            elements.authSubmitText.textContent = 'Sign In to Command Center';
+          } else {
+            elements.authSubmitText.textContent = `Sign In as ${name}`;
+          }
         }
         refreshIcons();
       });
@@ -2926,12 +2948,20 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.themeToggleBtn.innerHTML = '<i data-lucide="sun"></i>';
         elements.themeToggleBtn.setAttribute('title', 'Switch to Light Theme');
       }
+      if (elements.authThemeToggleBtn) {
+        elements.authThemeToggleBtn.innerHTML = '<i data-lucide="sun"></i>';
+        elements.authThemeToggleBtn.setAttribute('title', 'Switch to Light Theme');
+      }
     } else {
       document.body.classList.remove('dark-theme');
       document.body.classList.add('light-theme');
       if (elements.themeToggleBtn) {
         elements.themeToggleBtn.innerHTML = '<i data-lucide="moon"></i>';
         elements.themeToggleBtn.setAttribute('title', 'Switch to Dark Theme');
+      }
+      if (elements.authThemeToggleBtn) {
+        elements.authThemeToggleBtn.innerHTML = '<i data-lucide="moon"></i>';
+        elements.authThemeToggleBtn.setAttribute('title', 'Switch to Dark Theme');
       }
     }
     localStorage.setItem(THEME_KEY, theme);
@@ -2944,6 +2974,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (elements.themeToggleBtn) {
     elements.themeToggleBtn.addEventListener('click', () => {
+      const isCurrentlyDark = document.body.classList.contains('dark-theme');
+      applyTheme(isCurrentlyDark ? 'light' : 'dark');
+      showToast(`Switched to ${isCurrentlyDark ? 'Light' : 'Dark'} Theme`, 'info');
+    });
+  }
+
+  if (elements.authThemeToggleBtn) {
+    elements.authThemeToggleBtn.addEventListener('click', () => {
       const isCurrentlyDark = document.body.classList.contains('dark-theme');
       applyTheme(isCurrentlyDark ? 'light' : 'dark');
       showToast(`Switched to ${isCurrentlyDark ? 'Light' : 'Dark'} Theme`, 'info');
