@@ -17,7 +17,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=36">
+  <link rel="stylesheet" href="css/styles.css?v=37">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -79,11 +79,9 @@
         <h2 class="auth-title">Nexcrest Insights</h2>
       </div>
 
-      <!-- Quick Account / Portal Profile Selector -->
+      <!-- Quick Account Selector -->
       <div class="auth-profiles-section">
-        <div class="auth-section-header">
-          <span class="auth-section-title">Select Account</span>
-        </div>
+        <span class="auth-section-title">Select Account</span>
         <div class="role-login-tabs" id="role-login-tabs-container">
           <!-- Injected dynamically via JavaScript -->
         </div>
@@ -92,18 +90,16 @@
       <form id="auth-form" class="auth-form">
         <div class="form-group auth-form-group">
           <label for="login-email" class="auth-label">Email</label>
-          <div class="input-with-icon auth-input-wrap">
+          <div class="auth-input-wrap">
             <i data-lucide="mail" class="auth-input-icon"></i>
             <input type="email" id="login-email" class="auth-input" placeholder="name@nexcrest.com" required value="manager@nexcrest.com" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username">
           </div>
         </div>
 
         <div class="form-group auth-form-group">
-          <div class="auth-label-row">
-            <label for="login-password" class="auth-label">Password</label>
-          </div>
-          <div class="input-with-icon-right auth-input-wrap" id="login-password-wrapper">
-            <i data-lucide="lock" class="input-left-icon auth-input-icon"></i>
+          <label for="login-password" class="auth-label">Password</label>
+          <div class="auth-input-wrap" id="login-password-wrapper">
+            <i data-lucide="lock" class="auth-input-icon"></i>
             <input type="password" id="login-password" class="auth-input" placeholder="Enter password" required autocomplete="current-password" value="" autocapitalize="none" autocorrect="off" spellcheck="false">
             <button type="button" class="btn-toggle-pass-visibility auth-pass-toggle" data-target="login-password" title="Toggle password visibility" aria-label="Toggle password visibility">
               <i data-lucide="eye"></i>
@@ -1346,9 +1342,9 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=36"></script>
-  <script src="js/data.js?v=36"></script>
-  <script src="js/auth.js?v=36"></script>
-  <script src="js/app.js?v=36"></script>
+  <script src="js/firebase-config.js?v=37"></script>
+  <script src="js/data.js?v=37"></script>
+  <script src="js/auth.js?v=37"></script>
+  <script src="js/app.js?v=37"></script>
 </body>
 </html>

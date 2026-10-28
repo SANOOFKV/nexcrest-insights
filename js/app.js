@@ -1678,14 +1678,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const roleDisplay = u.title || (u.role.charAt(0).toUpperCase() + u.role.slice(1));
 
       return `
-        <button type="button" class="role-login-tab ${isActive ? 'active' : ''}" data-email="${escapeHtml(u.email)}" data-name="${escapeHtml(u.name)}" data-role="${escapeHtml(u.role)}" data-title="${escapeHtml(roleDisplay)}" aria-pressed="${isActive ? 'true' : 'false'}">
+        <button type="button" class="role-login-tab ${isActive ? 'active' : ''}" data-email="${escapeHtml(u.email)}" data-name="${escapeHtml(u.name)}" data-role="${escapeHtml(u.role)}" aria-pressed="${isActive ? 'true' : 'false'}" title="${escapeHtml(u.name)}">
           <div class="role-tab-badge role-badge-${escapeHtml(u.role)}">
             <i data-lucide="${icon}"></i>
           </div>
-          <div class="role-tab-info">
-            <div class="role-tab-name">${escapeHtml(u.name)}</div>
-            <div class="role-tab-role">${escapeHtml(roleDisplay)}</div>
-          </div>
+          <span class="role-tab-name">${escapeHtml(u.name)}</span>
           <div class="role-tab-indicator">
             <i data-lucide="check"></i>
           </div>
