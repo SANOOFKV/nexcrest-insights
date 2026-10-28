@@ -1588,7 +1588,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div>
               <div class="del-card-header">
                 <div class="del-badges-row">
-                  <span class="badge-brand ${escapeHtml(target.brand)}">${escapeHtml(target.brand)}</span>
+                  ${target.brand && target.brand.toLowerCase() !== 'insights' ? `<span class="badge-brand ${escapeHtml(target.brand)}">${escapeHtml(target.brand)}</span>` : ''}
                   <span class="badge-category">${escapeHtml(target.category)}</span>
                   <span class="badge-format">${escapeHtml(target.format)}</span>
                 </div>

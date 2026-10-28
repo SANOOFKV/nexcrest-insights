@@ -88,7 +88,7 @@ const SEED_TARGETS = [
     format: 'Carousel',
     targetQty: 5,
     month: '2026-10',
-    notes: 'Corporate tech insights, system architecture deep-dives'
+    notes: 'Corporate tech updates, system architecture deep-dives'
   },
   {
     id: 'gd-8',
@@ -163,7 +163,7 @@ const SEED_TARGETS = [
     assignee: 'videographer',
     brand: 'IT',
     category: 'Branding',
-    program: 'IT Program Explainers & Faculty Insights',
+    program: 'IT Program Explainers & Faculty Talks',
     format: 'Short Video Clips',
     targetQty: 4,
     month: '2026-10',
@@ -314,7 +314,7 @@ const SEED_SUBMISSIONS = [
     format: 'Carousel',
     title: 'Top 7 Git Commands Every Developer Must Know',
     url: 'https://drive.google.com/drive/folders/demo-git-carousel',
-    notes: 'Carousel #1 of 5 for Nexcrest Insights. Includes code snippets.',
+    notes: 'Carousel #1 of 5. Includes code snippets.',
     submittedAt: '2026-10-15T09:45:00Z',
     status: 'approved',
     feedback: 'Great format, carousel verified.'

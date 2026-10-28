@@ -1527,6 +1527,11 @@ body.dark-theme .badge-role.badge-community {
   border: 1px solid rgba(239, 36, 36, 0.25);
 }
 
+.deliverable-card .badge-brand.Insights,
+.deliverable-card .del-badges-row .badge-brand.Insights {
+  display: none !important;
+}
+
 .badge-brand.IT {
   background: #EDE9FE;
   color: #6D28D9;
