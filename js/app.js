@@ -1148,9 +1148,9 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="empty-cycle-banner">
                 <i data-lucide="calendar-plus" style="width: 42px; height: 42px; color: var(--teal-primary);"></i>
                 <h4>No Target Quotas Assigned for ${escapeHtml(activeMonth)}</h4>
-                <p>Would you like to duplicate and clone the standard operational quotas from October 2026 into this month?</p>
+                <p>Would you like to duplicate and clone the standard operational quotas into this cycle?</p>
                 <button id="btn-clone-quotas" class="btn btn-primary">
-                  <i data-lucide="copy"></i> Clone October 2026 Quotas (${escapeHtml(activeMonth)})
+                  <i data-lucide="copy"></i> Clone Standard Quotas (${escapeHtml(activeMonth)})
                 </button>
               </div>
             </td>
@@ -1776,8 +1776,77 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Dynamic Month Selector Generator (Perpetual Rolling Calendar: 2026, 2027, 2028+)
+  function populateMonthSelector() {
+    if (!elements.monthSelector) return;
+    const activeMonth = window.dataStore.getActiveMonth();
+
+    if (!elements.monthSelector.dataset.dynamicBuilt) {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonthNum = now.getMonth() + 1;
+      const currentYm = `${currentYear}-${String(currentMonthNum).padStart(2, '0')}`;
+
+      // Start with standard archive & cycles
+      const existingMonths = new Set(['2026-09', '2026-10', '2026-11', '2026-12']);
+
+      // Collect all historical months from stored data
+      if (window.dataStore && Array.isArray(window.dataStore.targets)) {
+        window.dataStore.targets.forEach(t => {
+          if (t.month && /^\d{4}-\d{2}$/.test(t.month)) existingMonths.add(t.month);
+        });
+      }
+      if (window.dataStore && Array.isArray(window.dataStore.submissions)) {
+        window.dataStore.submissions.forEach(s => {
+          if (s.month && /^\d{4}-\d{2}$/.test(s.month)) existingMonths.add(s.month);
+        });
+      }
+
+      // Automatically generate rolling months for 2026 up through currentYear + 1 (e.g. all 2027, 2028)
+      const endYear = Math.max(currentYear + 1, 2027);
+      for (let y = 2026; y <= endYear; y++) {
+        for (let m = 1; m <= 12; m++) {
+          existingMonths.add(`${y}-${String(m).padStart(2, '0')}`);
+        }
+      }
+
+      const sortedMonths = Array.from(existingMonths).sort();
+      const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+
+      elements.monthSelector.innerHTML = sortedMonths.map(ym => {
+        const [y, mStr] = ym.split('-');
+        const mIdx = parseInt(mStr, 10) - 1;
+        const monthName = monthNames[mIdx] || ym;
+        let label = `${monthName} ${y}`;
+
+        if (ym === currentYm) {
+          label += ' (Active)';
+        } else if (ym === '2026-09') {
+          label += ' (Archive)';
+        } else if (ym === '2026-10') {
+          label += ' (Target Baseline)';
+        }
+
+        return `<option value="${ym}">${label}</option>`;
+      }).join('');
+
+      elements.monthSelector.dataset.dynamicBuilt = 'true';
+    }
+
+    elements.monthSelector.value = activeMonth;
+
+    if (elements.monthDisplay) {
+      const selectedOpt = elements.monthSelector.options[elements.monthSelector.selectedIndex];
+      if (selectedOpt) elements.monthDisplay.textContent = selectedOpt.text;
+    }
+  }
+
   // Master Render Loop
   function renderApp() {
+    populateMonthSelector();
     updateHeader();
     populateLoginProfileTabs();
     populateTargetAssigneeOptions();
