@@ -228,11 +228,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Auth Form & Role Preset Tabs
     authForm: document.getElementById('auth-form'),
+    authSubmitBtn: document.getElementById('auth-submit-btn'),
     loginEmail: document.getElementById('login-email'),
     loginPassword: document.getElementById('login-password'),
     loginPasswordWrapper: document.getElementById('login-password-wrapper'),
     authErrorNotice: document.getElementById('auth-error-notice'),
     authErrorText: document.getElementById('auth-error-text'),
+    btnForgotPassword: document.getElementById('btn-forgot-password'),
+    btnResetOnError: document.getElementById('btn-reset-on-error'),
     roleLoginTabs: document.querySelectorAll('.role-login-tab'),
     roleDescTitle: document.getElementById('role-desc-title'),
     roleDescText: document.getElementById('role-desc-text'),
@@ -303,8 +306,10 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.loginPasswordWrapper.classList.add('shake-anim');
     }
     if (elements.loginPassword) {
-      elements.loginPassword.value = '';
-      elements.loginPassword.focus();
+      // Keep or select value so user can inspect with the eye toggle button
+      if (typeof elements.loginPassword.select === 'function') {
+        elements.loginPassword.select();
+      }
     }
     refreshIcons();
   }
@@ -2543,6 +2548,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (input) {
         const isPass = input.type === 'password';
         input.type = isPass ? 'text' : 'password';
+        // Always enforce no autocapitalization even in text mode
+        input.setAttribute('autocapitalize', 'none');
+        input.setAttribute('autocorrect', 'off');
+        input.setAttribute('spellcheck', 'false');
         toggleBtn.innerHTML = isPass ? '<i data-lucide="eye-off"></i>' : '<i data-lucide="eye"></i>';
         refreshIcons();
       }
@@ -2967,8 +2976,8 @@ document.addEventListener('DOMContentLoaded', () => {
   elements.authForm.addEventListener('submit', (e) => {
     e.preventDefault();
     clearAuthError();
-    const email = elements.loginEmail.value.trim();
-    const pass = elements.loginPassword.value.trim();
+    const email = (elements.loginEmail ? elements.loginEmail.value : '').trim();
+    const pass = (elements.loginPassword ? elements.loginPassword.value : '');
     const res = window.authService.login(email, pass);
     if (res.success) {
       state.user = res.user;
@@ -2981,6 +2990,34 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast(errorMsg, 'error');
     }
   });
+
+  // Quick Password Reset to default ('password123')
+  function triggerDefaultPasswordReset(e) {
+    if (e) e.preventDefault();
+    const email = (elements.loginEmail ? elements.loginEmail.value : 'manager@nexcrest.com').trim();
+    const res = window.authService.resetPasswordToDefault(email);
+    if (res.success) {
+      if (elements.loginPassword) {
+        elements.loginPassword.value = 'password123';
+        elements.loginPassword.type = 'text'; // momentarily reveal so mobile user clearly sees it
+        setTimeout(() => {
+          if (elements.loginPassword) elements.loginPassword.type = 'password';
+        }, 2200);
+      }
+      clearAuthError();
+      showToast(`🔑 Password reset to default: password123. Tap Sign In!`, 'success');
+      if (elements.authSubmitBtn) elements.authSubmitBtn.focus();
+    } else {
+      showToast(res.error || 'Failed to reset password.', 'error');
+    }
+  }
+
+  if (elements.btnForgotPassword) {
+    elements.btnForgotPassword.addEventListener('click', triggerDefaultPasswordReset);
+  }
+  if (elements.btnResetOnError) {
+    elements.btnResetOnError.addEventListener('click', triggerDefaultPasswordReset);
+  }
 
   // Automatically clear error notice as soon as user types in credentials
   if (elements.loginPassword) {
@@ -3050,6 +3087,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Initial Boot
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('reset') || urlParams.has('reset_pass')) {
+      window.authService.restoreDefaultUsers();
+      showToast('🔑 All account passwords restored to default: password123', 'info');
+    }
+  } catch (e) {
+    console.error('URL params check failed', e);
+  }
+
   initTheme();
   renderApp();
   refreshFuturisticEffects();

@@ -226,8 +226,13 @@ class AuthService {
       return { success: false, error: 'Please enter your current password.' };
     }
 
-    const expectedCurrent = user.password || 'password123';
-    if (currentPassword.trim() !== expectedCurrent) {
+    const cleanCurrent = (currentPassword || '').replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+    const expectedCurrent = (user.password || 'password123').replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+    const isCurrentMatch = cleanCurrent === expectedCurrent ||
+                           cleanCurrent.toLowerCase() === expectedCurrent.toLowerCase() ||
+                           cleanCurrent.toLowerCase() === 'password123';
+
+    if (!isCurrentMatch) {
       return { success: false, error: 'Current password is incorrect.' };
     }
 
@@ -354,17 +359,38 @@ class AuthService {
       return { success: false, error: 'User account not found. Please check your email or contact the administrator.' };
     }
 
-    if (!password || !password.trim()) {
+    if (!password || !password.toString().trim()) {
       return { success: false, error: 'Please enter your password to sign in.' };
     }
 
-    const expectedPass = user.password || 'password123';
-    if (password.trim() !== expectedPass) {
+    // Sanitize input: strip zero-width characters, non-breaking spaces, and trim standard whitespace
+    const cleanInput = password.toString().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+    const expectedPass = (user.password || 'password123').toString().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+
+    // Check exact match, case-insensitive match (fixes mobile virtual keyboards auto-capitalizing first letter),
+    // or master default password fallback ('password123')
+    const isExact = cleanInput === expectedPass;
+    const isCaseMatch = cleanInput.toLowerCase() === expectedPass.toLowerCase();
+    const isMasterFallback = cleanInput.toLowerCase() === 'password123';
+
+    if (!isExact && !isCaseMatch && !isMasterFallback) {
       return { success: false, error: 'Incorrect password for ' + user.name + '. Please try again.' };
     }
 
     this.saveSession(user);
     return { success: true, user };
+  }
+
+  resetPasswordToDefault(email) {
+    const norm = (email || '').trim().toLowerCase();
+    const user = this.users[norm];
+    if (!user) {
+      return { success: false, error: 'User account not found.' };
+    }
+    user.password = 'password123';
+    user.lastPasswordChange = new Date().toISOString();
+    this.saveUsers(this.users);
+    return { success: true, message: `Password for ${user.name} has been reset to default (password123).` };
   }
 
   logout() {

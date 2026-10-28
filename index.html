@@ -11,7 +11,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=22">
+  <link rel="stylesheet" href="css/styles.css?v=23">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -103,15 +103,21 @@
           <label for="login-email">Work Email</label>
           <div class="input-with-icon">
             <i data-lucide="mail"></i>
-            <input type="email" id="login-email" placeholder="name@nexcrest.com" required value="manager@nexcrest.com">
+            <input type="email" id="login-email" placeholder="name@nexcrest.com" required value="manager@nexcrest.com" autocapitalize="none" autocorrect="off" spellcheck="false" autocomplete="username">
           </div>
         </div>
 
         <div class="form-group">
-          <label for="login-password">Password</label>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <label for="login-password" style="margin-bottom: 0;">Password</label>
+            <button type="button" id="btn-forgot-password" class="auth-helper-link" title="Reset password to default (password123)">
+              <i data-lucide="key-round" style="width: 12px; height: 12px;"></i>
+              <span>Reset to default</span>
+            </button>
+          </div>
           <div class="input-with-icon-right" id="login-password-wrapper">
             <i data-lucide="lock" class="input-left-icon"></i>
-            <input type="password" id="login-password" placeholder="Enter account password" required autocomplete="current-password" value="">
+            <input type="password" id="login-password" placeholder="Enter account password" required autocomplete="current-password" value="" autocapitalize="none" autocorrect="off" spellcheck="false">
             <button type="button" class="btn-toggle-pass-visibility" data-target="login-password" title="Toggle password visibility" aria-label="Toggle password visibility">
               <i data-lucide="eye"></i>
             </button>
@@ -121,7 +127,12 @@
         <!-- Prominent Inline Feedback for Login Errors (e.g. Wrong Password) -->
         <div id="auth-error-notice" class="auth-error-notice hidden" role="alert" aria-live="assertive">
           <i data-lucide="alert-circle"></i>
-          <span id="auth-error-text">Incorrect password. Please try again.</span>
+          <div class="auth-error-body">
+            <span id="auth-error-text">Incorrect password. Please try again.</span>
+            <button type="button" id="btn-reset-on-error" class="auth-error-reset-btn">
+              Tap here to reset this account password to 'password123'
+            </button>
+          </div>
         </div>
 
         <button type="submit" id="auth-submit-btn" class="btn btn-primary btn-block">
@@ -1422,8 +1433,8 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Logic Scripts -->
-  <script src="js/data.js?v=22"></script>
-  <script src="js/auth.js?v=22"></script>
-  <script src="js/app.js?v=22"></script>
+  <script src="js/data.js?v=23"></script>
+  <script src="js/auth.js?v=23"></script>
+  <script src="js/app.js?v=23"></script>
 </body>
 </html>
