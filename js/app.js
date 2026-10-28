@@ -29,13 +29,15 @@ document.addEventListener('DOMContentLoaded', () => {
       search: ''
     },
     pendingDeleteEmail: null,
-    pendingDeleteName: null
+    pendingDeleteName: null,
+    calendarModalYear: 2026
   };
 
   // DOM Element Selectors
   const elements = {
     // Top Bar
     monthSelector: document.getElementById('month-selector'),
+    btnCalendarPicker: document.getElementById('btn-calendar-picker'),
     monthDisplay: document.getElementById('current-month-display'),
     headerUserProfileMenu: document.getElementById('header-user-profile-menu'),
     btnOpenUserProfile: document.getElementById('btn-open-user-profile'),
@@ -213,6 +215,16 @@ document.addEventListener('DOMContentLoaded', () => {
     profileNewPass: document.getElementById('profile-new-pass'),
     profileConfirmPass: document.getElementById('profile-confirm-pass'),
     profilePasswordError: document.getElementById('profile-password-error'),
+
+    // Historical Calendar Modal Elements
+    historicalCalendarModal: document.getElementById('historical-calendar-modal'),
+    btnCloseCalendarModal: document.getElementById('btn-close-calendar-modal'),
+    btnCalClose: document.getElementById('btn-cal-close'),
+    btnCalPrevYear: document.getElementById('btn-cal-prev-year'),
+    btnCalNextYear: document.getElementById('btn-cal-next-year'),
+    calSelectedYearText: document.getElementById('cal-selected-year-text'),
+    calendarMonthsGrid: document.getElementById('calendar-months-grid'),
+    btnCalJumpCurrent: document.getElementById('btn-cal-jump-current'),
 
     // Auth Form & Role Preset Tabs
     authForm: document.getElementById('auth-form'),
@@ -1776,72 +1788,215 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Dynamic Month Selector Generator (Perpetual Rolling Calendar: 2026, 2027, 2028+)
+  // 6-Month Rolling Horizon + Historical Archive & Calendar Picker
   function populateMonthSelector() {
     if (!elements.monthSelector) return;
-    const activeMonth = window.dataStore.getActiveMonth();
+    const activeMonth = window.dataStore.getActiveMonth(); // e.g. '2026-10'
 
-    if (!elements.monthSelector.dataset.dynamicBuilt) {
-      const now = new Date();
-      const currentYear = now.getFullYear();
-      const currentMonthNum = now.getMonth() + 1;
-      const currentYm = `${currentYear}-${String(currentMonthNum).padStart(2, '0')}`;
+    const now = new Date();
+    const curY = now.getFullYear();
+    const curM = now.getMonth() + 1; // 1-12
+    const currentYm = `${curY}-${String(curM).padStart(2, '0')}`;
 
-      // Start with standard archive & cycles
-      const existingMonths = new Set(['2026-09', '2026-10', '2026-11', '2026-12']);
-
-      // Collect all historical months from stored data
-      if (window.dataStore && Array.isArray(window.dataStore.targets)) {
-        window.dataStore.targets.forEach(t => {
-          if (t.month && /^\d{4}-\d{2}$/.test(t.month)) existingMonths.add(t.month);
-        });
-      }
-      if (window.dataStore && Array.isArray(window.dataStore.submissions)) {
-        window.dataStore.submissions.forEach(s => {
-          if (s.month && /^\d{4}-\d{2}$/.test(s.month)) existingMonths.add(s.month);
-        });
-      }
-
-      // Automatically generate rolling months for 2026 up through currentYear + 1 (e.g. all 2027, 2028)
-      const endYear = Math.max(currentYear + 1, 2027);
-      for (let y = 2026; y <= endYear; y++) {
-        for (let m = 1; m <= 12; m++) {
-          existingMonths.add(`${y}-${String(m).padStart(2, '0')}`);
-        }
-      }
-
-      const sortedMonths = Array.from(existingMonths).sort();
-      const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-      ];
-
-      elements.monthSelector.innerHTML = sortedMonths.map(ym => {
-        const [y, mStr] = ym.split('-');
-        const mIdx = parseInt(mStr, 10) - 1;
-        const monthName = monthNames[mIdx] || ym;
-        let label = `${monthName} ${y}`;
-
-        if (ym === currentYm) {
-          label += ' (Active)';
-        } else if (ym === '2026-09') {
-          label += ' (Archive)';
-        } else if (ym === '2026-10') {
-          label += ' (Target Baseline)';
-        }
-
-        return `<option value="${ym}">${label}</option>`;
-      }).join('');
-
-      elements.monthSelector.dataset.dynamicBuilt = 'true';
+    // Exactly 6-month rolling window starting from current active month
+    // When a month completes, the next future month is automatically added!
+    const rolling6 = [];
+    const baseDate = new Date(curY, curM - 1, 1);
+    for (let i = 0; i < 6; i++) {
+      const d = new Date(baseDate.getFullYear(), baseDate.getMonth() + i, 1);
+      const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      rolling6.push(ym);
     }
 
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    function formatLabel(ym) {
+      const [y, mStr] = ym.split('-');
+      const mIdx = parseInt(mStr, 10) - 1;
+      const mName = monthNames[mIdx] || ym;
+      if (ym === currentYm) return `${mName} ${y} (Active)`;
+      if (ym === '2026-09') return `${mName} ${y} (Archive)`;
+      return `${mName} ${y}`;
+    }
+
+    // Collect past historical months (prior to current month)
+    const pastMonths = new Set(['2026-09']);
+    if (window.dataStore && Array.isArray(window.dataStore.targets)) {
+      window.dataStore.targets.forEach(t => {
+        if (t.month && t.month < currentYm) pastMonths.add(t.month);
+      });
+    }
+    if (window.dataStore && Array.isArray(window.dataStore.submissions)) {
+      window.dataStore.submissions.forEach(s => {
+        if (s.month && s.month < currentYm) pastMonths.add(s.month);
+      });
+    }
+    // If user selected a custom past/future month outside rolling6 and pastMonths, preserve it
+    if (activeMonth && !rolling6.includes(activeMonth)) {
+      pastMonths.add(activeMonth);
+    }
+
+    const sortedPast = Array.from(pastMonths).sort().reverse();
+
+    let optionsHtml = '';
+
+    // Group 1: 6-Month Rolling Horizon
+    optionsHtml += `<optgroup label="Active 6-Month Horizon">`;
+    rolling6.forEach(ym => {
+      optionsHtml += `<option value="${ym}" ${ym === activeMonth ? 'selected' : ''}>${formatLabel(ym)}</option>`;
+    });
+    optionsHtml += `</optgroup>`;
+
+    // Group 2: Past Month Archives (if any exist)
+    if (sortedPast.length > 0) {
+      optionsHtml += `<optgroup label="Past Month Archives">`;
+      sortedPast.forEach(ym => {
+        optionsHtml += `<option value="${ym}" ${ym === activeMonth ? 'selected' : ''}>${formatLabel(ym)}</option>`;
+      });
+      optionsHtml += `</optgroup>`;
+    }
+
+    // Special Action: Open Full Calendar
+    optionsHtml += `<optgroup label="Calendar Actions">`;
+    optionsHtml += `<option value="__pick_calendar__">📅 Choose from Calendar...</option>`;
+    optionsHtml += `</optgroup>`;
+
+    elements.monthSelector.innerHTML = optionsHtml;
     elements.monthSelector.value = activeMonth;
 
     if (elements.monthDisplay) {
       const selectedOpt = elements.monthSelector.options[elements.monthSelector.selectedIndex];
       if (selectedOpt) elements.monthDisplay.textContent = selectedOpt.text;
     }
+  }
+
+  // =========================================================================
+  // HISTORICAL ARCHIVE & CYCLE CALENDAR MODAL CONTROLLERS
+  // =========================================================================
+  function openHistoricalCalendarModal() {
+    const activeMonth = window.dataStore.getActiveMonth() || '2026-10';
+    const parts = activeMonth.split('-');
+    state.calendarModalYear = parseInt(parts[0], 10) || new Date().getFullYear();
+
+    renderCalendarMonthsGrid(state.calendarModalYear);
+
+    if (elements.historicalCalendarModal) {
+      elements.historicalCalendarModal.classList.remove('hidden');
+      refreshIcons();
+    }
+  }
+
+  function closeHistoricalCalendarModal() {
+    if (elements.historicalCalendarModal) {
+      elements.historicalCalendarModal.classList.add('hidden');
+    }
+  }
+
+  function renderCalendarMonthsGrid(year) {
+    if (elements.calSelectedYearText) {
+      elements.calSelectedYearText.textContent = year.toString();
+    }
+    if (!elements.calendarMonthsGrid) return;
+
+    const activeMonth = window.dataStore.getActiveMonth();
+    const now = new Date();
+    const curYm = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+    const monthShorts = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthFull = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    // Compute target counts per month in this year
+    const targets = (window.dataStore && window.dataStore.targets) || [];
+    const counts = {};
+    targets.forEach(t => {
+      if (t.month && t.month.startsWith(`${year}-`)) {
+        counts[t.month] = (counts[t.month] || 0) + (t.targetQty || 1);
+      }
+    });
+
+    elements.calendarMonthsGrid.innerHTML = monthShorts.map((shortName, idx) => {
+      const mNum = idx + 1;
+      const ym = `${year}-${String(mNum).padStart(2, '0')}`;
+      const isActive = ym === activeMonth;
+      const isCurrent = ym === curYm;
+      const totalTargets = counts[ym] || 0;
+      const hasData = totalTargets > 0;
+
+      let badgeHtml = '';
+      if (isCurrent) {
+        badgeHtml = `<span class="cal-month-badge">Current</span>`;
+      } else if (hasData) {
+        badgeHtml = `<span class="cal-month-badge">${totalTargets} targets</span>`;
+      } else if (ym < curYm) {
+        badgeHtml = `<span class="cal-month-badge" style="opacity: 0.6;">Past</span>`;
+      } else {
+        badgeHtml = `<span class="cal-month-badge" style="opacity: 0.6;">Future</span>`;
+      }
+
+      return `
+        <button type="button" class="cal-month-btn ${isActive ? 'active' : ''} ${hasData ? 'has-data' : ''}" data-ym="${ym}">
+          <span class="cal-month-name">${shortName}</span>
+          ${badgeHtml}
+        </button>
+      `;
+    }).join('');
+
+    // Attach click listener to month buttons
+    elements.calendarMonthsGrid.querySelectorAll('.cal-month-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const ym = btn.dataset.ym;
+        if (!ym) return;
+        window.dataStore.setActiveMonth(ym);
+        closeHistoricalCalendarModal();
+        populateMonthSelector();
+        renderApp();
+        const [y, mStr] = ym.split('-');
+        const mName = monthFull[parseInt(mStr, 10) - 1] || ym;
+        showToast(`📅 Switched active cycle to ${mName} ${y}`, 'success');
+      });
+    });
+  }
+
+  // Hook up Calendar Modal Buttons
+  if (elements.btnCalendarPicker) {
+    elements.btnCalendarPicker.addEventListener('click', openHistoricalCalendarModal);
+  }
+  if (elements.btnCloseCalendarModal) {
+    elements.btnCloseCalendarModal.addEventListener('click', closeHistoricalCalendarModal);
+  }
+  if (elements.btnCalClose) {
+    elements.btnCalClose.addEventListener('click', closeHistoricalCalendarModal);
+  }
+  if (elements.btnCalPrevYear) {
+    elements.btnCalPrevYear.addEventListener('click', () => {
+      state.calendarModalYear--;
+      renderCalendarMonthsGrid(state.calendarModalYear);
+      refreshIcons();
+    });
+  }
+  if (elements.btnCalNextYear) {
+    elements.btnCalNextYear.addEventListener('click', () => {
+      state.calendarModalYear++;
+      renderCalendarMonthsGrid(state.calendarModalYear);
+      refreshIcons();
+    });
+  }
+  if (elements.btnCalJumpCurrent) {
+    elements.btnCalJumpCurrent.addEventListener('click', () => {
+      const now = new Date();
+      const curYm = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      window.dataStore.setActiveMonth(curYm);
+      closeHistoricalCalendarModal();
+      populateMonthSelector();
+      renderApp();
+      showToast(`📅 Jumped to current month (${curYm})`, 'info');
+    });
   }
 
   // Master Render Loop
@@ -1867,7 +2022,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Month Switcher
   elements.monthSelector.addEventListener('change', (e) => {
-    window.dataStore.setActiveMonth(e.target.value);
+    const val = e.target.value;
+    if (val === '__pick_calendar__') {
+      elements.monthSelector.value = window.dataStore.getActiveMonth();
+      openHistoricalCalendarModal();
+      return;
+    }
+    window.dataStore.setActiveMonth(val);
     if (elements.monthDisplay) {
       elements.monthDisplay.textContent = e.target.options[e.target.selectedIndex].text;
     }

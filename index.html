@@ -10,7 +10,7 @@
   <!-- Lucide Icons & Chart.js -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="css/styles.css?v=18">
+  <link rel="stylesheet" href="css/styles.css?v=19">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -37,13 +37,12 @@
             <span class="company-name">Nexcrest Insights</span>
           </div>
         </div>
-        <div class="cycle-badge">
-          <i data-lucide="calendar"></i>
+        <div class="cycle-badge" title="Active Operations Cycle & Calendar Picker">
+          <button type="button" id="btn-calendar-picker" class="cycle-calendar-btn" title="Open Calendar to choose past archives or future cycles">
+            <i data-lucide="calendar"></i>
+          </button>
           <select id="month-selector" class="header-select" aria-label="Select Target Month">
             <option value="2026-10">October 2026 (Active)</option>
-            <option value="2026-09">September 2026 (40 Target Archive)</option>
-            <option value="2026-11">November 2026 (Planning)</option>
-            <option value="2026-12">December 2026</option>
           </select>
         </div>
       </div>
@@ -1362,12 +1361,59 @@
     </div>
   </div>
 
+  <!-- MODAL: HISTORICAL MONTH & ARCHIVE CALENDAR -->
+  <div id="historical-calendar-modal" class="modal-overlay hidden">
+    <div class="modal-card spotlight-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i data-lucide="calendar" class="modal-title-icon" style="color: var(--teal-primary);"></i>
+          <h3>Archive & Cycle Calendar</h3>
+        </div>
+        <button type="button" class="btn-close-modal" id="btn-close-calendar-modal" aria-label="Close calendar modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div class="calendar-modal-body">
+        <!-- Year Navigation Header -->
+        <div class="calendar-year-nav">
+          <button type="button" id="btn-cal-prev-year" class="cal-nav-btn" title="Previous Year">
+            <i data-lucide="chevron-left"></i>
+          </button>
+          <div class="cal-year-display">
+            <span id="cal-selected-year-text" class="cal-year-text">2026</span>
+          </div>
+          <button type="button" id="btn-cal-next-year" class="cal-nav-btn" title="Next Year">
+            <i data-lucide="chevron-right"></i>
+          </button>
+        </div>
+
+        <p class="cal-modal-hint">Select any past month to inspect historical archives or choose upcoming planning cycles:</p>
+
+        <!-- 12-Month Grid -->
+        <div class="calendar-months-grid" id="calendar-months-grid">
+          <!-- Dynamically populated 12 months with active highlights and data indicators -->
+        </div>
+
+        <!-- Quick Jump & Actions -->
+        <div class="modal-footer split" style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+          <button type="button" id="btn-cal-jump-current" class="btn btn-outline-sm">
+            <i data-lucide="clock"></i> Current Month
+          </button>
+          <button type="button" id="btn-cal-close" class="btn btn-primary btn-sm">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Logic Scripts -->
-  <script src="js/data.js?v=18"></script>
-  <script src="js/auth.js?v=18"></script>
-  <script src="js/app.js?v=18"></script>
+  <script src="js/data.js?v=19"></script>
+  <script src="js/auth.js?v=19"></script>
+  <script src="js/app.js?v=19"></script>
 </body>
 </html>
