@@ -10,7 +10,7 @@
   <!-- Lucide Icons & Chart.js -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="css/styles.css?v=12">
+  <link rel="stylesheet" href="css/styles.css?v=14">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -52,11 +52,14 @@
           <button id="theme-toggle-btn" class="icon-btn theme-toggle" title="Switch Theme">
             <i data-lucide="moon"></i>
           </button>
-          <div class="user-avatar" id="header-user-avatar">M</div>
-          <div class="user-meta">
-            <span class="user-name" id="header-user-name">Marketing Manager</span>
-            <span class="user-role-badge" id="header-role-badge">Lead Admin</span>
-          </div>
+          <button type="button" id="btn-open-user-profile" class="user-profile-chip-btn" title="My Profile & Security Settings">
+            <div class="user-avatar" id="header-user-avatar">M</div>
+            <div class="user-meta">
+              <span class="user-name" id="header-user-name">Marketing Manager</span>
+              <span class="user-role-badge" id="header-role-badge">Lead Admin</span>
+            </div>
+            <i data-lucide="settings" class="profile-settings-icon" style="width: 15px; height: 15px; margin-left: 2px; color: var(--text-muted);"></i>
+          </button>
           <button id="logout-btn" class="btn btn-outline-sm btn-logout" title="Sign Out of Workspace">
             <i data-lucide="log-out"></i>
             <span>Sign Out</span>
@@ -720,9 +723,14 @@
           <span style="font-size: 13px; color: var(--text-main);">Logged in as:</span>
           <strong id="member-banner-user-name" style="color: var(--teal-primary);">Graphic Designer</strong>
         </div>
-        <div style="font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
-          <i data-lucide="lock" style="width: 14px; height: 14px; color: var(--teal-primary);"></i>
-          <span>Independent Employee Workspace</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" id="btn-member-open-profile" class="btn btn-outline-sm" title="Manage Profile & Change Password">
+            <i data-lucide="shield-check"></i> Profile & Security
+          </button>
+          <div style="font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="lock" style="width: 14px; height: 14px; color: var(--teal-primary);"></i>
+            <span>Independent Workspace</span>
+          </div>
         </div>
       </div>
 
@@ -1224,12 +1232,140 @@
     </div>
   </div>
 
+  <!-- MODAL: USER PROFILE & SECURITY SETTINGS (CHANGE PASSWORD) -->
+  <div id="profile-management-modal" class="modal-overlay hidden">
+    <div class="modal-card spotlight-card" style="max-width: 540px;">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <i data-lucide="shield-check" class="modal-title-icon" style="color: var(--teal-primary);"></i>
+          <h3>My Profile & Security Settings</h3>
+        </div>
+        <button type="button" class="btn-close-modal" id="btn-close-profile-modal" aria-label="Close modal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <!-- Account Summary Banner -->
+      <div class="profile-summary-header">
+        <div class="profile-summary-avatar" id="profile-modal-avatar">M</div>
+        <div class="profile-summary-info">
+          <h4 id="profile-modal-name-display">Marketing Manager</h4>
+          <div class="profile-badges-row">
+            <span class="user-role-badge badge-lead" id="profile-modal-role-badge">Lead Admin</span>
+            <span class="profile-brand-badge" id="profile-modal-brand-badge">All Nexcrest Brands</span>
+          </div>
+          <div class="profile-email-meta">
+            <i data-lucide="mail"></i>
+            <span id="profile-modal-email-display">manager@nexcrest.com</span>
+            <span class="profile-lock-tag" title="Account identifier is fixed"><i data-lucide="lock"></i> Verified</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs: Personal Info & Security -->
+      <div class="profile-modal-tabs">
+        <button type="button" class="profile-tab-btn active" data-profile-tab="details">
+          <i data-lucide="user"></i> Personal Info
+        </button>
+        <button type="button" class="profile-tab-btn" data-profile-tab="security">
+          <i data-lucide="key"></i> Change Password
+        </button>
+      </div>
+
+      <!-- TAB PANEL 1: Personal Info -->
+      <div id="profile-tab-details" class="profile-tab-panel active">
+        <form id="profile-details-form" class="modal-form">
+          <div class="form-group">
+            <label for="profile-edit-name">Display Name <span class="required">*</span></label>
+            <div class="input-with-icon">
+              <i data-lucide="user"></i>
+              <input type="text" id="profile-edit-name" required placeholder="Your full name">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="profile-edit-title">Job Title</label>
+            <div class="input-with-icon">
+              <i data-lucide="briefcase"></i>
+              <input type="text" id="profile-edit-title" placeholder="e.g. Senior Graphic Designer">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Assigned Brand Focus</label>
+            <div class="input-with-icon">
+              <i data-lucide="tag"></i>
+              <input type="text" id="profile-edit-brand-readonly" readonly disabled style="opacity: 0.8; cursor: not-allowed;">
+            </div>
+            <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px; display: block;">Brand assignments are configured by system administration.</small>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" id="btn-cancel-profile-details">Close</button>
+            <button type="submit" class="btn btn-primary">
+              <i data-lucide="check"></i> Save Profile
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TAB PANEL 2: Change Password & Security -->
+      <div id="profile-tab-security" class="profile-tab-panel hidden">
+        <form id="profile-password-form" class="modal-form">
+          <div class="form-group">
+            <label for="profile-current-pass">Current Password <span class="required">*</span></label>
+            <div class="input-with-icon-right">
+              <i data-lucide="lock" class="input-left-icon"></i>
+              <input type="password" id="profile-current-pass" required placeholder="Enter current password">
+              <button type="button" class="btn-toggle-pass-visibility" data-target="profile-current-pass" title="Toggle visibility">
+                <i data-lucide="eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="profile-new-pass">New Password <span class="required">*</span></label>
+            <div class="input-with-icon-right">
+              <i data-lucide="key-round" class="input-left-icon"></i>
+              <input type="password" id="profile-new-pass" required minlength="6" placeholder="At least 6 characters">
+              <button type="button" class="btn-toggle-pass-visibility" data-target="profile-new-pass" title="Toggle visibility">
+                <i data-lucide="eye"></i>
+              </button>
+            </div>
+            <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px; display: block;">Must be at least 6 characters long and different from current password.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="profile-confirm-pass">Confirm New Password <span class="required">*</span></label>
+            <div class="input-with-icon-right">
+              <i data-lucide="check-check" class="input-left-icon"></i>
+              <input type="password" id="profile-confirm-pass" required minlength="6" placeholder="Re-enter new password">
+              <button type="button" class="btn-toggle-pass-visibility" data-target="profile-confirm-pass" title="Toggle visibility">
+                <i data-lucide="eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="profile-password-error" class="form-error-notice hidden"></div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline" id="btn-cancel-profile-password">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-change-password">
+              <i data-lucide="shield-check"></i> Update Password
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Logic Scripts -->
-  <script src="js/data.js?v=13"></script>
-  <script src="js/auth.js?v=13"></script>
-  <script src="js/app.js?v=13"></script>
+  <script src="js/data.js?v=14"></script>
+  <script src="js/auth.js?v=14"></script>
+  <script src="js/app.js?v=14"></script>
 </body>
 </html>

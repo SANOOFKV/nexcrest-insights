@@ -215,6 +215,75 @@ class AuthService {
     return { success: true, user };
   }
 
+  changePassword(email, currentPassword, newPassword, confirmPassword) {
+    const normEmail = (email || '').trim().toLowerCase();
+    const user = this.users[normEmail];
+    if (!user) {
+      return { success: false, error: 'User account not found.' };
+    }
+
+    if (!currentPassword || !currentPassword.trim()) {
+      return { success: false, error: 'Please enter your current password.' };
+    }
+
+    const expectedCurrent = user.password || 'password123';
+    if (currentPassword.trim() !== expectedCurrent) {
+      return { success: false, error: 'Current password is incorrect.' };
+    }
+
+    if (!newPassword || newPassword.trim().length < 6) {
+      return { success: false, error: 'New password must be at least 6 characters long.' };
+    }
+
+    if (newPassword.trim() === expectedCurrent) {
+      return { success: false, error: 'New password must be different from your current password.' };
+    }
+
+    if (confirmPassword !== undefined && newPassword.trim() !== confirmPassword.trim()) {
+      return { success: false, error: 'New password and confirmation do not match.' };
+    }
+
+    user.password = newPassword.trim();
+    user.lastPasswordChange = new Date().toISOString();
+    this.saveUsers(this.users);
+
+    if (this.currentUser && this.currentUser.email.toLowerCase() === normEmail) {
+      this.currentUser = { ...user };
+      this.saveSession(this.currentUser);
+    } else {
+      this.notify();
+    }
+
+    return { success: true, message: 'Password updated successfully!' };
+  }
+
+  updateProfile(email, { name, title }) {
+    const normEmail = (email || '').trim().toLowerCase();
+    const user = this.users[normEmail];
+    if (!user) {
+      return { success: false, error: 'User account not found.' };
+    }
+
+    if (name && name.trim()) {
+      user.name = name.trim();
+      user.avatar = this.getInitials(name);
+    }
+    if (title && title.trim()) {
+      user.title = title.trim();
+    }
+
+    this.saveUsers(this.users);
+
+    if (this.currentUser && this.currentUser.email.toLowerCase() === normEmail) {
+      this.currentUser = { ...user };
+      this.saveSession(this.currentUser);
+    } else {
+      this.notify();
+    }
+
+    return { success: true, user };
+  }
+
   deleteUser(email) {
     const normEmail = (email || '').trim().toLowerCase();
     const user = this.users[normEmail];

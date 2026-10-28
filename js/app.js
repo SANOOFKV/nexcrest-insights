@@ -38,11 +38,13 @@ document.addEventListener('DOMContentLoaded', () => {
     monthSelector: document.getElementById('month-selector'),
     monthDisplay: document.getElementById('current-month-display'),
     headerUserProfileMenu: document.getElementById('header-user-profile-menu'),
+    btnOpenUserProfile: document.getElementById('btn-open-user-profile'),
     headerUserAvatar: document.getElementById('header-user-avatar'),
     headerUserName: document.getElementById('header-user-name'),
     headerRoleBadge: document.getElementById('header-role-badge'),
     logoutBtn: document.getElementById('logout-btn'),
     themeToggleBtn: document.getElementById('theme-toggle-btn'),
+    btnMemberOpenProfile: document.getElementById('btn-member-open-profile'),
 
     // Views
     managerView: document.getElementById('manager-view'),
@@ -189,6 +191,28 @@ document.addEventListener('DOMContentLoaded', () => {
     reviewFeedbackInput: document.getElementById('review-feedback-input'),
     btnApproveWork: document.getElementById('btn-approve-work'),
     btnRequestRework: document.getElementById('btn-request-rework'),
+
+    // Profile Management Modal Elements
+    profileModal: document.getElementById('profile-management-modal'),
+    btnCloseProfileModal: document.getElementById('btn-close-profile-modal'),
+    btnCancelProfileDetails: document.getElementById('btn-cancel-profile-details'),
+    btnCancelProfilePassword: document.getElementById('btn-cancel-profile-password'),
+    profileModalAvatar: document.getElementById('profile-modal-avatar'),
+    profileModalNameDisplay: document.getElementById('profile-modal-name-display'),
+    profileModalRoleBadge: document.getElementById('profile-modal-role-badge'),
+    profileModalBrandBadge: document.getElementById('profile-modal-brand-badge'),
+    profileModalEmailDisplay: document.getElementById('profile-modal-email-display'),
+    profileTabBtns: document.querySelectorAll('.profile-tab-btn'),
+    profileTabPanels: document.querySelectorAll('.profile-tab-panel'),
+    profileDetailsForm: document.getElementById('profile-details-form'),
+    profileEditName: document.getElementById('profile-edit-name'),
+    profileEditTitle: document.getElementById('profile-edit-title'),
+    profileEditBrandReadonly: document.getElementById('profile-edit-brand-readonly'),
+    profilePasswordForm: document.getElementById('profile-password-form'),
+    profileCurrentPass: document.getElementById('profile-current-pass'),
+    profileNewPass: document.getElementById('profile-new-pass'),
+    profileConfirmPass: document.getElementById('profile-confirm-pass'),
+    profilePasswordError: document.getElementById('profile-password-error'),
 
     // Auth Form & Role Preset Tabs
     authForm: document.getElementById('auth-form'),
@@ -2023,6 +2047,236 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast(`Updated profile for ${name}!`, 'success');
     });
   }
+
+  // =========================================================================
+  // USER SELF-PROFILE & SECURITY (CHANGE PASSWORD) CONTROLLERS
+  // =========================================================================
+  function openProfileModal(tab = 'details') {
+    const user = state.user;
+    if (!user) return;
+
+    // Populate header summary
+    if (elements.profileModalAvatar) {
+      elements.profileModalAvatar.textContent = user.avatar || user.name.charAt(0);
+    }
+    if (elements.profileModalNameDisplay) {
+      elements.profileModalNameDisplay.textContent = user.name;
+    }
+    if (elements.profileModalEmailDisplay) {
+      elements.profileModalEmailDisplay.textContent = user.email;
+    }
+    if (elements.profileModalRoleBadge) {
+      elements.profileModalRoleBadge.textContent = user.title || (user.role === 'manager' ? 'Lead Admin' : 'Team Member');
+      elements.profileModalRoleBadge.className = `user-role-badge ${user.badgeClass || (user.role === 'manager' ? 'badge-lead' : 'badge-member')}`;
+    }
+    if (elements.profileModalBrandBadge) {
+      elements.profileModalBrandBadge.textContent = user.brand || 'All Nexcrest Brands';
+    }
+
+    // Populate personal details form
+    if (elements.profileEditName) {
+      elements.profileEditName.value = user.name || '';
+    }
+    if (elements.profileEditTitle) {
+      elements.profileEditTitle.value = user.title || '';
+    }
+    if (elements.profileEditBrandReadonly) {
+      elements.profileEditBrandReadonly.value = user.brand || 'All Nexcrest Brands';
+    }
+
+    // Reset password form
+    if (elements.profileCurrentPass) elements.profileCurrentPass.value = '';
+    if (elements.profileNewPass) elements.profileNewPass.value = '';
+    if (elements.profileConfirmPass) elements.profileConfirmPass.value = '';
+    if (elements.profilePasswordError) {
+      elements.profilePasswordError.textContent = '';
+      elements.profilePasswordError.classList.add('hidden');
+    }
+
+    // Reset password input visibility icons
+    document.querySelectorAll('.btn-toggle-pass-visibility').forEach(btn => {
+      const targetId = btn.dataset.target;
+      const targetInput = document.getElementById(targetId);
+      if (targetInput) targetInput.type = 'password';
+      btn.innerHTML = '<i data-lucide="eye"></i>';
+    });
+
+    switchProfileTab(tab);
+
+    if (elements.profileModal) {
+      elements.profileModal.classList.remove('hidden');
+      refreshIcons();
+    }
+  }
+
+  function closeProfileModal() {
+    if (elements.profileModal) {
+      elements.profileModal.classList.add('hidden');
+    }
+  }
+
+  function switchProfileTab(tabName) {
+    if (elements.profileTabBtns) {
+      elements.profileTabBtns.forEach(btn => {
+        if (btn.dataset.profileTab === tabName) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    const panelDetails = document.getElementById('profile-tab-details');
+    const panelSecurity = document.getElementById('profile-tab-security');
+
+    if (panelDetails && panelSecurity) {
+      if (tabName === 'details') {
+        panelDetails.classList.remove('hidden');
+        panelDetails.classList.add('active');
+        panelSecurity.classList.add('hidden');
+        panelSecurity.classList.remove('active');
+      } else {
+        panelSecurity.classList.remove('hidden');
+        panelSecurity.classList.add('active');
+        panelDetails.classList.add('hidden');
+        panelDetails.classList.remove('active');
+      }
+    }
+    refreshIcons();
+  }
+
+  // Open / Close Profile Modal triggers
+  if (elements.btnOpenUserProfile) {
+    elements.btnOpenUserProfile.addEventListener('click', () => openProfileModal('details'));
+  }
+  if (elements.btnMemberOpenProfile) {
+    elements.btnMemberOpenProfile.addEventListener('click', () => openProfileModal('security'));
+  }
+  if (elements.btnCloseProfileModal) {
+    elements.btnCloseProfileModal.addEventListener('click', closeProfileModal);
+  }
+  if (elements.btnCancelProfileDetails) {
+    elements.btnCancelProfileDetails.addEventListener('click', closeProfileModal);
+  }
+  if (elements.btnCancelProfilePassword) {
+    elements.btnCancelProfilePassword.addEventListener('click', closeProfileModal);
+  }
+
+  // Tab switching buttons
+  if (elements.profileTabBtns) {
+    elements.profileTabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.profileTab;
+        switchProfileTab(tab);
+      });
+    });
+  }
+
+  // Save Personal Details Form
+  if (elements.profileDetailsForm) {
+    elements.profileDetailsForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const user = state.user;
+      if (!user) return;
+
+      const newName = elements.profileEditName.value.trim();
+      const newTitle = elements.profileEditTitle.value.trim();
+
+      if (!newName) {
+        showToast('Please enter your full name.', 'error');
+        return;
+      }
+
+      const res = window.authService.updateProfile(user.email, {
+        name: newName,
+        title: newTitle || user.title
+      });
+
+      if (!res.success) {
+        showToast(res.error || 'Failed to update profile.', 'error');
+        return;
+      }
+
+      state.user = res.user;
+      closeProfileModal();
+      populateTargetAssigneeOptions();
+      populateRoleFilterOptions();
+      renderApp();
+      showToast('Profile updated successfully!', 'success');
+    });
+  }
+
+  // Save Change Password Form
+  if (elements.profilePasswordForm) {
+    elements.profilePasswordForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const user = state.user;
+      if (!user) return;
+
+      const currentPass = elements.profileCurrentPass.value;
+      const newPass = elements.profileNewPass.value;
+      const confirmPass = elements.profileConfirmPass.value;
+
+      if (elements.profilePasswordError) {
+        elements.profilePasswordError.classList.add('hidden');
+        elements.profilePasswordError.textContent = '';
+      }
+
+      if (newPass !== confirmPass) {
+        if (elements.profilePasswordError) {
+          elements.profilePasswordError.textContent = 'New password and confirmation do not match.';
+          elements.profilePasswordError.classList.remove('hidden');
+        } else {
+          showToast('New password and confirmation do not match.', 'error');
+        }
+        return;
+      }
+
+      if (newPass.length < 6) {
+        if (elements.profilePasswordError) {
+          elements.profilePasswordError.textContent = 'Password must be at least 6 characters.';
+          elements.profilePasswordError.classList.remove('hidden');
+        } else {
+          showToast('Password must be at least 6 characters.', 'error');
+        }
+        return;
+      }
+
+      const res = window.authService.changePassword(user.email, currentPass, newPass, confirmPass);
+      if (!res.success) {
+        if (elements.profilePasswordError) {
+          elements.profilePasswordError.textContent = res.error;
+          elements.profilePasswordError.classList.remove('hidden');
+        }
+        showToast(res.error, 'error');
+        return;
+      }
+
+      // Success
+      elements.profileCurrentPass.value = '';
+      elements.profileNewPass.value = '';
+      elements.profileConfirmPass.value = '';
+      closeProfileModal();
+      showToast('🔒 Password changed successfully! Keep it safe.', 'success');
+    });
+  }
+
+  // Password visibility eye toggle handler (delegated)
+  document.addEventListener('click', (e) => {
+    const toggleBtn = e.target.closest('.btn-toggle-pass-visibility');
+    if (toggleBtn) {
+      e.preventDefault();
+      const targetId = toggleBtn.dataset.target;
+      const input = document.getElementById(targetId);
+      if (input) {
+        const isPass = input.type === 'password';
+        input.type = isPass ? 'text' : 'password';
+        toggleBtn.innerHTML = isPass ? '<i data-lucide="eye-off"></i>' : '<i data-lucide="eye"></i>';
+        refreshIcons();
+      }
+      return;
+    }
+  });
 
   // Overview Screen "Manage Full Roster" Link
   const btnOvGotoRoster = document.getElementById('btn-ov-goto-roster');
