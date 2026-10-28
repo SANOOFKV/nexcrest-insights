@@ -4,7 +4,7 @@
  * dynamic employee onboarding, and quick role-switching.
  */
 
-const AUTH_STORAGE_KEY = 'nexcrest_active_user_v1';
+const AUTH_SESSION_KEY = 'nexcrest_active_session_v3';
 const USERS_STORAGE_KEY = 'nexcrest_users_v2';
 
 const DEFAULT_USERS = {
@@ -81,7 +81,7 @@ class AuthService {
         if (this.currentUser && cloudUsers[this.currentUser.email.toLowerCase()]) {
           this.currentUser = { ...this.currentUser, ...cloudUsers[this.currentUser.email.toLowerCase()] };
           try {
-            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(this.currentUser));
+            sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(this.currentUser));
           } catch (e) {}
         }
         this.notify();
@@ -341,7 +341,16 @@ class AuthService {
   }
 
   loadSession() {
-    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    // Purge legacy auto-saved sessions from localStorage to guarantee security
+    try {
+      localStorage.removeItem('nexcrest_active_user_v1');
+      localStorage.removeItem('nexcrest_active_user_v2');
+      localStorage.removeItem('nexcrest_active_session_v1');
+      localStorage.removeItem('nexcrest_active_session_v2');
+      localStorage.removeItem('nexcrest_active_session_v3');
+    } catch (e) {}
+
+    const raw = sessionStorage.getItem(AUTH_SESSION_KEY);
     if (raw) {
       try {
         const parsed = JSON.parse(raw);
@@ -354,12 +363,7 @@ class AuthService {
         console.error('Failed to parse user session', e);
       }
     }
-    // Default to Marketing Manager so the Command Center & Team Roster are immediately active and visible
-    const defaultManager = this.users['manager@nexcrest.com'];
-    if (defaultManager) {
-      this.saveSession(defaultManager);
-      return defaultManager;
-    }
+    // Return null: When clicking the URL or opening the app, ALWAYS show the login portal
     return null;
   }
 
@@ -367,10 +371,13 @@ class AuthService {
     this.currentUser = user;
     try {
       if (user) {
-        localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+        sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(user));
       } else {
-        localStorage.removeItem(AUTH_STORAGE_KEY);
+        sessionStorage.removeItem(AUTH_SESSION_KEY);
       }
+      // Guarantee localStorage is purged so direct URL visits always require sign-in
+      localStorage.removeItem('nexcrest_active_user_v1');
+      localStorage.removeItem(AUTH_SESSION_KEY);
     } catch (e) {
       console.error('Storage error while saving session', e);
     }
@@ -433,6 +440,11 @@ class AuthService {
 
   logout() {
     this.saveSession(null);
+    try {
+      sessionStorage.clear();
+      localStorage.removeItem(AUTH_SESSION_KEY);
+      localStorage.removeItem('nexcrest_active_user_v1');
+    } catch (e) {}
   }
 
   onChange(callback) {

@@ -50,7 +50,7 @@
 
       <!-- Header Actions: User Profile, Theme & Sign Out -->
       <div class="header-actions">
-        <div class="user-profile-menu" id="header-user-profile-menu">
+        <div class="user-profile-menu" id="header-user-profile-menu" style="display: none;">
           <button id="theme-toggle-btn" class="icon-btn theme-toggle" title="Switch Theme">
             <i data-lucide="moon"></i>
           </button>
@@ -71,8 +71,8 @@
     </div>
   </header>
 
-  <!-- Dedicated Full-Screen Login Portal (shown when not logged in) -->
-  <div id="auth-modal" class="modal-overlay hidden">
+  <!-- Dedicated Full-Screen Login Portal (shown by default when not logged in) -->
+  <div id="auth-modal" class="modal-overlay">
     <div class="modal-card auth-card spotlight-card">
       <div class="auth-header">
         <div class="brand-logo large" style="background: transparent; border: none; box-shadow: none; padding: 0;">
@@ -124,7 +124,7 @@
   <!-- Main Application Container -->
   <main class="app-main">
     <!-- VIEW 1: MARKETING MANAGER COMMAND CENTER -->
-    <section id="manager-view" class="view-section active">
+    <section id="manager-view" class="view-section hidden">
       <!-- Manager Pending Review Banner -->
       <div id="review-alert-banner" class="alert-banner hidden">
         <div class="alert-content">
