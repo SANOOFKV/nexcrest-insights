@@ -5091,57 +5091,9 @@ body.dark-theme .form-error-notice {
 }
 
 /* Auth Form Inline Error Notice (Wrong Password, etc.) */
-.auth-helper-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: transparent;
-  border: none;
-  color: var(--teal-primary);
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
-}
-
-.auth-helper-link:hover {
-  text-decoration: underline;
-  background: var(--teal-subtle);
-}
-
-.auth-error-body {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 100%;
-}
-
-.auth-error-reset-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  color: #DC2626;
-  font-size: 12px;
-  font-weight: 700;
-  text-decoration: underline;
-  cursor: pointer;
-  text-align: left;
-  line-height: 1.35;
-}
-
-body.dark-theme .auth-error-reset-btn {
-  color: #FF8A8A;
-}
-
-.auth-error-reset-btn:hover {
-  opacity: 0.85;
-}
-
 .auth-error-notice {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
   background: rgba(239, 36, 36, 0.12);
   border: 1px solid rgba(239, 36, 36, 0.45);

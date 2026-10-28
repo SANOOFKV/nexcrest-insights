@@ -234,8 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
     loginPasswordWrapper: document.getElementById('login-password-wrapper'),
     authErrorNotice: document.getElementById('auth-error-notice'),
     authErrorText: document.getElementById('auth-error-text'),
-    btnForgotPassword: document.getElementById('btn-forgot-password'),
-    btnResetOnError: document.getElementById('btn-reset-on-error'),
     roleLoginTabs: document.querySelectorAll('.role-login-tab'),
     roleDescTitle: document.getElementById('role-desc-title'),
     roleDescText: document.getElementById('role-desc-text'),
@@ -2990,34 +2988,6 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast(errorMsg, 'error');
     }
   });
-
-  // Quick Password Reset to default ('password123')
-  function triggerDefaultPasswordReset(e) {
-    if (e) e.preventDefault();
-    const email = (elements.loginEmail ? elements.loginEmail.value : 'manager@nexcrest.com').trim();
-    const res = window.authService.resetPasswordToDefault(email);
-    if (res.success) {
-      if (elements.loginPassword) {
-        elements.loginPassword.value = 'password123';
-        elements.loginPassword.type = 'text'; // momentarily reveal so mobile user clearly sees it
-        setTimeout(() => {
-          if (elements.loginPassword) elements.loginPassword.type = 'password';
-        }, 2200);
-      }
-      clearAuthError();
-      showToast(`🔑 Password reset to default: password123. Tap Sign In!`, 'success');
-      if (elements.authSubmitBtn) elements.authSubmitBtn.focus();
-    } else {
-      showToast(res.error || 'Failed to reset password.', 'error');
-    }
-  }
-
-  if (elements.btnForgotPassword) {
-    elements.btnForgotPassword.addEventListener('click', triggerDefaultPasswordReset);
-  }
-  if (elements.btnResetOnError) {
-    elements.btnResetOnError.addEventListener('click', triggerDefaultPasswordReset);
-  }
 
   // Automatically clear error notice as soon as user types in credentials
   if (elements.loginPassword) {
