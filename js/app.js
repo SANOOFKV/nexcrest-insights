@@ -484,8 +484,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!user) {
       elements.authModal.classList.remove('hidden');
       if (elements.headerUserProfileMenu) elements.headerUserProfileMenu.style.display = 'none';
-      const wsSwitcher = document.getElementById('header-workspace-switcher');
-      if (wsSwitcher) wsSwitcher.style.display = 'none';
       if (elements.reviewAlertBanner) elements.reviewAlertBanner.classList.add('hidden');
       elements.managerView.classList.remove('active');
       elements.managerView.classList.add('hidden');
@@ -496,8 +494,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     elements.authModal.classList.add('hidden');
     if (elements.headerUserProfileMenu) elements.headerUserProfileMenu.style.display = 'flex';
-    const wsSwitcher = document.getElementById('header-workspace-switcher');
-    if (wsSwitcher) wsSwitcher.style.display = 'inline-flex';
 
     elements.headerUserName.textContent = user.name;
     elements.headerRoleBadge.textContent = user.title;
@@ -740,11 +736,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <button type="button" class="btn-emp-assign btn-card-assign-task" data-emp-email="${escapeHtml(emp.email)}" data-emp-role="${escapeHtml(emp.role)}" data-emp-name="${escapeHtml(emp.name)}" style="flex: 1; padding: 6px 8px; font-size: 11px;">
               <i data-lucide="plus-circle" style="width: 12px; height: 12px;"></i> Assign Task
             </button>
-            <button type="button" class="btn-emp-portal btn-card-switch-user" data-user-email="${escapeHtml(emp.email)}" style="padding: 6px 8px; font-size: 11px;" title="View Portal">
-              <i data-lucide="external-link" style="width: 12px; height: 12px;"></i> View Portal
-            </button>
-            <button type="button" class="btn-emp-edit btn-card-edit-emp" data-user-email="${escapeHtml(emp.email)}" style="padding: 6px 8px; font-size: 11px;" title="Edit Employee Profile">
-              <i data-lucide="edit-3" style="width: 12px; height: 12px;"></i>
+            <button type="button" class="btn-emp-edit btn-card-edit-emp" data-user-email="${escapeHtml(emp.email)}" style="padding: 6px 10px; font-size: 11px;" title="Edit Employee Profile">
+              <i data-lucide="edit-3" style="width: 12px; height: 12px; margin-right: 4px;"></i> Edit
             </button>
           </div>
         </div>
@@ -1504,9 +1497,6 @@ document.addEventListener('DOMContentLoaded', () => {
               <button type="button" class="btn-emp-assign btn-card-assign-task" data-emp-email="${escapeHtml(emp.email)}" data-emp-role="${escapeHtml(emp.role)}" data-emp-name="${escapeHtml(emp.name)}" title="Assign Target Deliverable">
                 <i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i> Assign Task
               </button>
-              <button type="button" class="btn-emp-portal btn-card-switch-user" data-user-email="${escapeHtml(emp.email)}" title="Login & View Portal as ${escapeHtml(emp.name)}">
-                <i data-lucide="external-link" style="width: 14px; height: 14px;"></i> View Portal
-              </button>
             </div>
             <div style="display: flex; gap: 6px; align-items: center;">
               <button type="button" class="btn-emp-edit btn-card-edit-emp" data-user-email="${escapeHtml(emp.email)}" title="Edit Profile for ${escapeHtml(emp.name)}">
@@ -1701,36 +1691,6 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshFuturisticEffects();
   }
 
-  function populateHeaderRoleSwitcher() {
-    const switcher = document.getElementById('header-role-select');
-    if (!switcher) return;
-    const allUsers = window.authService.getAllUsers();
-    const currentUser = state.user || window.authService.getCurrentUser();
-    const currentEmail = currentUser ? currentUser.email.toLowerCase() : 'manager@nexcrest.com';
-
-    let html = `
-      <optgroup label="Management">
-        <option value="manager@nexcrest.com" ${currentEmail === 'manager@nexcrest.com' ? 'selected' : ''}>
-          👑 Marketing Manager (Command Center)
-        </option>
-      </optgroup>
-    `;
-
-    const employees = allUsers.filter(u => u.role !== 'manager');
-    if (employees.length > 0) {
-      html += `<optgroup label="Team Member Portals">`;
-      employees.forEach(emp => {
-        const isSelected = currentEmail === emp.email.toLowerCase();
-        html += `<option value="${escapeHtml(emp.email)}" ${isSelected ? 'selected' : ''}>
-          👤 ${escapeHtml(emp.name)} (${escapeHtml(emp.title || emp.role)})
-        </option>`;
-      });
-      html += `</optgroup>`;
-    }
-
-    switcher.innerHTML = html;
-  }
-
   function populateLoginProfileTabs(activeEmail = null) {
     const container = document.getElementById('role-login-tabs-container');
     if (!container) return;
@@ -1771,20 +1731,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const role = tab.dataset.role;
         const title = tab.dataset.title;
 
-        // Retrieve credentials securely from authService without exposing raw password in DOM
-        const targetUser = window.authService.getUserByEmail(email);
-        const pass = targetUser ? (targetUser.password || 'password123') : 'password123';
-
         if (elements.loginEmail) elements.loginEmail.value = email;
-        if (elements.loginPassword) elements.loginPassword.value = pass;
+        if (elements.loginPassword) {
+          elements.loginPassword.value = '';
+          elements.loginPassword.placeholder = `Enter password for ${name}`;
+          elements.loginPassword.focus();
+        }
 
         if (role === 'manager') {
           if (elements.roleDescTitle) elements.roleDescTitle.textContent = 'Marketing Manager Command Center';
-          if (elements.roleDescText) elements.roleDescText.textContent = 'Full administrative control: View total targets & achievement graphs, review queue, and assign monthly quotas.';
+          if (elements.roleDescText) elements.roleDescText.textContent = 'Full administrative control. Please enter your password to sign in.';
           if (elements.authSubmitText) elements.authSubmitText.textContent = 'Sign In as Marketing Manager';
         } else {
           if (elements.roleDescTitle) elements.roleDescTitle.textContent = `${name}'s Deliverables Studio`;
-          if (elements.roleDescText) elements.roleDescText.textContent = `Personal workspace for ${title}. Track assigned deliverables, submit links, and view approvals.`;
+          if (elements.roleDescText) elements.roleDescText.textContent = `Independent portal for ${title}. Please enter your password to sign in.`;
           if (elements.authSubmitText) elements.authSubmitText.textContent = `Sign In as ${name}`;
         }
         refreshIcons();
@@ -1795,7 +1755,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Master Render Loop
   function renderApp() {
     updateHeader();
-    populateHeaderRoleSwitcher();
     populateLoginProfileTabs();
     populateTargetAssigneeOptions();
     populateRoleFilterOptions();
@@ -1935,21 +1894,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.btnRosterAddEmp.addEventListener('click', openAddEmployeeModal);
   }
 
-  const btnMemberSwitchAdmin = document.getElementById('btn-member-switch-admin');
-  if (btnMemberSwitchAdmin) {
-    btnMemberSwitchAdmin.addEventListener('click', () => {
-      window.authService.switchRole('manager');
-      showToast('Switched to Marketing Manager Command Center', 'info');
-    });
-  }
 
-  const btnSwitchToManager = document.getElementById('btn-switch-to-manager');
-  if (btnSwitchToManager) {
-    btnSwitchToManager.addEventListener('click', () => {
-      window.authService.switchRole('manager');
-      showToast('Switched to Marketing Manager Command Center', 'info');
-    });
-  }
 
   // Save Add Employee Form
   if (elements.addEmployeeForm) {
@@ -2251,14 +2196,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Card Switch User / View Portal (Roster)
-    const cardSwitchBtn = e.target.closest('.btn-card-switch-user');
-    if (cardSwitchBtn) {
-      const email = cardSwitchBtn.dataset.userEmail;
-      window.authService.switchRole(email);
-      showToast(`Switched workspace to ${email}`, 'info');
-      return;
-    }
+
 
     // Card Edit Employee Profile (Roster or Overview)
     const cardEditBtn = e.target.closest('.btn-card-edit-emp');
@@ -2499,17 +2437,6 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast(`💾 Exported JSON Backup for ${month}!`, 'success');
   }
 
-  // Header Workspace Profile Switcher
-  const headerRoleSelect = document.getElementById('header-role-select');
-  if (headerRoleSelect) {
-    headerRoleSelect.addEventListener('change', (e) => {
-      const email = e.target.value;
-      window.authService.switchRole(email);
-      const selName = e.target.options[e.target.selectedIndex].text;
-      showToast(`Switched workspace to ${selName}`, 'info');
-    });
-  }
-
   // Auth / Login Handling
   elements.authForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -2520,6 +2447,8 @@ document.addEventListener('DOMContentLoaded', () => {
       state.user = res.user;
       showToast(`Welcome back, ${res.user.name}!`, 'success');
       renderApp();
+    } else {
+      showToast(res.error || 'Invalid email or password.', 'error');
     }
   });
 

@@ -48,13 +48,6 @@
 
       <!-- Header Actions: User Profile, Theme & Sign Out -->
       <div class="header-actions">
-        <div class="header-role-switcher" id="header-workspace-switcher" title="Switch User Portal Workspace">
-          <i data-lucide="layers" class="switcher-icon"></i>
-          <select id="header-role-select" class="header-select" aria-label="Switch User Portal">
-            <option value="manager@nexcrest.com">👑 Marketing Manager (Command Center)</option>
-          </select>
-        </div>
-
         <div class="user-profile-menu" id="header-user-profile-menu">
           <button id="theme-toggle-btn" class="icon-btn theme-toggle" title="Switch Theme">
             <i data-lucide="moon"></i>
@@ -113,19 +106,19 @@
           <label for="login-password">Password</label>
           <div class="input-with-icon">
             <i data-lucide="lock"></i>
-            <input type="password" id="login-password" placeholder="••••••••" required value="password123">
+            <input type="password" id="login-password" placeholder="Enter account password" required value="">
           </div>
         </div>
 
         <button type="submit" id="auth-submit-btn" class="btn btn-primary btn-block">
-          <span id="auth-submit-text">Sign In as Marketing Manager</span>
+          <span id="auth-submit-text">Sign In to Workspace</span>
           <i data-lucide="arrow-right"></i>
         </button>
       </form>
 
       <div class="auth-security-notice">
-        <i data-lucide="lock"></i>
-        <span>Isolated profiles: Logging in shows exclusively the dashboard and deliverables for your assigned role.</span>
+        <i data-lucide="shield"></i>
+        <span>Independent Workspaces: Every account requires its own password. Cross-account toggling is disabled.</span>
       </div>
     </div>
   </div>
@@ -720,16 +713,16 @@
 
     <!-- VIEW 2: TEAM MEMBER DASHBOARD (Graphic Designer / Videographer / Marketing Exec) -->
     <section id="member-view" class="view-section hidden">
-      <!-- Prominent Member Admin Bar -->
-      <div class="member-admin-pill-bar" style="margin-bottom: 20px; background: rgba(0, 139, 165, 0.08); border: 1px solid rgba(0, 139, 165, 0.25); border-radius: var(--radius-md); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <!-- Dedicated Member Workspace Badge -->
+      <div class="member-status-bar" style="margin-bottom: 20px; background: rgba(0, 139, 165, 0.08); border: 1px solid rgba(0, 139, 165, 0.25); border-radius: var(--radius-md); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
         <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 13px; color: var(--text-main);">Viewing workspace as:</span>
+          <i data-lucide="user-check" style="width: 16px; height: 16px; color: var(--teal-primary);"></i>
+          <span style="font-size: 13px; color: var(--text-main);">Logged in as:</span>
           <strong id="member-banner-user-name" style="color: var(--teal-primary);">Graphic Designer</strong>
         </div>
-        <div style="display: flex; gap: 8px; align-items: center;">
-          <button type="button" id="btn-member-switch-admin" class="btn btn-primary btn-sm">
-            <i data-lucide="shield"></i> Switch to Admin Command Center
-          </button>
+        <div style="font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+          <i data-lucide="lock" style="width: 14px; height: 14px; color: var(--teal-primary);"></i>
+          <span>Independent Employee Workspace</span>
         </div>
       </div>
 
@@ -740,9 +733,6 @@
           <p class="view-subtitle" id="member-dashboard-subtitle">Track your monthly target quota, submit completed designs, and view feedback.</p>
         </div>
         <div class="header-action-buttons">
-          <button id="btn-switch-to-manager" class="btn btn-outline-sm" title="Return to Marketing Manager Command Center">
-            <i data-lucide="shield"></i> Switch to Admin
-          </button>
           <button id="btn-member-log-work" class="btn btn-primary">
             <i data-lucide="upload-cloud"></i> + Submit Deliverable
           </button>
@@ -1238,8 +1228,8 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Logic Scripts -->
-  <script src="js/data.js?v=12"></script>
-  <script src="js/auth.js?v=12"></script>
-  <script src="js/app.js?v=12"></script>
+  <script src="js/data.js?v=13"></script>
+  <script src="js/auth.js?v=13"></script>
+  <script src="js/app.js?v=13"></script>
 </body>
 </html>

@@ -226,9 +226,9 @@ class AuthService {
     delete this.users[normEmail];
     this.saveUsers(this.users);
 
-    // If current session is this deleted user, switch to manager
+    // If current session is this deleted user, log out cleanly
     if (this.currentUser && this.currentUser.email.toLowerCase() === normEmail) {
-      this.switchRole('manager');
+      this.logout();
     } else {
       this.notify();
     }
@@ -282,30 +282,16 @@ class AuthService {
     const user = this.users[normalized];
 
     if (!user) {
-      // Dynamic fallback for any custom email
-      let role = 'designer';
-      if (normalized.includes('manager')) role = 'manager';
-      else if (normalized.includes('video')) role = 'videographer';
-      else if (normalized.includes('market')) role = 'marketing';
-      else if (normalized.includes('content') || normalized.includes('writer')) role = 'content';
+      return { success: false, error: 'User account not found. Please check your email or contact the administrator.' };
+    }
 
-      const customUser = {
-        id: 'emp-' + Date.now(),
-        email: normalized,
-        role: role,
-        name: normalized.split('@')[0].toUpperCase(),
-        title: `${role.toUpperCase()} Member`,
-        brand: 'Both',
-        avatar: normalized.charAt(0).toUpperCase(),
-        badgeClass: this.getRoleBadgeClass(role),
-        password: password || 'password123',
-        createdAt: new Date().toISOString(),
-        isSystem: false
-      };
-      this.users[normalized] = customUser;
-      this.saveUsers(this.users);
-      this.saveSession(customUser);
-      return { success: true, user: customUser };
+    if (!password || !password.trim()) {
+      return { success: false, error: 'Please enter your password to sign in.' };
+    }
+
+    const expectedPass = user.password || 'password123';
+    if (password.trim() !== expectedPass) {
+      return { success: false, error: 'Incorrect password for ' + user.name + '. Please try again.' };
     }
 
     this.saveSession(user);
@@ -314,21 +300,6 @@ class AuthService {
 
   logout() {
     this.saveSession(null);
-  }
-
-  // Switch to a user by role or email directly
-  switchRole(roleOrEmail) {
-    const key = (roleOrEmail || '').trim().toLowerCase();
-    // Direct email match
-    if (this.users[key]) {
-      this.saveSession(this.users[key]);
-      return;
-    }
-    // Match by role
-    const found = this.getAllUsers().find(u => u.role === key);
-    if (found) {
-      this.saveSession(found);
-    }
   }
 
   onChange(callback) {
