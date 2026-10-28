@@ -17,7 +17,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=39">
+  <link rel="stylesheet" href="css/styles.css?v=40">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -1147,10 +1147,10 @@
 
   <!-- MODAL: USER PROFILE & SECURITY SETTINGS (CHANGE PASSWORD) -->
   <div id="profile-management-modal" class="modal-overlay hidden">
-    <div class="modal-card spotlight-card" style="max-width: 540px;">
+    <div class="modal-card spotlight-card" style="max-width: 520px;">
       <div class="modal-header">
-        <div class="modal-header-title">
-          <i data-lucide="shield-check" class="modal-title-icon" style="color: var(--teal-primary);"></i>
+        <div class="modal-title-group">
+          <i data-lucide="shield-check" class="modal-icon" style="color: #EF2424;"></i>
           <h3>Profile Settings</h3>
         </div>
         <button type="button" class="btn-close-modal" id="btn-close-profile-modal" aria-label="Close modal">
@@ -1158,141 +1158,141 @@
         </button>
       </div>
 
-      <!-- Account Summary Banner -->
-      <div class="profile-summary-header">
-        <div class="profile-summary-avatar" id="profile-modal-avatar">M</div>
-        <div class="profile-summary-info">
-          <h4 id="profile-modal-name-display">Marketing Manager</h4>
-          <div class="profile-badges-row">
-            <span class="user-role-badge badge-lead" id="profile-modal-role-badge">Lead Admin</span>
-            <span class="profile-brand-badge" id="profile-modal-brand-badge">All Nexcrest Brands</span>
-          </div>
-          <div class="profile-email-meta">
-            <i data-lucide="mail"></i>
-            <span id="profile-modal-email-display">manager@nexcrest.com</span>
-            <span class="profile-lock-tag" title="Account identifier is fixed"><i data-lucide="lock"></i> Verified</span>
-          </div>
-        </div>
-        <button type="button" id="logout-btn" class="btn-profile-header-logout btn-logout-action" title="Sign Out">
-          <i data-lucide="log-out"></i>
-          <span>Sign Out</span>
-        </button>
-      </div>
-
-      <!-- Tabs: Personal Info & Security -->
-      <div class="profile-modal-tabs">
-        <button type="button" class="profile-tab-btn active" data-profile-tab="details">
-          <i data-lucide="user"></i> Personal Info
-        </button>
-        <button type="button" class="profile-tab-btn" data-profile-tab="security">
-          <i data-lucide="key"></i> Change Password
-        </button>
-      </div>
-
-      <!-- TAB PANEL 1: Personal Info -->
-      <div id="profile-tab-details" class="profile-tab-panel active">
-        <form id="profile-details-form" class="modal-form">
-          <div class="form-group">
-            <label for="profile-edit-name">Display Name <span class="required">*</span></label>
-            <div class="input-with-icon">
-              <i data-lucide="user"></i>
-              <input type="text" id="profile-edit-name" required placeholder="Your full name">
+      <div class="profile-modal-body">
+        <!-- Account Summary Banner -->
+        <div class="profile-summary-header">
+          <div class="profile-summary-left">
+            <div class="profile-summary-avatar" id="profile-modal-avatar">M</div>
+            <div class="profile-summary-info">
+              <div class="profile-summary-name-row">
+                <h4 id="profile-modal-name-display">Marketing Manager</h4>
+                <span class="user-role-badge badge-lead" id="profile-modal-role-badge">Lead Admin</span>
+              </div>
+              <div class="profile-email-meta">
+                <i data-lucide="mail"></i>
+                <span id="profile-modal-email-display">manager@nexcrest.com</span>
+                <span class="profile-lock-tag" title="Account identifier is fixed"><i data-lucide="lock"></i> Verified</span>
+              </div>
+              <span class="profile-brand-badge" id="profile-modal-brand-badge" style="display: none;">All Nexcrest Brands</span>
             </div>
           </div>
-
-          <div class="form-group">
-            <label for="profile-edit-title">Job Title</label>
-            <div class="input-with-icon">
-              <i data-lucide="briefcase"></i>
-              <input type="text" id="profile-edit-title" placeholder="e.g. Senior Graphic Designer">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Brand</label>
-            <div class="input-with-icon">
-              <i data-lucide="tag"></i>
-              <input type="text" id="profile-edit-brand-readonly" readonly disabled style="opacity: 0.8; cursor: not-allowed;">
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline" id="btn-cancel-profile-details">Close</button>
-            <button type="submit" class="btn btn-primary">
-              <i data-lucide="check"></i> Save Profile
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- TAB PANEL 2: Change Password & Security -->
-      <div id="profile-tab-security" class="profile-tab-panel hidden">
-        <form id="profile-password-form" class="modal-form">
-          <div class="form-group">
-            <label for="profile-current-pass">Current Password <span class="required">*</span></label>
-            <div class="input-with-icon-right">
-              <i data-lucide="lock" class="input-left-icon"></i>
-              <input type="password" id="profile-current-pass" required placeholder="Enter current password">
-              <button type="button" class="btn-toggle-pass-visibility" data-target="profile-current-pass" title="Toggle visibility">
-                <i data-lucide="eye"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="profile-new-pass">New Password <span class="required">*</span></label>
-            <div class="input-with-icon-right">
-              <i data-lucide="key-round" class="input-left-icon"></i>
-              <input type="password" id="profile-new-pass" required minlength="6" placeholder="At least 6 characters">
-              <button type="button" class="btn-toggle-pass-visibility" data-target="profile-new-pass" title="Toggle visibility">
-                <i data-lucide="eye"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="profile-confirm-pass">Confirm New Password <span class="required">*</span></label>
-            <div class="input-with-icon-right">
-              <i data-lucide="check-check" class="input-left-icon"></i>
-              <input type="password" id="profile-confirm-pass" required minlength="6" placeholder="Re-enter new password">
-              <button type="button" class="btn-toggle-pass-visibility" data-target="profile-confirm-pass" title="Toggle visibility">
-                <i data-lucide="eye"></i>
-              </button>
-            </div>
-          </div>
-
-          <div id="profile-password-error" class="form-error-notice hidden"></div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline" id="btn-cancel-profile-password">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="btn-submit-change-password">
-              <i data-lucide="shield-check"></i> Update Password
-            </button>
-          </div>
-        </form>
-
-        <!-- Cross-Device Mobile Sync Card -->
-        <div class="mobile-sync-card" id="mobile-sync-card">
-          <div class="sync-header">
-            <i data-lucide="smartphone" class="sync-icon"></i>
-            <div>
-              <div class="sync-title">Sync to Mobile</div>
-              <div class="sync-subtitle">Sync your login session with your mobile device.</div>
-            </div>
-          </div>
-          <button type="button" id="btn-copy-sync-link" class="btn btn-outline btn-block">
-            <i data-lucide="copy"></i>
-            <span>Copy Sync Link</span>
+          <button type="button" id="logout-btn" class="btn-profile-header-logout btn-logout-action" title="Sign Out">
+            <i data-lucide="log-out"></i>
+            <span>Sign Out</span>
           </button>
         </div>
-      </div>
 
-      <!-- Sign Out Strip -->
-      <div class="profile-modal-signout-wrap">
-        <button type="button" class="btn-profile-logout btn-logout-action" title="Sign Out">
-          <i data-lucide="log-out"></i>
-          <span>Sign Out</span>
-        </button>
+        <!-- Tabs: Personal Info & Security -->
+        <div class="profile-modal-tabs">
+          <button type="button" class="profile-tab-btn active" data-profile-tab="details">
+            <i data-lucide="user"></i>
+            <span>Personal Info</span>
+          </button>
+          <button type="button" class="profile-tab-btn" data-profile-tab="security">
+            <i data-lucide="key"></i>
+            <span>Change Password</span>
+          </button>
+        </div>
+
+        <!-- TAB PANEL 1: Personal Info -->
+        <div id="profile-tab-details" class="profile-tab-panel active">
+          <form id="profile-details-form" class="modal-form">
+            <div class="form-group">
+              <label for="profile-edit-name">Display Name <span class="required">*</span></label>
+              <div class="input-with-icon">
+                <i data-lucide="user"></i>
+                <input type="text" id="profile-edit-name" required placeholder="Your full name">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="profile-edit-title">Job Title</label>
+              <div class="input-with-icon">
+                <i data-lucide="briefcase"></i>
+                <input type="text" id="profile-edit-title" placeholder="e.g. Senior Graphic Designer">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Brand</label>
+              <div class="input-with-icon">
+                <i data-lucide="tag"></i>
+                <input type="text" id="profile-edit-brand-readonly" readonly disabled>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline" id="btn-cancel-profile-details">Close</button>
+              <button type="submit" class="btn btn-primary">
+                <i data-lucide="check"></i>
+                <span>Save Profile</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- TAB PANEL 2: Change Password & Security -->
+        <div id="profile-tab-security" class="profile-tab-panel hidden">
+          <form id="profile-password-form" class="modal-form">
+            <div class="form-group">
+              <label for="profile-current-pass">Current Password <span class="required">*</span></label>
+              <div class="input-with-icon-right">
+                <i data-lucide="lock" class="input-left-icon"></i>
+                <input type="password" id="profile-current-pass" required placeholder="Enter current password">
+                <button type="button" class="btn-toggle-pass-visibility" data-target="profile-current-pass" title="Toggle visibility">
+                  <i data-lucide="eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="profile-new-pass">New Password <span class="required">*</span></label>
+              <div class="input-with-icon-right">
+                <i data-lucide="key-round" class="input-left-icon"></i>
+                <input type="password" id="profile-new-pass" required minlength="6" placeholder="At least 6 characters">
+                <button type="button" class="btn-toggle-pass-visibility" data-target="profile-new-pass" title="Toggle visibility">
+                  <i data-lucide="eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="profile-confirm-pass">Confirm New Password <span class="required">*</span></label>
+              <div class="input-with-icon-right">
+                <i data-lucide="check-check" class="input-left-icon"></i>
+                <input type="password" id="profile-confirm-pass" required minlength="6" placeholder="Re-enter new password">
+                <button type="button" class="btn-toggle-pass-visibility" data-target="profile-confirm-pass" title="Toggle visibility">
+                  <i data-lucide="eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div id="profile-password-error" class="form-error-notice hidden"></div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline" id="btn-cancel-profile-password">Cancel</button>
+              <button type="submit" class="btn btn-primary" id="btn-submit-change-password">
+                <i data-lucide="shield-check"></i>
+                <span>Update Password</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Cross-Device Mobile Sync Card -->
+          <div class="mobile-sync-card" id="mobile-sync-card">
+            <div class="sync-header">
+              <i data-lucide="smartphone" class="sync-icon"></i>
+              <div>
+                <div class="sync-title">Sync to Mobile</div>
+                <div class="sync-subtitle">Sync your login session with your mobile device.</div>
+              </div>
+            </div>
+            <button type="button" id="btn-copy-sync-link" class="btn btn-outline btn-block">
+              <i data-lucide="copy"></i>
+              <span>Copy Sync Link</span>
+            </button>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -1353,6 +1353,6 @@
   <script src="js/firebase-config.js?v=39"></script>
   <script src="js/data.js?v=39"></script>
   <script src="js/auth.js?v=39"></script>
-  <script src="js/app.js?v=39"></script>
+  <script src="js/app.js?v=40"></script>
 </body>
 </html>
