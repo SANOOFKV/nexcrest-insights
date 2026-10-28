@@ -828,8 +828,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!window.Chart) return;
 
     const isDark = document.body.classList.contains('dark-theme');
-    const textColor = isDark ? '#94A3B8' : '#475569';
-    const gridColor = isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.06)';
+    const textColor = isDark ? '#E2E8F0' : '#475569';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
 
     // Chart 1: Category Target vs Achievement Bar Chart
     const ctxCat = document.getElementById('categoryComparisonChart');
@@ -871,7 +871,7 @@ document.addEventListener('DOMContentLoaded', () => {
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: isDark ? '#0D1E2C' : '#0F172A',
+              backgroundColor: isDark ? '#161922' : '#0F172A',
               titleColor: '#FFFFFF',
               bodyColor: '#E2E8F0',
               padding: 10,
@@ -908,7 +908,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
       });
 
-      const roleTargetColor = isDark ? '#45B2C3' : '#2B557A';
+      const roleTargetColor = isDark ? '#FF6B6B' : '#EF2424';
       const roleAchievedColor = isDark ? '#34D399' : '#10B981';
 
       state.charts.role = new Chart(ctxRole, {
@@ -938,7 +938,7 @@ document.addEventListener('DOMContentLoaded', () => {
           plugins: {
             legend: { display: false },
             tooltip: {
-              backgroundColor: isDark ? '#0D1E2C' : '#0F172A',
+              backgroundColor: isDark ? '#161922' : '#0F172A',
               padding: 10,
               cornerRadius: 8,
               callbacks: {
@@ -1395,7 +1395,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <td>${escapeHtml(sub.title)}</td>
           <td>${renderProofChip(sub.url)}</td>
           <td>${statusBadge}</td>
-          <td>${sub.feedback ? `<span style="font-size: 12px; color: #E2E8F0;">${escapeHtml(sub.feedback)}</span>` : '<span style="color: var(--text-dim);">-</span>'}</td>
+          <td>${sub.feedback ? `<span class="feedback-table-text">${escapeHtml(sub.feedback)}</span>` : '<span style="color: var(--text-dim);">-</span>'}</td>
         </tr>
       `;
     }).join('');
@@ -1759,7 +1759,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <td>${renderProofChip(sub.url)}</td>
             <td>${sub.notes ? escapeHtml(sub.notes) : '-'}</td>
             <td>${statusBadge}</td>
-            <td>${sub.feedback ? `<span style="color: #E2E8F0; font-weight: 500;">${escapeHtml(sub.feedback)}</span>` : '<span style="color: var(--text-dim);">-</span>'}</td>
+            <td>${sub.feedback ? `<span class="feedback-table-text">${escapeHtml(sub.feedback)}</span>` : '<span style="color: var(--text-dim);">-</span>'}</td>
           </tr>
         `;
       }).join('');
