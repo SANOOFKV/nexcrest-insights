@@ -5439,6 +5439,60 @@ body.dark-theme .mobile-sync-card {
   line-height: 1.4;
 }
 
+/* Profile Modal Sign Out Footer */
+.profile-modal-signout-wrap {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.btn-profile-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 44px;
+  padding: 0 16px;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1.5px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--radius-md);
+  color: #DC2626;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.btn-profile-logout svg {
+  width: 16px;
+  height: 16px;
+  color: #DC2626;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.btn-profile-logout:hover {
+  background: #DC2626;
+  border-color: #DC2626;
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-profile-logout:hover svg {
+  color: #FFFFFF;
+  transform: translateX(2px);
+}
+
+.btn-profile-logout:active {
+  transform: scale(0.98);
+}
+
 /* Mobile Responsive Optimization for Profile Modal */
 @media (max-width: 640px) {
   .profile-summary-header {

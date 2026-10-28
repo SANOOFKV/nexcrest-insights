@@ -2943,15 +2943,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Logout Button
-  elements.logoutBtn.addEventListener('click', () => {
-    window.authService.logout();
-    state.user = null;
-    clearAuthError();
-    showToast('Signed out of Nexcrest Ops', 'info');
-    populateLoginProfileTabs('manager@nexcrest.com');
-    renderApp();
-  });
+  // Logout Button (Inside Profile Settings Modal)
+  if (elements.logoutBtn) {
+    elements.logoutBtn.addEventListener('click', () => {
+      closeProfileModal();
+      window.authService.logout();
+      state.user = null;
+      clearAuthError();
+      showToast('Signed out', 'info');
+      populateLoginProfileTabs('manager@nexcrest.com');
+      renderApp();
+    });
+  }
 
   // Exclusive System Theme: High-End Light Theme Only (Dark theme removed entirely)
   function initTheme() {
