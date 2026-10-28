@@ -430,6 +430,8 @@ class DataStore {
 
   initCloudSync() {
     if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.seedTargetsIfEmpty(SEED_TARGETS);
+      window.firebaseSync.seedSubmissionsIfEmpty(SEED_SUBMISSIONS);
       window.firebaseSync.subscribeTargets((cloudTargets) => {
         if (Array.isArray(cloudTargets) && cloudTargets.length > 0) {
           this.targets = cloudTargets;

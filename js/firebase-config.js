@@ -4,12 +4,13 @@
  */
 
 window.FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyA155j7eTnmIi7VaUIgDU8dCs3GHYMxyvk",
+  authDomain: "nexcrest-insights.firebaseapp.com",
+  projectId: "nexcrest-insights",
+  storageBucket: "nexcrest-insights.firebasestorage.app",
+  messagingSenderId: "484312039866",
+  appId: "1:484312039866:web:1007950ed09adbc6079d83",
+  measurementId: "G-30XDBKR84M"
 };
 
 class FirebaseSyncService {
@@ -122,6 +123,25 @@ class FirebaseSyncService {
     }
   }
 
+  // Seed default targets to cloud if collection is empty
+  async seedTargetsIfEmpty(seedTargets) {
+    if (!this.isActive() || !Array.isArray(seedTargets)) return;
+    try {
+      const snap = await this.db.collection('targets').limit(1).get();
+      if (snap.empty) {
+        const batch = this.db.batch();
+        seedTargets.forEach(t => {
+          const ref = this.db.collection('targets').doc(String(t.id));
+          batch.set(ref, t);
+        });
+        await batch.commit();
+        console.log('✅ Seeded default targets into Cloud Firestore');
+      }
+    } catch (err) {
+      console.warn('Notice seeding targets:', err);
+    }
+  }
+
   // Save target to cloud
   async saveTarget(target) {
     if (!this.isActive() || !target || !target.id) return false;
@@ -131,6 +151,25 @@ class FirebaseSyncService {
     } catch (err) {
       console.error('Failed to save target to Firestore:', err);
       return false;
+    }
+  }
+
+  // Seed default submissions to cloud if collection is empty
+  async seedSubmissionsIfEmpty(seedSubs) {
+    if (!this.isActive() || !Array.isArray(seedSubs)) return;
+    try {
+      const snap = await this.db.collection('submissions').limit(1).get();
+      if (snap.empty) {
+        const batch = this.db.batch();
+        seedSubs.forEach(s => {
+          const ref = this.db.collection('submissions').doc(String(s.id));
+          batch.set(ref, s);
+        });
+        await batch.commit();
+        console.log('✅ Seeded default submissions into Cloud Firestore');
+      }
+    } catch (err) {
+      console.warn('Notice seeding submissions:', err);
     }
   }
 
@@ -168,3 +207,4 @@ class FirebaseSyncService {
 
 // Global instance
 window.firebaseSync = new FirebaseSyncService();
+
