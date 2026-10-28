@@ -230,6 +230,9 @@ document.addEventListener('DOMContentLoaded', () => {
     authForm: document.getElementById('auth-form'),
     loginEmail: document.getElementById('login-email'),
     loginPassword: document.getElementById('login-password'),
+    loginPasswordWrapper: document.getElementById('login-password-wrapper'),
+    authErrorNotice: document.getElementById('auth-error-notice'),
+    authErrorText: document.getElementById('auth-error-text'),
     roleLoginTabs: document.querySelectorAll('.role-login-tab'),
     roleDescTitle: document.getElementById('role-desc-title'),
     roleDescText: document.getElementById('role-desc-text'),
@@ -266,6 +269,44 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
+  }
+
+  // Auth Error State Management (Wrong Password / Invalid Account)
+  function clearAuthError() {
+    if (elements.authErrorNotice) {
+      elements.authErrorNotice.classList.add('hidden');
+    }
+    if (elements.authErrorText) {
+      elements.authErrorText.textContent = '';
+    }
+    if (elements.loginPasswordWrapper) {
+      elements.loginPasswordWrapper.classList.remove('input-error', 'shake-anim');
+    }
+    if (elements.loginPassword) {
+      elements.loginPassword.classList.remove('input-error');
+    }
+  }
+
+  function showAuthError(message) {
+    const errorText = message || 'Incorrect password. Please try again.';
+    if (elements.authErrorText) {
+      elements.authErrorText.textContent = errorText;
+    }
+    if (elements.authErrorNotice) {
+      elements.authErrorNotice.classList.remove('hidden');
+    }
+    if (elements.loginPasswordWrapper) {
+      elements.loginPasswordWrapper.classList.add('input-error');
+      elements.loginPasswordWrapper.classList.remove('shake-anim');
+      // Trigger browser DOM reflow so shake animation restarts on consecutive failures
+      void elements.loginPasswordWrapper.offsetWidth;
+      elements.loginPasswordWrapper.classList.add('shake-anim');
+    }
+    if (elements.loginPassword) {
+      elements.loginPassword.value = '';
+      elements.loginPassword.focus();
+    }
+    refreshIcons();
   }
 
   // Debounce utility to prevent UI stutter on rapid search typing
@@ -1759,6 +1800,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabs = container.querySelectorAll('.role-login-tab');
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
+        clearAuthError();
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
 
@@ -2924,22 +2966,39 @@ document.addEventListener('DOMContentLoaded', () => {
   // Auth / Login Handling
   elements.authForm.addEventListener('submit', (e) => {
     e.preventDefault();
+    clearAuthError();
     const email = elements.loginEmail.value.trim();
     const pass = elements.loginPassword.value.trim();
     const res = window.authService.login(email, pass);
     if (res.success) {
       state.user = res.user;
+      clearAuthError();
       showToast(`Welcome back, ${res.user.name}!`, 'success');
       renderApp();
     } else {
-      showToast(res.error || 'Invalid email or password.', 'error');
+      const errorMsg = res.error || 'Incorrect password. Please try again.';
+      showAuthError(errorMsg);
+      showToast(errorMsg, 'error');
     }
   });
+
+  // Automatically clear error notice as soon as user types in credentials
+  if (elements.loginPassword) {
+    elements.loginPassword.addEventListener('input', () => {
+      clearAuthError();
+    });
+  }
+  if (elements.loginEmail) {
+    elements.loginEmail.addEventListener('input', () => {
+      clearAuthError();
+    });
+  }
 
   // Logout Button
   elements.logoutBtn.addEventListener('click', () => {
     window.authService.logout();
     state.user = null;
+    clearAuthError();
     showToast('Signed out of Nexcrest Ops', 'info');
     populateLoginProfileTabs('manager@nexcrest.com');
     renderApp();

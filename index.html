@@ -10,7 +10,7 @@
   <!-- Lucide Icons & Chart.js -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="css/styles.css?v=19">
+  <link rel="stylesheet" href="css/styles.css?v=20">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -108,10 +108,19 @@
 
         <div class="form-group">
           <label for="login-password">Password</label>
-          <div class="input-with-icon">
-            <i data-lucide="lock"></i>
-            <input type="password" id="login-password" placeholder="Enter account password" required value="">
+          <div class="input-with-icon-right" id="login-password-wrapper">
+            <i data-lucide="lock" class="input-left-icon"></i>
+            <input type="password" id="login-password" placeholder="Enter account password" required autocomplete="current-password" value="">
+            <button type="button" class="btn-toggle-pass-visibility" data-target="login-password" title="Toggle password visibility" aria-label="Toggle password visibility">
+              <i data-lucide="eye"></i>
+            </button>
           </div>
+        </div>
+
+        <!-- Prominent Inline Feedback for Login Errors (e.g. Wrong Password) -->
+        <div id="auth-error-notice" class="auth-error-notice hidden" role="alert" aria-live="assertive">
+          <i data-lucide="alert-circle"></i>
+          <span id="auth-error-text">Incorrect password. Please try again.</span>
         </div>
 
         <button type="submit" id="auth-submit-btn" class="btn btn-primary btn-block">
@@ -1412,8 +1421,8 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Logic Scripts -->
-  <script src="js/data.js?v=19"></script>
-  <script src="js/auth.js?v=19"></script>
-  <script src="js/app.js?v=19"></script>
+  <script src="js/data.js?v=20"></script>
+  <script src="js/auth.js?v=20"></script>
+  <script src="js/app.js?v=20"></script>
 </body>
 </html>
