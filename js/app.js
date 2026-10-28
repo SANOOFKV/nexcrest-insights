@@ -754,72 +754,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (elements.catMomentBar) elements.catMomentBar.style.width = `${mmPct}%`;
     }
 
-    // 5. Team Operations & Staff Pacing (Overview Breakdown)
-    renderOverviewTeamGrid();
-
-    // 6. Render Target vs Achievement Graphs
+    // 5. Render Target vs Achievement Graphs
     renderCharts(ov);
 
-    // 7. Refresh Futuristic VFX & Micro-Physics
+    // 6. Refresh Futuristic VFX & Micro-Physics
     refreshFuturisticEffects();
-  }
-
-  function renderOverviewTeamGrid() {
-    const grid = document.getElementById('overview-team-grid');
-    if (!grid) return;
-    const employees = window.authService.getEmployees();
-
-    const rosterCount = document.getElementById('ov-roster-total-count');
-    if (rosterCount) {
-      rosterCount.textContent = employees.length;
-    }
-
-    if (employees.length === 0) {
-      grid.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px;">
-          No staff onboarded yet. Head to the Team Roster & Staff tab to add members.
-        </div>
-      `;
-      return;
-    }
-
-    grid.innerHTML = employees.map(emp => {
-      const stats = window.dataStore.getEmployeeStats(emp);
-      const isAhead = stats.pct >= 50;
-
-      return `
-        <div class="ov-employee-card spotlight-card" style="background: var(--bg-card-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; gap: 10px; transition: var(--transition);">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div class="employee-avatar ${escapeHtml(emp.role)}" style="width: 38px; height: 38px; font-size: 14px; border-radius: var(--radius-sm);">${escapeHtml(emp.avatar || 'U')}</div>
-            <div style="flex: 1; min-width: 0;">
-              <div style="font-weight: 700; font-size: 14px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(emp.name)}</div>
-              <div style="font-size: 11px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(emp.title || emp.role)}</div>
-            </div>
-            <span class="badge-role ${escapeHtml(emp.badgeClass || 'badge-designer')}" style="font-size: 10px;">${escapeHtml((emp.role || '').toUpperCase())}</span>
-          </div>
-
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; background: var(--bg-card); padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-            <span style="color: var(--text-muted);">Allocated: <strong style="color: var(--text-main);">${stats.totalCompleted}/${stats.totalTarget}</strong></span>
-            <span style="font-weight: 700; color: ${isAhead ? 'var(--mint-success)' : 'var(--teal-primary)'};">${stats.pct}% Pace</span>
-          </div>
-
-          <div class="progress-bar-container" style="margin: 0; height: 4px;">
-            <div class="progress-bar-fill ${isAhead ? 'mint' : 'teal'}" style="width: ${stats.pct}%;"></div>
-          </div>
-
-          <div style="display: flex; gap: 6px; margin-top: 2px;">
-            <button type="button" class="btn-emp-assign btn-card-assign-task" data-emp-email="${escapeHtml(emp.email)}" data-emp-role="${escapeHtml(emp.role)}" data-emp-name="${escapeHtml(emp.name)}" style="flex: 1; padding: 6px 8px; font-size: 11px;">
-              <i data-lucide="plus-circle" style="width: 12px; height: 12px;"></i> Assign Task
-            </button>
-            <button type="button" class="btn-emp-edit btn-card-edit-emp" data-user-email="${escapeHtml(emp.email)}" style="padding: 6px 10px; font-size: 11px;" title="Edit Employee Profile">
-              <i data-lucide="edit-3" style="width: 12px; height: 12px; margin-right: 4px;"></i> Edit
-            </button>
-          </div>
-        </div>
-      `;
-    }).join('');
-
-    refreshIcons();
   }
 
   function renderCharts(ov) {
@@ -2533,21 +2472,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Overview Screen "Manage Full Roster" Link
-  const btnOvGotoRoster = document.getElementById('btn-ov-goto-roster');
-  if (btnOvGotoRoster) {
-    btnOvGotoRoster.addEventListener('click', () => {
-      state.activeManagerTab = 'team-roster';
-      elements.managerTabBtns.forEach(btn => {
-        if (btn.dataset.managerTab === 'team-roster') {
-          btn.classList.add('active');
-        } else {
-          btn.classList.remove('active');
-        }
-      });
-      renderManagerActiveTab();
-    });
-  }
 
   // Roster Search and Filter Listeners
   if (elements.rosterSearchInput) {
