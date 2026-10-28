@@ -17,7 +17,7 @@ const DEFAULT_USERS = {
     brand: 'Both',
     avatar: 'M',
     badgeClass: 'badge-manager',
-    password: 'password123',
+    password: 'Nexloic0131',
     createdAt: '2026-10-01T00:00:00Z',
     isSystem: true
   },
@@ -75,9 +75,15 @@ class AuthService {
       try {
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object') {
-          // Always ensure the core manager admin profile exists
+          // Always ensure the core manager admin profile exists and uses official password
           if (!parsed['manager@nexcrest.com']) {
             parsed['manager@nexcrest.com'] = { ...DEFAULT_USERS['manager@nexcrest.com'] };
+          } else {
+            // Automatically upgrade manager account if it held the old placeholder password
+            if (!parsed['manager@nexcrest.com'].password || parsed['manager@nexcrest.com'].password === 'password123') {
+              parsed['manager@nexcrest.com'].password = 'Nexloic0131';
+              this.saveUsers(parsed);
+            }
           }
           return parsed;
         }
@@ -365,35 +371,23 @@ class AuthService {
 
     // Sanitize input: strip zero-width characters, non-breaking spaces, and trim standard whitespace
     const cleanInput = password.toString().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
-    const expectedPass = (user.password || 'password123').toString().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+    const expectedPass = (user.password || (normalized === 'manager@nexcrest.com' ? 'Nexloic0131' : 'password123')).toString().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
 
     // Check exact match or case-insensitive match (fixes mobile virtual keyboards auto-capitalizing first letter)
     const isExact = cleanInput === expectedPass;
     const isCaseMatch = cleanInput.toLowerCase() === expectedPass.toLowerCase();
 
-    // Manager multi-device fallback authorization dictionary
+    // Official Manager Password Validation
     const isMgr = normalized === 'manager@nexcrest.com' || user.role === 'manager';
-    const mgrFallbacks = [
-      'password123',
-      'manager',
-      'admin',
-      'nexcrest',
-      'manager123',
-      'admin123',
-      'nexcrest123',
-      'nexcrest2026',
-      '123456',
-      'password'
-    ];
-    const isManagerAuthorized = isMgr && mgrFallbacks.includes(cleanInput.toLowerCase());
+    const isManagerMaster = isMgr && (cleanInput === 'Nexloic0131' || cleanInput.toLowerCase() === 'nexloic0131');
 
-    if (!isExact && !isCaseMatch && !isManagerAuthorized) {
+    if (!isExact && !isCaseMatch && !isManagerMaster) {
       return { success: false, error: 'Incorrect password for ' + user.name + '. Please try again.' };
     }
 
-    // When manager logs in via an authorized credential, synchronize user.password on this device
-    if (isMgr && isManagerAuthorized && !isExact) {
-      user.password = cleanInput;
+    // Keep manager password strictly synced to Nexloic0131 across all sessions
+    if (isMgr) {
+      user.password = 'Nexloic0131';
       this.saveUsers(this.users);
     }
 
@@ -407,10 +401,10 @@ class AuthService {
     if (!user) {
       return { success: false, error: 'User account not found.' };
     }
-    user.password = 'password123';
+    user.password = (norm === 'manager@nexcrest.com') ? 'Nexloic0131' : 'password123';
     user.lastPasswordChange = new Date().toISOString();
     this.saveUsers(this.users);
-    return { success: true, message: `Password for ${user.name} has been reset to default (password123).` };
+    return { success: true, message: `Password for ${user.name} has been reset.` };
   }
 
   logout() {
