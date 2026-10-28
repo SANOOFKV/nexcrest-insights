@@ -1,4 +1,4 @@
-# Nexcrest Media & Marketing - Operations & KPI Command Center
+# Nexcrest Insights - Operations & KPI Command Center
 
 A high-performance, dark-themed operations management dashboard built specifically for **Nexcrest Media & Marketing**. It enables the **Marketing Manager** to allocate monthly deliverable quotas, track real-time pacing, and review submitted proof links for:
 1. **Graphic Designer** (25 Monthly Deliverables)
@@ -14,14 +14,14 @@ As defined in the official Deliverables by Brand chart across the 3 core categor
 
 | Brand | Category | Content / Program | Format | Target Qty |
 | :--- | :--- | :--- | :--- | :---: |
-| **Techschool** | Campus Events | NexTalk Series | Carousel | **1** |
-| **Techschool** | Campus Events | Let's Talk Series | Carousel | **1** |
-| **Techschool** | Campus Events | LinkedIn Contest | Carousel | **1** |
-| **Techschool** | Campus Events | Experts Talk | Poster | **1** |
-| **Techschool** | Campus Events | Experts Talk | Carousel | **1** |
-| **Techschool** | Branding | Informative Contents | Carousel | **5** |
+| **Insights** | Campus Events | NexTalk Series | Carousel | **1** |
+| **Insights** | Campus Events | Let's Talk Series | Carousel | **1** |
+| **Insights** | Campus Events | LinkedIn Contest | Carousel | **1** |
+| **Insights** | Campus Events | Experts Talk | Poster | **1** |
+| **Insights** | Campus Events | Experts Talk | Carousel | **1** |
+| **Insights** | Branding | Informative Contents | Carousel | **5** |
 | **IT** | Branding | Informative Contents | Carousel | **5** |
-| **Techschool** | Marketing | Marketing Posters | Poster | **5** |
+| **Insights** | Marketing | Marketing Posters | Poster | **5** |
 | **IT** | Marketing | Marketing Posters | Poster | **5** |
 | **Total** | | **Monthly design deliverables** | | **25** |
 
@@ -32,11 +32,11 @@ Structured across the same 3 categories (**Campus Events**, **Branding**, **Mark
 
 | Brand | Category | Content / Program | Format | Target Qty |
 | :--- | :--- | :--- | :--- | :---: |
-| **Techschool** | Campus Events | NexTalk & Let's Talk Coverage | 9:16 Reel / Highlight | **2** |
-| **Techschool** | Campus Events | Experts Talk Speaker Clips & Student Reactions | Vertical Reels | **3** |
-| **Techschool** | Branding | Techschool Life & Campus Culture Series | Cinematic 9:16 Reel | **4** |
+| **Insights** | Campus Events | NexTalk & Let's Talk Coverage | 9:16 Reel / Highlight | **2** |
+| **Insights** | Campus Events | Experts Talk Speaker Clips & Student Reactions | Vertical Reels | **3** |
+| **Insights** | Branding | Techschool Life & Campus Culture Series | Cinematic 9:16 Reel | **4** |
 | **IT** | Branding | IT Program Explainers & Faculty Insights | Short Video Clips | **4** |
-| **Techschool** | Marketing | Course Admission Video Ads | Paid Ad Creative (9:16 & 1:1) | **3** |
+| **Insights** | Marketing | Course Admission Video Ads | Paid Ad Creative (9:16 & 1:1) | **3** |
 | **IT** | Marketing | Student Career Transformation Testimonials | Long-form Video (16:9) | **2** |
 | **Total** | | **Monthly video production** | | **18** |
 
@@ -47,11 +47,11 @@ Structured across the same 3 categories (**Campus Events**, **Branding**, **Mark
 
 | Brand | Category | Content / Program | Format | Target Qty |
 | :--- | :--- | :--- | :--- | :---: |
-| **Techschool** | Campus Events | NexTalk & Let's Talk Audience Registrations | Event Registration Drive | **2 Drives (150 RSVPs)** |
-| **Techschool** | Campus Events | LinkedIn Contest & Student Engagement Campaign | Organic Engagement Sprints | **3 Sprints** |
-| **Techschool** | Branding | Multi-Platform Content Distribution & Growth | Daily Social Publishing | **12 Scheduled Posts** |
+| **Insights** | Campus Events | NexTalk & Let's Talk Audience Registrations | Event Registration Drive | **2 Drives (150 RSVPs)** |
+| **Insights** | Campus Events | LinkedIn Contest & Student Engagement Campaign | Organic Engagement Sprints | **3 Sprints** |
+| **Insights** | Branding | Multi-Platform Content Distribution & Growth | Daily Social Publishing | **12 Scheduled Posts** |
 | **IT** | Branding | IT Career Community & Newsletter Broadcasts | Bi-Weekly Tech Newsletter | **2 Issues** |
-| **Techschool** | Marketing | Meta & Google Lead Acquisition Ads | Paid Lead Funnel | **4 Sets (300 Leads)** |
+| **Insights** | Marketing | Meta & Google Lead Acquisition Ads | Paid Lead Funnel | **4 Sets (300 Leads)** |
 | **IT** | Marketing | IT Upskilling Conversion Campaign | Conversion Funnel | **2 Sets (120 Inquiries)** |
 
 ---
@@ -81,7 +81,7 @@ The tool includes role-protected dashboards with instant single-click demo switc
 
 2. **Target Assignment Studio (Manager View)**:
    - Click **"+ Assign Target"** to allocate deliverable quotas to standard roles or directly to specific onboarded employees.
-   - Customize Brand (`Techschool`, `IT`), Category, Format, Program Title, Target Quantity, and Guidelines.
+   - Customize Brand (`Insights`, `IT`), Category, Format, Program Title, Target Quantity, and Guidelines.
    - Edit or delete assigned targets anytime.
 
 3. **Quality Review Queue (Manager View)**:
@@ -94,7 +94,7 @@ The tool includes role-protected dashboards with instant single-click demo switc
    - Instant visual cues: **Ahead / On Track** (Green) or **Behind Target** (Red).
 
 5. **Category & Brand Filtering**:
-   - Filter down deliverables by **Brand** (`Techschool`, `IT`), **Category** (`Campus Events`, `Branding`, `Marketing`), and **Role / Assignee**.
+   - Filter down deliverables by **Brand** (`Insights`, `IT`), **Category** (`Campus Events`, `Branding`, `Marketing`), and **Role / Assignee**.
 
 6. **Data Export & Local Persistence**:
    - All state (targets, submissions, and employees) is automatically persisted in browser `localStorage`.

@@ -30,7 +30,7 @@
   --glass-shadow-hover: 0 18px 40px -4px rgba(239, 36, 36, 0.12), 0 4px 12px rgba(0, 0, 0, 0.03);
   --glass-blur: blur(20px) saturate(180%);
 
-  /* Official Nexcrest Tech School Brand Tokens */
+  /* Official Nexcrest Insights Brand Tokens */
   --brand-primary: #EF2424;
   --brand-dark: #B11414;
   --brand-light: #FF5A3C;
@@ -1427,10 +1427,11 @@ body.dark-theme .tab-pill.active svg {
   display: inline-block;
 }
 
-.badge-brand.Techschool {
-  background: #E0F2FE;
-  color: #0369A1;
-  border: 1px solid #BAE6FD;
+.badge-brand.Techschool,
+.badge-brand.Insights {
+  background: rgba(239, 36, 36, 0.12);
+  color: #EF2424;
+  border: 1px solid rgba(239, 36, 36, 0.25);
 }
 
 .badge-brand.IT {
@@ -4523,7 +4524,7 @@ body.dark-theme .export-menu {
 }
 
 /* =========================================================================
-   USER PROFILE & SECURITY SETTINGS MODAL (NEXCREST TECH SCHOOL BRAND)
+   USER PROFILE & SECURITY SETTINGS MODAL (NEXCREST INSIGHTS BRAND)
    ========================================================================= */
 .profile-summary-header {
   display: flex;

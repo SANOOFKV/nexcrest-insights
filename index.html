@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexcrest Media & Marketing | Operations & KPI Command Center</title>
+  <title>Nexcrest Insights | Operations & KPI Command Center</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons & Chart.js -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="css/styles.css?v=15">
+  <link rel="stylesheet" href="css/styles.css?v=16">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -32,10 +32,10 @@
     <div class="header-container">
       <div class="brand-group">
         <div class="brand-logo">
-          <img src="assets/logo-cropped.png" alt="Nexcrest Tech School" class="brand-logo-img" style="height: 38px; width: auto; object-fit: contain;">
+          <img src="assets/logo-cropped.png" alt="Nexcrest Insights" class="brand-logo-img" style="height: 38px; width: auto; object-fit: contain;">
           <div class="logo-text">
             <span class="company-name">NEXCREST</span>
-            <span class="sub-label">Tech School Media Ops</span>
+            <span class="sub-label">Insights & Media Ops</span>
           </div>
         </div>
         <div class="cycle-badge">
@@ -77,10 +77,10 @@
     <div class="modal-card auth-card spotlight-card">
       <div class="auth-header">
         <div class="brand-logo large" style="background: transparent; border: none; box-shadow: none; padding: 0;">
-          <img src="assets/logo-cropped.png" alt="Nexcrest Tech School" style="height: 56px; width: auto; object-fit: contain; margin: 0 auto 12px auto; display: block;">
+          <img src="assets/logo-cropped.png" alt="Nexcrest Insights" style="height: 56px; width: auto; object-fit: contain; margin: 0 auto 12px auto; display: block;">
         </div>
-        <h2>Nexcrest Tech School</h2>
-        <p class="auth-subtitle">Media, Marketing & Operations Command Center</p>
+        <h2>Nexcrest Insights</h2>
+        <p class="auth-subtitle">Operations, KPI & Marketing Command Center</p>
       </div>
 
       <!-- Quick Account / Portal Profile Selector (Dynamically populated with all staff including Sumesh) -->
@@ -225,8 +225,8 @@
             <label><i data-lucide="building"></i> Brand:</label>
             <select id="filter-brand-select">
               <option value="all">All Brands</option>
-              <option value="Techschool">Techschool</option>
-              <option value="IT">IT</option>
+              <option value="Insights">Nexcrest Insights</option>
+              <option value="IT">IT Division</option>
             </select>
           </div>
 
@@ -863,8 +863,9 @@
           <div class="form-group">
             <label for="target-brand">Brand *</label>
             <select id="target-brand" required>
-              <option value="Techschool">Techschool</option>
-              <option value="IT">IT</option>
+              <option value="Insights">Nexcrest Insights</option>
+              <option value="IT">IT Division</option>
+              <option value="Both">Both (Insights & IT)</option>
             </select>
           </div>
         </div>
@@ -967,9 +968,9 @@
           <div class="form-group">
             <label for="new-emp-brand">Brand Assignment</label>
             <select id="new-emp-brand">
-              <option value="Both">Both Brands (Techschool & IT)</option>
-              <option value="Techschool">Techschool</option>
-              <option value="IT">IT</option>
+              <option value="Both">Both (Insights & IT)</option>
+              <option value="Insights">Nexcrest Insights</option>
+              <option value="IT">IT Division</option>
             </select>
           </div>
           <div class="form-group">
@@ -1073,9 +1074,9 @@
           <div class="form-group">
             <label for="edit-emp-brand">Assigned Brand Focus</label>
             <select id="edit-emp-brand">
-              <option value="Nexcrest Tech School">Nexcrest Tech School</option>
+              <option value="Nexcrest Insights">Nexcrest Insights</option>
               <option value="Nexcrest IT Services">Nexcrest IT Services</option>
-              <option value="Both (Tech School & IT)">Both (Tech School & IT)</option>
+              <option value="Both (Insights & IT)">Both (Insights & IT)</option>
             </select>
           </div>
         </div>
@@ -1213,7 +1214,7 @@
             <span class="chips-label">Quick Suggestions:</span>
             <div class="feedback-chips-list">
               <button type="button" class="feedback-chip" data-chip="Approved on first review! Exceptional execution.">👍 Approved</button>
-              <button type="button" class="feedback-chip" data-chip="Please update to official Nexcrest Tech School brand colors (#EF2424 Crimson).">🎨 Brand Colors</button>
+              <button type="button" class="feedback-chip" data-chip="Please update to official Nexcrest Insights brand colors (#EF2424 Crimson).">🎨 Brand Colors</button>
               <button type="button" class="feedback-chip" data-chip="Aspect ratio needs to be 9:16 for Reels / Stories.">📐 9:16 Ratio</button>
               <button type="button" class="feedback-chip" data-chip="Spelling/typography review needed on slide text.">✏️ Typo Fix</button>
               <button type="button" class="feedback-chip" data-chip="Please grant access permissions on Google Drive / Figma file.">🔗 File Permissions</button>
@@ -1366,8 +1367,8 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Logic Scripts -->
-  <script src="js/data.js?v=15"></script>
-  <script src="js/auth.js?v=15"></script>
-  <script src="js/app.js?v=15"></script>
+  <script src="js/data.js?v=16"></script>
+  <script src="js/auth.js?v=16"></script>
+  <script src="js/app.js?v=16"></script>
 </body>
 </html>
