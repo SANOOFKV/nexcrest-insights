@@ -425,6 +425,26 @@ class DataStore {
     this.targets = this.loadTargets();
     this.submissions = this.loadSubmissions();
     this.activeMonth = localStorage.getItem(STORAGE_KEYS.SELECTED_MONTH) || '2026-10';
+    this.initCloudSync();
+  }
+
+  initCloudSync() {
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.subscribeTargets((cloudTargets) => {
+        if (Array.isArray(cloudTargets) && cloudTargets.length > 0) {
+          this.targets = cloudTargets;
+          try { localStorage.setItem(STORAGE_KEYS.TARGETS, JSON.stringify(this.targets)); } catch (e) {}
+          if (typeof this.notify === 'function') this.notify();
+        }
+      });
+      window.firebaseSync.subscribeSubmissions((cloudSubs) => {
+        if (Array.isArray(cloudSubs)) {
+          this.submissions = cloudSubs;
+          try { localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(this.submissions)); } catch (e) {}
+          if (typeof this.notify === 'function') this.notify();
+        }
+      });
+    }
   }
 
   loadTargets() {
@@ -457,6 +477,10 @@ class DataStore {
     } catch (e) {
       console.error('Storage quota exceeded while saving targets', e);
     }
+    // Broadcast target changes to Cloud Firestore
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      this.targets.forEach(t => window.firebaseSync.saveTarget(t));
+    }
   }
 
   loadSubmissions() {
@@ -488,6 +512,10 @@ class DataStore {
       localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(this.submissions));
     } catch (e) {
       console.error('Storage quota exceeded while saving submissions', e);
+    }
+    // Broadcast submission changes to Cloud Firestore
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      this.submissions.forEach(s => window.firebaseSync.saveSubmission(s));
     }
   }
 

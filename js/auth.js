@@ -67,6 +67,26 @@ class AuthService {
     this.listeners = [];
     this.users = this.loadUsers();
     this.currentUser = this.loadSession();
+    this.initCloudSync();
+  }
+
+  initCloudSync() {
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.seedUsersIfEmpty(DEFAULT_USERS);
+      window.firebaseSync.subscribeUsers((cloudUsers) => {
+        this.users = { ...this.users, ...cloudUsers };
+        try {
+          localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(this.users));
+        } catch (e) {}
+        if (this.currentUser && cloudUsers[this.currentUser.email.toLowerCase()]) {
+          this.currentUser = { ...this.currentUser, ...cloudUsers[this.currentUser.email.toLowerCase()] };
+          try {
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(this.currentUser));
+          } catch (e) {}
+        }
+        this.notify();
+      });
+    }
   }
 
   loadUsers() {
@@ -108,6 +128,10 @@ class AuthService {
       localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
     } catch (e) {
       console.error('Storage quota exceeded while saving users', e);
+    }
+    // Broadcast user / password update to Cloud Firestore across all devices
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      Object.values(users).forEach(u => window.firebaseSync.saveUser(u));
     }
   }
 
