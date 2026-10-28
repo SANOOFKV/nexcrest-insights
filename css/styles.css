@@ -5159,6 +5159,50 @@ input.input-error,
   40%, 60% { transform: translate3d(6px, 0, 0); }
 }
 
+/* Mobile Sync Card in Profile Management */
+.mobile-sync-card {
+  margin-top: 18px;
+  padding: 14px 16px;
+  background: var(--bg-card-hover);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+body.dark-theme .mobile-sync-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.sync-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.sync-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--teal-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sync-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.sync-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
 /* Mobile Responsive Optimization for Profile Modal */
 @media (max-width: 640px) {
   .profile-summary-header {

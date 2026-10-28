@@ -11,7 +11,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=25">
+  <link rel="stylesheet" href="css/styles.css?v=26">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -1350,6 +1350,21 @@
             </button>
           </div>
         </form>
+
+        <!-- Cross-Device Mobile Sync Card -->
+        <div class="mobile-sync-card" id="mobile-sync-card">
+          <div class="sync-header">
+            <i data-lucide="smartphone" class="sync-icon"></i>
+            <div>
+              <div class="sync-title">Sync Password to Mobile Device</div>
+              <div class="sync-subtitle">Because passwords are stored locally on each device, copy this instant link to synchronize your password with your mobile phone.</div>
+            </div>
+          </div>
+          <button type="button" id="btn-copy-sync-link" class="btn btn-outline btn-block">
+            <i data-lucide="copy"></i>
+            <span>Copy Mobile Sync Link</span>
+          </button>
+        </div>
       </div>
 
     </div>
@@ -1406,8 +1421,8 @@
   <div id="toast-container" class="toast-container"></div>
 
   <!-- Application Logic Scripts -->
-  <script src="js/data.js?v=25"></script>
-  <script src="js/auth.js?v=25"></script>
-  <script src="js/app.js?v=25"></script>
+  <script src="js/data.js?v=26"></script>
+  <script src="js/auth.js?v=26"></script>
+  <script src="js/app.js?v=26"></script>
 </body>
 </html>
