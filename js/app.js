@@ -136,9 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
     filterStatusSelect: document.getElementById('filter-status-select'),
 
     // Member View Elements
-    memberRoleTag: document.getElementById('member-role-tag'),
-    memberDashboardTitle: document.getElementById('member-dashboard-title'),
-    memberDashboardSubtitle: document.getElementById('member-dashboard-subtitle'),
     memberKpiTarget: document.getElementById('member-kpi-target'),
     memberKpiCompleted: document.getElementById('member-kpi-completed'),
     memberKpiReview: document.getElementById('member-kpi-review'),
@@ -1598,54 +1595,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderMemberView() {
     const user = state.user;
     if (!user) return;
-
-    const roleConfigs = {
-      designer: {
-        tag: 'Graphic Designer',
-        title: 'Graphic Designer Deliverables Studio',
-        subtitle: 'Track your assigned monthly design deliverables, submit links, and view approvals.'
-      },
-      videographer: {
-        tag: 'Videographer + Editor',
-        title: 'Video Production & Editing Dashboard',
-        subtitle: 'Track shoot reels, long-form transformation videos, and ad creatives.'
-      },
-      marketing: {
-        tag: 'Marketing Executive',
-        title: 'Marketing & Campaign Executive Portal',
-        subtitle: 'Track campaigns, lead quotas, social publishing schedules, and outreach.'
-      },
-      content: {
-        tag: 'Content & Copywriter',
-        title: 'Content & Copywriting Studio',
-        subtitle: 'Track articles, captions, newsletters, and conversion copy.'
-      },
-      motion: {
-        tag: 'Motion & 3D Designer',
-        title: 'Motion & Animation Studio',
-        subtitle: 'Track dynamic title cards, 3D assets, and animated promos.'
-      },
-      community: {
-        tag: 'Community Lead',
-        title: 'Social & Community Operations',
-        subtitle: 'Track community outreach, event engagement, and student threads.'
-      }
-    };
-
-    const cfg = roleConfigs[user.role] || {
-      tag: user.title || `${user.role.toUpperCase()} Member`,
-      title: `${user.name}'s Studio`,
-      subtitle: 'Track assigned monthly deliverables, submit verified links, and view approvals.'
-    };
-
-    elements.memberRoleTag.textContent = user.title ? `${user.name} • ${user.title}` : cfg.tag;
-    elements.memberDashboardTitle.textContent = `${user.name}'s Deliverables Studio`;
-    elements.memberDashboardSubtitle.textContent = cfg.subtitle;
-
-    const bannerUserName = document.getElementById('member-banner-user-name');
-    if (bannerUserName) {
-      bannerUserName.textContent = `${user.name} (${user.title || user.role})`;
-    }
 
     // Load Stats for this user (Kinetic Number Rollers)
     const stats = window.dataStore.getEmployeeStats(user);
