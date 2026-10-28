@@ -1,5 +1,5 @@
 /**
- * Nexcrest Media & Marketing - Data Storage & Model Service
+ * Nexcrest Insights - Data Storage & Model Service
  * Manages targets, deliverables, and submissions across Graphic Designer,
  * Videographer + Editor, and Marketing Executive.
  */

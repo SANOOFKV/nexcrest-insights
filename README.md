@@ -1,6 +1,6 @@
 # Nexcrest Insights - Operations & KPI Command Center
 
-A high-performance, dark-themed operations management dashboard built specifically for **Nexcrest Media & Marketing**. It enables the **Marketing Manager** to allocate monthly deliverable quotas, track real-time pacing, and review submitted proof links for:
+A high-performance, dark-themed operations management dashboard built specifically for **Nexcrest Insights**. It enables the **Marketing Manager** to allocate monthly deliverable quotas, track real-time pacing, and review submitted proof links for:
 1. **Graphic Designer** (25 Monthly Deliverables)
 2. **Videographer + Editor** (18 Video Assets & Edits)
 3. **Marketing Executive** (Campaigns, Leads & Social Reach)
@@ -62,7 +62,7 @@ The tool includes role-protected dashboards with instant single-click demo switc
 
 | Role | Email | Password | Access Level |
 | :--- | :--- | :--- | :--- |
-| **Marketing Manager** | `manager@nexcrest.com` | `password123` | Full Admin: Target Assignment, Review Queue, Approvals, Analytics, Exports |
+| **Marketing Manager** | `manager@nexcrest.com` | `Nexloic0131` | Full Admin: Target Assignment, Review Queue, Approvals, Analytics, Cloud Sync |
 | **Graphic Designer** | `designer@nexcrest.com` | `password123` | Designer Dashboard: 25 Deliverable targets, link submissions, review feedback |
 | **Videographer + Editor** | `videographer@nexcrest.com` | `password123` | Video Dashboard: Video quotas, rough-cut link submissions, remarks |
 | **Marketing Executive** | `marketing@nexcrest.com` | `password123` | Growth Portal: Ad campaign links, lead reports, event coordination logs |
@@ -117,19 +117,17 @@ Navigate to `http://localhost:4173` to access the application.
 
 ---
 
-## 🚀 Pushing to GitHub & Deploying to GitHub Pages
+## 🚀 Repository & GitHub Pages Deployment
 
-To deploy this project:
+- **Repository**: [https://github.com/SANOOFKV/nexcrest-insights](https://github.com/SANOOFKV/nexcrest-insights)
+- **Live Deployment**: [https://sanoofkv.github.io/nexcrest-insights/](https://sanoofkv.github.io/nexcrest-insights/)
+
+To push local changes:
 
 ```powershell
-cd "d:\Antigravity\Marketing&Media Nexcrest"
-git init
+cd "d:\Antigravity\Nexcrest Insights"
 git add .
-git commit -m "Deploy Marketing & Media Nexcrest Command Center"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/Marketing-Media-Nexcrest.git
-git push -u origin main
+git commit -m "docs: Update project to Nexcrest Insights"
+git push origin main
 ```
-
-Then in GitHub repo settings: **Settings > Pages > Branch: `main` > `/ (root)` > Save**.
 

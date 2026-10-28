@@ -1,5 +1,5 @@
 /**
- * Nexcrest Media & Marketing - Authentication & Session Service
+ * Nexcrest Insights - Authentication & Session Service
  * Handles user sessions, roles (Manager, Designer, Videographer, Marketing, etc.),
  * dynamic employee onboarding, and quick role-switching.
  */

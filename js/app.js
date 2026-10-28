@@ -1,5 +1,5 @@
 /**
- * Nexcrest Media & Marketing - Main Application Controller
+ * Nexcrest Insights - Main Application Controller
  * Handles UI transitions, reactive stats updates, modal forms,
  * target management, and approval workflows.
  */
