@@ -1942,9 +1942,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function updateCalendarBtnTooltip() {
+    if (!elements.btnCalendarPicker) return;
+    const activeMonth = window.dataStore.getActiveMonth();
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    if (activeMonth) {
+      const [y, mStr] = activeMonth.split('-');
+      const mIdx = parseInt(mStr, 10) - 1;
+      const mName = monthNames[mIdx] || activeMonth;
+      elements.btnCalendarPicker.title = `Cycle Calendar (${mName} ${y})`;
+      elements.btnCalendarPicker.setAttribute('aria-label', `Cycle Calendar (${mName} ${y})`);
+    }
+  }
+
   // Master Render Loop
   function renderApp() {
     populateMonthSelector();
+    updateCalendarBtnTooltip();
     updateHeader();
     populateLoginProfileTabs();
     populateTargetAssigneeOptions();
@@ -1963,21 +1980,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // EVENT LISTENERS & MODAL HANDLERS
   // =========================================================================
 
-  // Month Switcher
-  elements.monthSelector.addEventListener('change', (e) => {
-    const val = e.target.value;
-    if (val === '__pick_calendar__') {
-      elements.monthSelector.value = window.dataStore.getActiveMonth();
-      openHistoricalCalendarModal();
-      return;
-    }
-    window.dataStore.setActiveMonth(val);
-    if (elements.monthDisplay) {
-      elements.monthDisplay.textContent = e.target.options[e.target.selectedIndex].text;
-    }
-    showToast(`Switched active cycle to ${e.target.options[e.target.selectedIndex].text}`, 'info');
-    renderApp();
-  });
+  // Month Switcher (Dropdown if present)
+  if (elements.monthSelector) {
+    elements.monthSelector.addEventListener('change', (e) => {
+      const val = e.target.value;
+      if (val === '__pick_calendar__') {
+        elements.monthSelector.value = window.dataStore.getActiveMonth();
+        openHistoricalCalendarModal();
+        return;
+      }
+      window.dataStore.setActiveMonth(val);
+      if (elements.monthDisplay) {
+        elements.monthDisplay.textContent = e.target.options[e.target.selectedIndex].text;
+      }
+      showToast(`Switched active cycle to ${e.target.options[e.target.selectedIndex].text}`, 'info');
+      renderApp();
+    });
+  }
 
 
 
@@ -2057,11 +2076,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Close Modals
+  // Close Modals (buttons and backdrop overlay clicks)
   document.querySelectorAll('[data-close-modal]').forEach(btn => {
     btn.addEventListener('click', () => {
       const modalId = btn.dataset.closeModal;
-      document.getElementById(modalId).classList.add('hidden');
+      const modalEl = document.getElementById(modalId);
+      if (modalEl) modalEl.classList.add('hidden');
+    });
+  });
+
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        if (modal.id === 'auth-modal' && !state.user) return;
+        modal.classList.add('hidden');
+      }
     });
   });
 
