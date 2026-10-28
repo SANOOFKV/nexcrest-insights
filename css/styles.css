@@ -5119,6 +5119,50 @@ body.dark-theme .telemetry-toggle-btn:hover {
   flex: 1;
 }
 
+.btn-profile-header-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: #FFFFFF;
+  border: 1.5px solid rgba(220, 38, 38, 0.35);
+  border-radius: var(--radius-md);
+  color: #DC2626;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-profile-header-logout svg {
+  width: 15px;
+  height: 15px;
+  color: #DC2626;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.btn-profile-header-logout:hover {
+  background: #DC2626;
+  border-color: #DC2626;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-profile-header-logout:hover svg {
+  color: #FFFFFF;
+  transform: translateX(2px);
+}
+
+.btn-profile-header-logout:active {
+  transform: scale(0.96);
+}
+
 .profile-summary-info h4 {
   margin: 0;
   font-family: var(--font-heading);
@@ -5500,6 +5544,11 @@ body.dark-theme .mobile-sync-card {
     text-align: center;
     gap: 12px;
     padding: 14px;
+  }
+
+  .btn-profile-header-logout {
+    width: 100%;
+    margin-top: 4px;
   }
 
   .profile-summary-info {

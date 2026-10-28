@@ -2943,9 +2943,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Logout Button (Inside Profile Settings Modal)
-  if (elements.logoutBtn) {
-    elements.logoutBtn.addEventListener('click', () => {
+  // Logout Buttons (Inside Profile Settings Modal)
+  document.querySelectorAll('.btn-logout-action, #logout-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
       closeProfileModal();
       window.authService.logout();
       state.user = null;
@@ -2954,7 +2954,7 @@ document.addEventListener('DOMContentLoaded', () => {
       populateLoginProfileTabs('manager@nexcrest.com');
       renderApp();
     });
-  }
+  });
 
   // Exclusive System Theme: High-End Light Theme Only (Dark theme removed entirely)
   function initTheme() {
