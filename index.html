@@ -17,7 +17,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=42">
+  <link rel="stylesheet" href="css/styles.css?v=44">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -130,33 +130,8 @@
         <button id="view-reviews-btn" class="btn btn-sm btn-light">Review Submissions</button>
       </div>
 
-      <!-- Manager Actions Bar -->
-      <div class="section-header" style="justify-content: flex-end; margin-bottom: 20px; gap: 12px;">
-        <div class="header-action-buttons" style="display: flex; gap: 10px;">
-          <div class="export-dropdown-wrapper">
-            <button id="btn-export-data" class="btn btn-secondary" title="Export Marketing & Operations Reports">
-              <i data-lucide="download"></i> Export Report <i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: 2px;"></i>
-            </button>
-            <div id="export-dropdown-menu" class="export-menu hidden">
-              <button type="button" id="btn-export-csv" class="dropdown-item-btn">
-                <i data-lucide="file-spreadsheet"></i> Export as CSV (Excel)
-              </button>
-              <button type="button" id="btn-export-json" class="dropdown-item-btn">
-                <i data-lucide="file-code"></i> Export as JSON Backup
-              </button>
-              <button type="button" id="btn-export-print" class="dropdown-item-btn">
-                <i data-lucide="printer"></i> Print / PDF Report
-              </button>
-            </div>
-          </div>
-          <button id="btn-open-assign-modal" class="btn btn-primary">
-            <i data-lucide="plus-circle"></i> Assign Target
-          </button>
-        </div>
-      </div>
-
-      <!-- Tab Navigation for Manager -->
-      <div class="tabs-control-bar">
+      <!-- Tab Navigation & Action Controls for Manager (Unified Single Row) -->
+      <div class="tabs-control-bar manager-unified-bar">
         <div class="tab-pills">
           <button id="tab-btn-overview" class="tab-pill active" data-manager-tab="overview">
             <i data-lucide="layout-dashboard"></i> Overview
@@ -177,52 +152,26 @@
           </button>
         </div>
 
-        <!-- Filter Controls (Visible on Table Tab) -->
-        <div class="filter-controls" id="manager-table-filters" style="display: none;">
-          <div class="search-box">
-            <i data-lucide="search"></i>
-            <input type="text" id="filter-search-input" placeholder="Search targets...">
+        <div class="header-action-buttons">
+          <div class="export-dropdown-wrapper">
+            <button id="btn-export-data" class="btn btn-secondary" title="Export Marketing & Operations Reports">
+              <i data-lucide="download"></i> Export Report <i data-lucide="chevron-down" style="width: 14px; height: 14px; margin-left: 2px;"></i>
+            </button>
+            <div id="export-dropdown-menu" class="export-menu hidden">
+              <button type="button" id="btn-export-csv" class="dropdown-item-btn">
+                <i data-lucide="file-spreadsheet"></i> Export as CSV (Excel)
+              </button>
+              <button type="button" id="btn-export-json" class="dropdown-item-btn">
+                <i data-lucide="file-code"></i> Export as JSON Backup
+              </button>
+              <button type="button" id="btn-export-print" class="dropdown-item-btn">
+                <i data-lucide="printer"></i> Print / PDF Report
+              </button>
+            </div>
           </div>
-
-          <div class="filter-group">
-            <label><i data-lucide="user"></i> Role:</label>
-            <select id="filter-role-select">
-              <option value="all">All Roles</option>
-              <option value="designer">Graphic Designer</option>
-              <option value="videographer">Videographer + Editor</option>
-              <option value="marketing">Marketing Executive</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label><i data-lucide="tag"></i> Category:</label>
-            <select id="filter-category-select">
-              <option value="all">All Categories</option>
-              <option value="Campus Happenings">Campus Happenings</option>
-              <option value="Branding">Branding</option>
-              <option value="Marketing Creatives">Marketing Creatives</option>
-              <option value="Moment Marketing">Moment Marketing</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label><i data-lucide="building"></i> Brand:</label>
-            <select id="filter-brand-select">
-              <option value="all">All Brands</option>
-              <option value="Techschool">Nexcrest Techschool</option>
-              <option value="IT">Nexcrest IT</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label><i data-lucide="activity"></i> Status:</label>
-            <select id="filter-status-select">
-              <option value="all">All Statuses</option>
-              <option value="completed">Completed / Quota Met</option>
-              <option value="in-progress">In Progress</option>
-              <option value="not-started">Not Started</option>
-            </select>
-          </div>
+          <button id="btn-open-assign-modal" class="btn btn-primary">
+            <i data-lucide="plus-circle"></i> Assign Target
+          </button>
         </div>
       </div>
 
@@ -487,6 +436,54 @@
 
       <!-- TAB 1: Target Deliverables Table -->
       <div id="tab-all-targets" class="tab-pane hidden">
+        <!-- Filter Controls (Visible on Table Tab) -->
+        <div class="filter-controls" id="manager-table-filters" style="margin-bottom: 16px;">
+          <div class="search-box">
+            <i data-lucide="search"></i>
+            <input type="text" id="filter-search-input" placeholder="Search targets...">
+          </div>
+
+          <div class="filter-group">
+            <label><i data-lucide="user"></i> Role:</label>
+            <select id="filter-role-select">
+              <option value="all">All Roles</option>
+              <option value="designer">Graphic Designer</option>
+              <option value="videographer">Videographer + Editor</option>
+              <option value="marketing">Marketing Executive</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label><i data-lucide="tag"></i> Category:</label>
+            <select id="filter-category-select">
+              <option value="all">All Categories</option>
+              <option value="Campus Happenings">Campus Happenings</option>
+              <option value="Branding">Branding</option>
+              <option value="Marketing Creatives">Marketing Creatives</option>
+              <option value="Moment Marketing">Moment Marketing</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label><i data-lucide="building"></i> Brand:</label>
+            <select id="filter-brand-select">
+              <option value="all">All Brands</option>
+              <option value="Techschool">Nexcrest Techschool</option>
+              <option value="IT">Nexcrest IT</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label><i data-lucide="activity"></i> Status:</label>
+            <select id="filter-status-select">
+              <option value="all">All Statuses</option>
+              <option value="completed">Completed / Quota Met</option>
+              <option value="in-progress">In Progress</option>
+              <option value="not-started">Not Started</option>
+            </select>
+          </div>
+        </div>
+
         <div class="card table-card">
           <div class="card-header">
             <div>
@@ -1426,9 +1423,9 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=43"></script>
-  <script src="js/data.js?v=43"></script>
-  <script src="js/auth.js?v=43"></script>
-  <script src="js/app.js?v=43"></script>
+  <script src="js/firebase-config.js?v=44"></script>
+  <script src="js/data.js?v=44"></script>
+  <script src="js/auth.js?v=44"></script>
+  <script src="js/app.js?v=44"></script>
 </body>
 </html>

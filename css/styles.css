@@ -1103,12 +1103,13 @@ body.dark-theme .badge-accent {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   gap: 16px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  width: 100%;
 }
 
-.tab-pills {
+.tabs-control-bar .tab-pills {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1119,6 +1120,46 @@ body.dark-theme .badge-accent {
   padding: 5px;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm), var(--glass-highlight);
+  flex-shrink: 0;
+}
+
+.tabs-control-bar .header-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.tabs-control-bar .header-action-buttons .btn {
+  height: 38px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+@media (min-width: 769px) and (max-width: 1080px) {
+  .tabs-control-bar {
+    gap: 8px;
+  }
+  .tabs-control-bar .tab-pill {
+    padding: 7px 10px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  .tabs-control-bar .header-action-buttons {
+    gap: 6px;
+  }
+  .tabs-control-bar .header-action-buttons .btn {
+    padding: 0 10px;
+    font-size: 12px;
+    height: 36px;
+  }
 }
 
 .tab-pill {
