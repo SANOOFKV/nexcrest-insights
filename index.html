@@ -17,7 +17,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=50">
+  <link rel="stylesheet" href="css/styles.css?v=51">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -788,59 +788,75 @@
         <div class="form-row">
           <div class="form-group">
             <label for="target-assignee">Assignee *</label>
-            <select id="target-assignee" required>
-              <!-- Injected dynamically with departments + all onboarded employees -->
-              <option value="designer">Graphic Designer</option>
-              <option value="videographer">Videographer + Editor</option>
-              <option value="marketing">Marketing Executive</option>
-            </select>
+            <div class="input-with-icon">
+              <i data-lucide="user"></i>
+              <select id="target-assignee" required>
+                <!-- Injected dynamically with departments + all onboarded employees -->
+                <option value="designer">Graphic Designer</option>
+                <option value="videographer">Videographer + Editor</option>
+                <option value="marketing">Marketing Executive</option>
+              </select>
+            </div>
           </div>
           <div class="form-group">
             <label for="target-category">Category *</label>
-            <select id="target-category" required>
-              <option value="Campus Events">Campus Events</option>
-              <option value="Branding">Branding</option>
-              <option value="Marketing">Marketing</option>
-            </select>
+            <div class="input-with-icon">
+              <i data-lucide="tag"></i>
+              <select id="target-category" required>
+                <option value="Campus Events">Campus Events</option>
+                <option value="Branding">Branding</option>
+                <option value="Marketing">Marketing</option>
+              </select>
+            </div>
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="target-brand">Brand *</label>
-            <select id="target-brand" required>
-              <option value="Techschool">Techschool</option>
-              <option value="IT">IT</option>
-              <option value="Both">Both</option>
-            </select>
+            <div class="input-with-icon">
+              <i data-lucide="building"></i>
+              <select id="target-brand" required>
+                <option value="Techschool">Techschool</option>
+                <option value="IT">IT</option>
+                <option value="Both">Both</option>
+              </select>
+            </div>
           </div>
           <div class="form-group">
             <label for="target-program">Title *</label>
-            <input type="text" id="target-program" placeholder="e.g. NexTalk Series, Let's Talk" required>
+            <div class="input-with-icon">
+              <i data-lucide="file-text"></i>
+              <input type="text" id="target-program" placeholder="e.g. NexTalk Series" required>
+            </div>
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="target-qty">Target Qty *</label>
-            <input type="number" id="target-qty" min="1" max="100" value="1" required>
+            <div class="input-with-icon">
+              <i data-lucide="hash"></i>
+              <input type="number" id="target-qty" min="1" max="100" value="1" required>
+            </div>
           </div>
           <div class="form-group">
             <label for="target-notes">Notes (Optional)</label>
-            <input type="text" id="target-notes" placeholder="e.g. 1080x1350, follow brand colors">
+            <div class="input-with-icon">
+              <i data-lucide="align-left"></i>
+              <input type="text" id="target-notes" placeholder="e.g. 1080x1350, follow brand colors">
+            </div>
           </div>
         </div>
 
-        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <div class="modal-footer">
           <button type="button" id="btn-modal-delete-target" class="btn btn-danger" style="display: none; background: rgba(225, 29, 72, 0.1); border-color: rgba(225, 29, 72, 0.3); color: var(--rose-danger); font-weight: 600;">
             <i data-lucide="trash-2"></i> Delete Task
           </button>
-          <div style="display: flex; gap: 10px; margin-left: auto;">
-            <button type="button" class="btn btn-secondary" data-close-modal="assign-target-modal">Cancel</button>
-            <button type="submit" id="btn-submit-target-modal" class="btn btn-primary">
-              <i data-lucide="check"></i> <span id="btn-submit-target-text">Assign Target</span>
-            </button>
-          </div>
+          <button type="button" class="btn btn-secondary" data-close-modal="assign-target-modal">Cancel</button>
+          <button type="submit" id="btn-submit-target-modal" class="btn btn-primary">
+            <i data-lucide="check"></i> <span id="btn-submit-target-text">Assign Target</span>
+          </button>
         </div>
       </form>
     </div>
@@ -880,14 +896,17 @@
         <div class="form-row">
           <div class="form-group">
             <label for="new-emp-role">Department *</label>
-            <select id="new-emp-role" required>
-              <option value="designer">Graphic Designer</option>
-              <option value="videographer">Videographer + Editor</option>
-              <option value="marketing">Marketing Executive</option>
-              <option value="content">Content Writer & Copywriter</option>
-              <option value="motion">Motion & 3D Designer</option>
-              <option value="community">Community & Social Media Lead</option>
-            </select>
+            <div class="input-with-icon">
+              <i data-lucide="layers"></i>
+              <select id="new-emp-role" required>
+                <option value="designer">Graphic Designer</option>
+                <option value="videographer">Videographer + Editor</option>
+                <option value="marketing">Marketing Executive</option>
+                <option value="content">Content Writer & Copywriter</option>
+                <option value="motion">Motion & 3D Designer</option>
+                <option value="community">Community & Social Media Lead</option>
+              </select>
+            </div>
           </div>
           <div class="form-group">
             <label for="new-emp-title">Job Title *</label>
@@ -901,11 +920,14 @@
         <div class="form-row">
           <div class="form-group">
             <label for="new-emp-brand">Brand</label>
-            <select id="new-emp-brand">
-              <option value="Both">Both</option>
-              <option value="Techschool">Techschool</option>
-              <option value="IT">IT</option>
-            </select>
+            <div class="input-with-icon">
+              <i data-lucide="building"></i>
+              <select id="new-emp-brand">
+                <option value="Both">Both</option>
+                <option value="Techschool">Techschool</option>
+                <option value="IT">IT</option>
+              </select>
+            </div>
           </div>
           <div class="form-group">
             <label for="new-emp-password">Password</label>
@@ -1110,20 +1132,26 @@
         <div class="form-row">
           <div class="form-group">
             <label for="edit-emp-role">Role *</label>
-            <select id="edit-emp-role" required>
-              <option value="designer">Graphic Designer</option>
-              <option value="videographer">Videographer + Video Editor</option>
-              <option value="marketing">Marketing Executive</option>
-              <option value="manager">Marketing Operations Lead</option>
-            </select>
+            <div class="input-with-icon">
+              <i data-lucide="layers"></i>
+              <select id="edit-emp-role" required>
+                <option value="designer">Graphic Designer</option>
+                <option value="videographer">Videographer + Video Editor</option>
+                <option value="marketing">Marketing Executive</option>
+                <option value="manager">Marketing Operations Lead</option>
+              </select>
+            </div>
           </div>
           <div class="form-group">
             <label for="edit-emp-brand">Brand</label>
-            <select id="edit-emp-brand">
-              <option value="Both">Both</option>
-              <option value="Techschool">Techschool</option>
-              <option value="IT">IT</option>
-            </select>
+            <div class="input-with-icon">
+              <i data-lucide="building"></i>
+              <select id="edit-emp-brand">
+                <option value="Both">Both</option>
+                <option value="Techschool">Techschool</option>
+                <option value="IT">IT</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -1489,9 +1517,9 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=50"></script>
-  <script src="js/data.js?v=50"></script>
-  <script src="js/auth.js?v=50"></script>
-  <script src="js/app.js?v=50"></script>
+  <script src="js/firebase-config.js?v=51"></script>
+  <script src="js/data.js?v=51"></script>
+  <script src="js/auth.js?v=51"></script>
+  <script src="js/app.js?v=51"></script>
 </body>
 </html>

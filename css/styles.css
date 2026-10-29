@@ -2615,7 +2615,8 @@ body.dark-theme .modal-overlay {
   pointer-events: none;
 }
 
-.input-with-icon input {
+.input-with-icon input,
+.input-with-icon select {
   padding-left: 38px;
   width: 100%;
 }
@@ -3558,6 +3559,11 @@ html, body {
   .form-row {
     grid-template-columns: 1fr;
   }
+  #assign-target-modal .form-row,
+  #add-employee-modal .form-row,
+  #edit-employee-modal .form-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
   .charts-grid-2col {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -4147,8 +4153,8 @@ html, body {
   .modal-card {
     width: 100% !important;
     max-width: 100% !important;
-    max-height: 92dvh !important;
-    padding: 22px 16px max(28px, env(safe-area-inset-bottom)) !important;
+    max-height: 90dvh !important;
+    padding: 0 0 max(16px, env(safe-area-inset-bottom)) 0 !important;
     margin: 0 !important;
     border-bottom-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
@@ -4161,40 +4167,103 @@ html, body {
   .modal-card::before {
     content: '';
     display: block;
-    width: 40px;
+    width: 38px;
     height: 4px;
     background: rgba(255, 255, 255, 0.25);
     border-radius: 9999px;
-    margin: 0 auto 14px auto;
+    margin: 8px auto 4px auto;
   }
   .modal-header {
-    padding-bottom: 12px;
+    padding: 10px 16px !important;
   }
   .modal-header h3 {
-    font-size: 16px;
+    font-size: 15px !important;
   }
   .modal-close-btn {
-    top: 14px;
-    right: 14px;
-    width: 36px;
-    height: 36px;
+    top: 10px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 22px;
+  }
+  .modal-form {
+    padding: 10px 14px 14px !important;
+    gap: 8px !important;
   }
   .form-row {
     grid-template-columns: 1fr !important;
-    gap: 12px !important;
+    gap: 10px !important;
+  }
+
+  /* Strict 2-Column × 3-Row Grid on Mobile for Assign Target and Employee Modals */
+  #assign-target-modal .form-row,
+  #add-employee-modal .form-row,
+  #edit-employee-modal .form-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px 8px !important;
+  }
+  #assign-target-modal .form-group,
+  #add-employee-modal .form-group,
+  #edit-employee-modal .form-group {
+    gap: 3px !important;
+  }
+  #assign-target-modal .form-group label,
+  #add-employee-modal .form-group label,
+  #edit-employee-modal .form-group label {
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin-bottom: 0 !important;
+  }
+  #assign-target-modal .form-group input,
+  #assign-target-modal .form-group select,
+  #add-employee-modal .form-group input,
+  #add-employee-modal .form-group select,
+  #edit-employee-modal .form-group input,
+  #edit-employee-modal .form-group select {
+    height: 36px !important;
+    min-height: 36px !important;
+    font-size: 11px !important;
+    padding: 0 6px 0 28px !important;
+    border-radius: 8px !important;
+  }
+  #assign-target-modal .input-with-icon svg,
+  #add-employee-modal .input-with-icon svg,
+  #edit-employee-modal .input-with-icon svg {
+    left: 8px !important;
+    width: 13px !important;
+    height: 13px !important;
   }
   .modal-footer {
-    flex-direction: column-reverse !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
     gap: 8px !important;
     width: 100% !important;
+    padding: 10px 14px 14px !important;
+    margin-top: 6px !important;
   }
   .modal-footer .btn {
-    width: 100% !important;
+    flex: 1 !important;
+    width: 50% !important;
     justify-content: center !important;
-    min-height: 44px !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    font-size: 12px !important;
+    padding: 0 10px !important;
+    border-radius: 8px !important;
+  }
+  #btn-modal-delete-target {
+    flex: 1 !important;
+    width: auto !important;
+    min-height: 38px !important;
+    height: 38px !important;
   }
   .modal-footer.split {
-    flex-direction: column-reverse !important;
+    flex-direction: row !important;
   }
 
   /* Centered Mobile Toast Notifications */
