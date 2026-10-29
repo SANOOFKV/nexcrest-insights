@@ -3800,13 +3800,46 @@ html, body {
     min-height: 40px;
   }
 
-  /* Categories Breakdown */
+  /* Categories Breakdown: 2-Column × 2-Row Mobile Matrix */
   .categories-cards-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
   }
   .category-summary-card {
-    padding: 16px;
+    padding: 10px 10px 12px !important;
+    border-radius: var(--radius-md) !important;
+  }
+  .cat-card-header {
+    margin-bottom: 8px !important;
+  }
+  .cat-name {
+    font-size: 11.5px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .cat-badge {
+    font-size: 9px !important;
+    padding: 1px 5px !important;
+  }
+  .cat-splits-row {
+    margin-bottom: 8px !important;
+    padding: 6px 2px !important;
+  }
+  .split-num {
+    font-size: 16px !important;
+    margin-bottom: 2px !important;
+  }
+  .split-label {
+    font-size: 8px !important;
+    letter-spacing: -0.2px !important;
+  }
+  .cat-split-divider {
+    height: 20px !important;
+  }
+  .cat-progress-wrap .progress-bar-container {
+    height: 4px !important;
   }
 
   /* Overview Live Team Staff Grid */
