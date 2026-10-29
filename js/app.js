@@ -378,12 +378,17 @@ document.addEventListener('DOMContentLoaded', () => {
     return 'Techschool';
   }
 
-  // Safe URL sanitizer to prevent javascript: pseudo-protocol XSS
+  // Hardened Safe URL sanitizer against XSS, data: URIs, javascript: and malicious protocols
   function safeUrl(url) {
     if (!url) return '#';
-    const trimmed = url.toString().trim();
-    if (/^https?:\/\//i.test(trimmed)) {
-      return trimmed;
+    try {
+      const trimmed = url.toString().trim();
+      const parsed = new URL(trimmed);
+      if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+        return parsed.href;
+      }
+    } catch (e) {
+      // Invalid URL format
     }
     return '#';
   }

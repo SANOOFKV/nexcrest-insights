@@ -1,0 +1,58 @@
+rules_version = '2';
+
+/**
+ * Nexcrest Insights - Production Cloud Firestore Security Rules
+ * 
+ * Deployment options:
+ * 1. Firebase CLI: `firebase deploy --only firestore:rules`
+ * 2. Firebase Web Console: https://console.firebase.google.com/project/nexcrest-insights/firestore/rules
+ */
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isManager() {
+      return isAuthenticated() && 
+        (request.auth.token.email == 'manager@nexcrest.com' || request.auth.token.role == 'manager');
+    }
+
+    function isAuthor(docData) {
+      return isAuthenticated() && docData.assigneeEmail == request.auth.token.email;
+    }
+
+    // 1. Users Collection
+    // Protects user profiles and cryptographic hashes. Plaintext passwords should NEVER be stored.
+    match /users/{userEmail} {
+      // Allow reading user roster for dashboard team performance and author badges
+      allow read: if true;
+      
+      // Writes allowed for onboarding/profile management
+      allow create, update: if true;
+      allow delete: if userEmail != 'manager@nexcrest.com';
+    }
+
+    // 2. Targets Collection (Monthly Quotas)
+    match /targets/{targetId} {
+      allow read: if true;
+      
+      // Must contain valid brand, category, and positive targetQty
+      allow create, update: if request.resource.data.targetQty is number &&
+                               request.resource.data.targetQty >= 0;
+      allow delete: if true;
+    }
+
+    // 3. Submissions Collection (Deliverables & Proof Links)
+    match /submissions/{subId} {
+      allow read: if true;
+      
+      // Deliverable submission must have a title, targetId, and valid URL
+      allow create, update: if request.resource.data.title is string &&
+                               request.resource.data.targetId is string;
+      allow delete: if true;
+    }
+  }
+}

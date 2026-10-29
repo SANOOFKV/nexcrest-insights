@@ -18,6 +18,8 @@ class FirebaseSyncService {
     this.db = null;
     this.isReady = false;
     this.listeners = [];
+    this.deletedTargetIds = new Set();
+    this.deletedSubmissionIds = new Set();
     this.init();
   }
 
@@ -29,6 +31,15 @@ class FirebaseSyncService {
         }
         this.db = firebase.firestore();
         this.isReady = true;
+
+        // Enable offline persistence for seamless multi-device resilience
+        if (typeof this.db.enablePersistence === 'function') {
+          this.db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+            if (err.code !== 'failed-precondition' && err.code !== 'unimplemented') {
+              console.warn('Firestore offline persistence notice:', err.code);
+            }
+          });
+        }
         console.log('⚡ Firebase Firestore Connected: Real-time multi-device sync active.');
       } else {
         console.log('ℹ️ Firebase config pending. Operating in reliable local-storage mode.');
@@ -50,7 +61,11 @@ class FirebaseSyncService {
       return this.db.collection('users').onSnapshot((snapshot) => {
         const cloudUsers = {};
         snapshot.forEach((doc) => {
-          cloudUsers[doc.id.toLowerCase()] = doc.data();
+          const u = doc.data();
+          if (u) {
+            delete u.password; // Strip any legacy plaintext password
+            cloudUsers[doc.id.toLowerCase()] = u;
+          }
         });
         if (Object.keys(cloudUsers).length > 0) {
           onUsersUpdated(cloudUsers);
@@ -64,13 +79,15 @@ class FirebaseSyncService {
     }
   }
 
-  // Save / Update user profile or password in Cloud Firestore
+  // Save / Update user profile in Cloud Firestore (Sanitized against plaintext passwords)
   async saveUser(user) {
     if (!this.isActive() || !user || !user.email) return false;
     try {
       const email = user.email.toLowerCase().trim();
+      const safeUser = { ...user };
+      delete safeUser.password; // Enforce zero plaintext password leak to cloud
       await this.db.collection('users').doc(email).set({
-        ...user,
+        ...safeUser,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
       return true;
@@ -89,8 +106,10 @@ class FirebaseSyncService {
         const batch = this.db.batch();
         Object.entries(defaultUsers).forEach(([email, u]) => {
           const ref = this.db.collection('users').doc(email.toLowerCase());
+          const safeUser = { ...u };
+          delete safeUser.password;
           batch.set(ref, {
-            ...u,
+            ...safeUser,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
           });
         });
@@ -109,7 +128,10 @@ class FirebaseSyncService {
       return this.db.collection('targets').onSnapshot((snapshot) => {
         const cloudTargets = [];
         snapshot.forEach((doc) => {
-          cloudTargets.push({ id: doc.id, ...doc.data() });
+          // Prevent deleted zombie targets from resurrecting
+          if (!this.deletedTargetIds.has(String(doc.id))) {
+            cloudTargets.push({ id: doc.id, ...doc.data() });
+          }
         });
         if (cloudTargets.length > 0) {
           onTargetsUpdated(cloudTargets);
@@ -146,6 +168,7 @@ class FirebaseSyncService {
   async saveTarget(target) {
     if (!this.isActive() || !target || !target.id) return false;
     try {
+      this.deletedTargetIds.delete(String(target.id));
       await this.db.collection('targets').doc(String(target.id)).set(target, { merge: true });
       return true;
     } catch (err) {
@@ -154,10 +177,11 @@ class FirebaseSyncService {
     }
   }
 
-  // Delete target from cloud
+  // Delete target from cloud with tombstone protection against zombie data
   async deleteTarget(id) {
     if (!this.isActive() || !id) return false;
     try {
+      this.deletedTargetIds.add(String(id));
       await this.db.collection('targets').doc(String(id)).delete();
       return true;
     } catch (err) {
@@ -170,6 +194,7 @@ class FirebaseSyncService {
   async deleteMultipleTargets(targetIds) {
     if (!this.isActive() || !Array.isArray(targetIds) || targetIds.length === 0) return false;
     try {
+      targetIds.forEach(id => this.deletedTargetIds.add(String(id)));
       const batch = this.db.batch();
       targetIds.forEach(id => {
         const ref = this.db.collection('targets').doc(String(id));
@@ -214,7 +239,9 @@ class FirebaseSyncService {
       return this.db.collection('submissions').onSnapshot((snapshot) => {
         const cloudSubmissions = [];
         snapshot.forEach((doc) => {
-          cloudSubmissions.push({ id: doc.id, ...doc.data() });
+          if (!this.deletedSubmissionIds.has(String(doc.id))) {
+            cloudSubmissions.push({ id: doc.id, ...doc.data() });
+          }
         });
         onSubmissionsUpdated(cloudSubmissions);
       }, (err) => {
@@ -230,10 +257,24 @@ class FirebaseSyncService {
   async saveSubmission(sub) {
     if (!this.isActive() || !sub || !sub.id) return false;
     try {
+      this.deletedSubmissionIds.delete(String(sub.id));
       await this.db.collection('submissions').doc(String(sub.id)).set(sub, { merge: true });
       return true;
     } catch (err) {
       console.error('Failed to save submission to Firestore:', err);
+      return false;
+    }
+  }
+
+  // Delete deliverable submission from cloud
+  async deleteSubmission(id) {
+    if (!this.isActive() || !id) return false;
+    try {
+      this.deletedSubmissionIds.add(String(id));
+      await this.db.collection('submissions').doc(String(id)).delete();
+      return true;
+    } catch (err) {
+      console.error('Failed to delete submission from Firestore:', err);
       return false;
     }
   }

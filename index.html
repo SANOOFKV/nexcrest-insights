@@ -13,11 +13,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <!-- Lucide Icons & Chart.js -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="manifest" href="manifest.webmanifest">
+  <!-- Pinned Core Libraries (Lucide Icons & Chart.js) -->
+  <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=53">
+  <link rel="stylesheet" href="css/styles.css?v=54">
+  <!-- Frame-Busting Clickjacking Mitigation -->
+  <script>
+    if (window.top !== window.self) {
+      window.top.location = window.self.location;
+    }
+  </script>
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -933,7 +942,7 @@
             <label for="new-emp-password">Password</label>
             <div class="input-with-icon">
               <i data-lucide="lock"></i>
-              <input type="password" id="new-emp-password" value="password123" required>
+              <input type="password" id="new-emp-password" placeholder="Enter initial password" required autocapitalize="none" autocorrect="off" spellcheck="false">
             </div>
           </div>
         </div>
@@ -1167,7 +1176,7 @@
             <label for="edit-emp-password">Reset Password</label>
             <div class="input-with-icon">
               <i data-lucide="key"></i>
-              <input type="password" id="edit-emp-password" placeholder="Leave blank to keep current">
+              <input type="password" id="edit-emp-password" placeholder="Leave blank to keep current" autocapitalize="none" autocorrect="off" spellcheck="false">
             </div>
           </div>
         </div>
@@ -1399,7 +1408,7 @@
               <label for="profile-current-pass">Current Password <span class="required">*</span></label>
               <div class="input-with-icon-right">
                 <i data-lucide="lock" class="input-left-icon"></i>
-                <input type="password" id="profile-current-pass" required placeholder="Enter current password">
+                <input type="password" id="profile-current-pass" required placeholder="Enter current password" autocapitalize="none" autocorrect="off" spellcheck="false">
                 <button type="button" class="btn-toggle-pass-visibility" data-target="profile-current-pass" title="Toggle visibility">
                   <i data-lucide="eye"></i>
                 </button>
@@ -1410,7 +1419,7 @@
               <label for="profile-new-pass">New Password <span class="required">*</span></label>
               <div class="input-with-icon-right">
                 <i data-lucide="key-round" class="input-left-icon"></i>
-                <input type="password" id="profile-new-pass" required minlength="6" placeholder="At least 6 characters">
+                <input type="password" id="profile-new-pass" required minlength="6" placeholder="At least 6 characters" autocapitalize="none" autocorrect="off" spellcheck="false">
                 <button type="button" class="btn-toggle-pass-visibility" data-target="profile-new-pass" title="Toggle visibility">
                   <i data-lucide="eye"></i>
                 </button>
@@ -1421,7 +1430,7 @@
               <label for="profile-confirm-pass">Confirm New Password <span class="required">*</span></label>
               <div class="input-with-icon-right">
                 <i data-lucide="check-check" class="input-left-icon"></i>
-                <input type="password" id="profile-confirm-pass" required minlength="6" placeholder="Re-enter new password">
+                <input type="password" id="profile-confirm-pass" required minlength="6" placeholder="Re-enter new password" autocapitalize="none" autocorrect="off" spellcheck="false">
                 <button type="button" class="btn-toggle-pass-visibility" data-target="profile-confirm-pass" title="Toggle visibility">
                   <i data-lucide="eye"></i>
                 </button>
@@ -1517,9 +1526,19 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=53"></script>
-  <script src="js/data.js?v=53"></script>
-  <script src="js/auth.js?v=53"></script>
-  <script src="js/app.js?v=53"></script>
+  <script src="js/firebase-config.js?v=54"></script>
+  <script src="js/data.js?v=54"></script>
+  <script src="js/auth.js?v=54"></script>
+  <script src="js/app.js?v=54"></script>
+  <!-- Progressive Web App Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => {
+          console.warn('PWA ServiceWorker registration note:', err);
+        });
+      });
+    }
+  </script>
 </body>
 </html>

@@ -1,0 +1,23 @@
+{
+  "name": "Nexcrest Insights - Operations & KPI Command Center",
+  "short_name": "Nexcrest",
+  "description": "High-performance operations management and KPI tracking dashboard for Nexcrest Techschool & IT.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#07131D",
+  "theme_color": "#07131D",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "assets/nexcrest_icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/nexcrest_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

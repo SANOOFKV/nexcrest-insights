@@ -56,18 +56,18 @@ Structured across the same 3 categories (**Campus Events**, **Branding**, **Mark
 
 ---
 
-## 🔐 Demo Accounts & Authentication
+## 🔐 Accounts & Role-Based Access
 
-The tool includes role-protected dashboards with instant single-click demo switching:
+The tool includes role-protected dashboards with separate permission scopes:
 
-| Role | Email | Password | Access Level |
-| :--- | :--- | :--- | :--- |
-| **Marketing Manager** | `manager@nexcrest.com` | `Nexloic0131` | Full Admin: Target Assignment, Review Queue, Approvals, Analytics, Cloud Sync |
-| **Graphic Designer** | `designer@nexcrest.com` | `password123` | Designer Dashboard: 25 Deliverable targets, link submissions, review feedback |
-| **Videographer + Editor** | `videographer@nexcrest.com` | `password123` | Video Dashboard: Video quotas, rough-cut link submissions, remarks |
-| **Marketing Executive** | `marketing@nexcrest.com` | `password123` | Growth Portal: Ad campaign links, lead reports, event coordination logs |
+| Role | Email | Access Scope |
+| :--- | :--- | :--- |
+| **Marketing Manager** | `manager@nexcrest.com` | Full Operations Command: Target Assignment, Review Queue, Approvals, Team Roster, Analytics |
+| **Graphic Designer** | `designer@nexcrest.com` | Designer Dashboard: Deliverable targets, link submissions, review feedback |
+| **Videographer + Editor** | `videographer@nexcrest.com` | Video Dashboard: Video quotas, rough-cut link submissions, remarks |
+| **Marketing Executive** | `marketing@nexcrest.com` | Growth Portal: Ad campaign links, lead reports, event coordination logs |
 
-> **Pro Tip:** In the top header bar, you can instantly toggle between **Manager**, **Graphic Designer**, **Videographer**, and **Marketing Exec** with the quick switcher buttons.
+> **Security Note:** Default passwords are cryptographically hashed on initialization. Passwords should be changed by users upon first sign-in via the Profile Settings panel.
 
 ---
 

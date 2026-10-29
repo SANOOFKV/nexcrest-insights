@@ -1,12 +1,86 @@
 /**
  * Nexcrest Insights - Authentication & Session Service
  * Handles user sessions, roles (Manager, Designer, Videographer, Marketing, etc.),
- * dynamic employee onboarding, and quick role-switching.
+ * dynamic employee onboarding, SHA-256 cryptographic credential hashing, and security rate limiting.
  */
 
 const AUTH_SESSION_KEY = 'nexcrest_active_session_v3';
 const USERS_STORAGE_KEY = 'nexcrest_users_v2';
 
+// Pure JavaScript SHA-256 Cryptographic Hash Utility (Zero External Dependencies)
+function hashPassword(password) {
+  if (!password) return '';
+  const clean = password.toString().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+  const ascii = 'nexcrest_kpi_v2::' + clean;
+  function rightRotate(value, amount) {
+    return (value >>> amount) | (value << (32 - amount));
+  }
+  var mathPow = Math.pow;
+  var maxWord = mathPow(2, 32);
+  var lengthProperty = 'length';
+  var i, j;
+  var result = '';
+  var words = [];
+  var asciiBitLength = ascii[lengthProperty] * 8;
+  var hash = hashPassword.h = hashPassword.h || [];
+  var k = hashPassword.k = hashPassword.k || [];
+  var primeCounter = k[lengthProperty];
+  var isComposite = {};
+  for (var candidate = 2; primeCounter < 64; candidate++) {
+    if (!isComposite[candidate]) {
+      for (i = 0; i < 313; i += candidate) {
+        isComposite[i] = candidate;
+      }
+      hash[primeCounter] = (mathPow(candidate, .5) * maxWord) | 0;
+      k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
+    }
+  }
+  ascii += '\x80';
+  while (ascii[lengthProperty] % 64 - 56) ascii += '\x00';
+  for (i = 0; i < ascii[lengthProperty]; i++) {
+    j = ascii.charCodeAt(i);
+    if (j >> 8) return '';
+    words[i >> 2] |= j << ((3 - i) % 4) * 8;
+  }
+  words[words[lengthProperty]] = ((asciiBitLength / maxWord) | 0);
+  words[words[lengthProperty]] = asciiBitLength;
+  for (j = 0; j < words[lengthProperty];) {
+    var w = words.slice(j, j += 16);
+    var oldHash = hash;
+    hash = hash.slice(0, 8);
+    for (i = 0; i < 64; i++) {
+      var w15 = w[i - 15], w2 = w[i - 2];
+      var a = hash[0], e = hash[4];
+      var temp1 = hash[7]
+        + (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25))
+        + ((e & hash[5]) ^ ((~e) & hash[6]))
+        + k[i]
+        + (w[i] = (i < 16) ? w[i] : (
+            w[i - 16]
+            + (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3))
+            + w[i - 7]
+            + (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10))
+          ) | 0
+        );
+      var temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22))
+        + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+      hash = [(temp1 + temp2) | 0].concat(hash);
+      hash[4] = (hash[4] + temp1) | 0;
+    }
+    for (i = 0; i < 8; i++) {
+      hash[i] = (hash[i] + oldHash[i]) | 0;
+    }
+  }
+  for (i = 0; i < 8; i++) {
+    for (j = 3; j + 1; j--) {
+      var b = (hash[i] >> (j * 8)) & 255;
+      result += ((b < 16) ? 0 : '') + b.toString(16);
+    }
+  }
+  return result;
+}
+
+// Default Users with Cryptographic SHA-256 Hashes (Zero Plaintext Passwords)
 const DEFAULT_USERS = {
   'manager@nexcrest.com': {
     id: 'usr-manager',
@@ -17,7 +91,7 @@ const DEFAULT_USERS = {
     brand: 'Both',
     avatar: 'M',
     badgeClass: 'badge-manager',
-    password: 'Nexloic0131',
+    passwordHash: 'ad66d6793d4dc6ddeaa846f6d6b2ba7fd3bdcbce026f652a1a1d751e9c60babb',
     createdAt: '2026-10-01T00:00:00Z',
     isSystem: true
   },
@@ -30,7 +104,7 @@ const DEFAULT_USERS = {
     brand: 'Both',
     avatar: 'GD',
     badgeClass: 'badge-designer',
-    password: 'password123',
+    passwordHash: '02d1b38eaa9b63391a31b00d882dfe78776eb3ada6e4440940de95334bf8173d',
     createdAt: '2026-10-01T00:00:00Z',
     isSystem: true
   },
@@ -43,7 +117,7 @@ const DEFAULT_USERS = {
     brand: 'Both',
     avatar: 'VE',
     badgeClass: 'badge-videographer',
-    password: 'password123',
+    passwordHash: '02d1b38eaa9b63391a31b00d882dfe78776eb3ada6e4440940de95334bf8173d',
     createdAt: '2026-10-01T00:00:00Z',
     isSystem: true
   },
@@ -56,7 +130,7 @@ const DEFAULT_USERS = {
     brand: 'Both',
     avatar: 'ME',
     badgeClass: 'badge-marketing',
-    password: 'password123',
+    passwordHash: '02d1b38eaa9b63391a31b00d882dfe78776eb3ada6e4440940de95334bf8173d',
     createdAt: '2026-10-01T00:00:00Z',
     isSystem: true
   }
@@ -65,6 +139,8 @@ const DEFAULT_USERS = {
 class AuthService {
   constructor() {
     this.listeners = [];
+    this.failedAttempts = 0;
+    this.lockoutUntil = 0;
     this.users = this.loadUsers();
     this.currentUser = this.loadSession();
     this.initCloudSync();
@@ -108,18 +184,28 @@ class AuthService {
               u.brand = 'Both';
               migrated = true;
             }
+
+            // Cryptographic Migration: upgrade legacy plaintext password to secure SHA-256 hash
+            if (u && u.password && !u.passwordHash) {
+              u.passwordHash = hashPassword(u.password);
+              delete u.password;
+              migrated = true;
+            } else if (u && u.password) {
+              delete u.password;
+              migrated = true;
+            }
           });
-          // Always ensure the core manager admin profile exists and uses official password
+
+          // Always ensure the core manager admin profile exists and uses secure cryptographic hash
           if (!parsed['manager@nexcrest.com']) {
             parsed['manager@nexcrest.com'] = { ...DEFAULT_USERS['manager@nexcrest.com'] };
             migrated = true;
-          } else {
-            // Automatically upgrade manager account if it held the old placeholder password
-            if (!parsed['manager@nexcrest.com'].password || parsed['manager@nexcrest.com'].password === 'password123') {
-              parsed['manager@nexcrest.com'].password = 'Nexloic0131';
-              migrated = true;
-            }
+          } else if (!parsed['manager@nexcrest.com'].passwordHash) {
+            parsed['manager@nexcrest.com'].passwordHash = 'ad66d6793d4dc6ddeaa846f6d6b2ba7fd3bdcbce026f652a1a1d751e9c60babb';
+            delete parsed['manager@nexcrest.com'].password;
+            migrated = true;
           }
+
           if (migrated) this.saveUsers(parsed);
           return parsed;
         }
@@ -216,7 +302,7 @@ class AuthService {
       brand: normBrand,
       avatar: this.getInitials(name),
       badgeClass: this.getRoleBadgeClass(role),
-      password: password || 'password123',
+      passwordHash: hashPassword(password || 'password123'),
       createdAt: new Date().toISOString(),
       isSystem: false
     };
@@ -247,7 +333,8 @@ class AuthService {
       user.brand = (brand === 'IT' || brand === 'Nexcrest IT') ? 'IT' : (brand === 'Techschool' || brand === 'Nexcrest Techschool' ? 'Techschool' : 'Both');
     }
     if (password && password.trim()) {
-      user.password = password.trim();
+      user.passwordHash = hashPassword(password.trim());
+      delete user.password;
     }
 
     this.saveUsers(this.users);
@@ -275,12 +362,11 @@ class AuthService {
     }
 
     const cleanCurrent = (currentPassword || '').replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
-    const expectedCurrent = (user.password || 'password123').replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
-    const isCurrentMatch = cleanCurrent === expectedCurrent ||
-                           cleanCurrent.toLowerCase() === expectedCurrent.toLowerCase() ||
-                           cleanCurrent.toLowerCase() === 'password123';
+    const currentHash = hashPassword(cleanCurrent);
+    const expectedHash = user.passwordHash || (user.password ? hashPassword(user.password) : '02d1b38eaa9b63391a31b00d882dfe78776eb3ada6e4440940de95334bf8173d');
 
-    if (!isCurrentMatch) {
+    // Strict cryptographic match (Zero backdoor strings!)
+    if (currentHash !== expectedHash) {
       return { success: false, error: 'Current password is incorrect.' };
     }
 
@@ -288,15 +374,19 @@ class AuthService {
       return { success: false, error: 'New password must be at least 6 characters long.' };
     }
 
-    if (newPassword.trim() === expectedCurrent) {
+    const cleanNew = newPassword.trim();
+    const newHash = hashPassword(cleanNew);
+
+    if (newHash === expectedHash) {
       return { success: false, error: 'New password must be different from your current password.' };
     }
 
-    if (confirmPassword !== undefined && newPassword.trim() !== confirmPassword.trim()) {
+    if (confirmPassword !== undefined && cleanNew !== confirmPassword.trim()) {
       return { success: false, error: 'New password and confirmation do not match.' };
     }
 
-    user.password = newPassword.trim();
+    user.passwordHash = newHash;
+    delete user.password;
     user.lastPasswordChange = new Date().toISOString();
     this.saveUsers(this.users);
 
@@ -389,7 +479,11 @@ class AuthService {
     this.currentUser = user;
     try {
       if (user) {
-        sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(user));
+        // Strip sensitive password hashes from session storage
+        const safeSessionUser = { ...user };
+        delete safeSessionUser.password;
+        delete safeSessionUser.passwordHash;
+        sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(safeSessionUser));
       } else {
         sessionStorage.removeItem(AUTH_SESSION_KEY);
       }
@@ -407,6 +501,16 @@ class AuthService {
   }
 
   login(email, password) {
+    // Security rate limiter & brute-force lockout
+    const now = Date.now();
+    if (this.lockoutUntil && now < this.lockoutUntil) {
+      const remainingSec = Math.ceil((this.lockoutUntil - now) / 1000);
+      return {
+        success: false,
+        error: `Too many failed attempts. Temporary security lockout active. Please wait ${remainingSec}s.`
+      };
+    }
+
     const normalized = (email || '').trim().toLowerCase();
     const user = this.users[normalized];
 
@@ -418,25 +522,39 @@ class AuthService {
       return { success: false, error: 'Please enter your password to sign in.' };
     }
 
-    // Sanitize input: strip zero-width characters, non-breaking spaces, and trim standard whitespace
+    // Sanitize input: strip zero-width characters and whitespace
     const cleanInput = password.toString().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
-    const expectedPass = (user.password || (normalized === 'manager@nexcrest.com' ? 'Nexloic0131' : 'password123')).toString().replace(/[\u200B-\u200D\uFEFF\u00A0]/g, '').trim();
+    const inputHash = hashPassword(cleanInput);
 
-    // Check exact match or case-insensitive match (fixes mobile virtual keyboards auto-capitalizing first letter)
-    const isExact = cleanInput === expectedPass;
-    const isCaseMatch = cleanInput.toLowerCase() === expectedPass.toLowerCase();
+    const expectedHash = user.passwordHash ||
+      (user.password ? hashPassword(user.password) :
+        (normalized === 'manager@nexcrest.com'
+          ? 'ad66d6793d4dc6ddeaa846f6d6b2ba7fd3bdcbce026f652a1a1d751e9c60babb'
+          : '02d1b38eaa9b63391a31b00d882dfe78776eb3ada6e4440940de95334bf8173d'));
 
-    // Official Manager Password Validation
-    const isMgr = normalized === 'manager@nexcrest.com' || user.role === 'manager';
-    const isManagerMaster = isMgr && (cleanInput === 'Nexloic0131' || cleanInput.toLowerCase() === 'nexloic0131');
+    // Strict case-sensitive cryptographic hash match
+    const isMatch = inputHash === expectedHash;
 
-    if (!isExact && !isCaseMatch && !isManagerMaster) {
+    if (!isMatch) {
+      this.failedAttempts = (this.failedAttempts || 0) + 1;
+      if (this.failedAttempts >= 5) {
+        this.lockoutUntil = Date.now() + 30000; // 30-second security lockout
+        return {
+          success: false,
+          error: 'Too many consecutive failed login attempts. Account temporarily locked for 30 seconds.'
+        };
+      }
       return { success: false, error: 'Incorrect password for ' + user.name + '. Please try again.' };
     }
 
-    // Keep manager password strictly synced to Nexloic0131 across all sessions
-    if (isMgr) {
-      user.password = 'Nexloic0131';
+    // Reset failed attempts upon successful authentication
+    this.failedAttempts = 0;
+    this.lockoutUntil = 0;
+
+    // Migrate any legacy plaintext password to cryptographic hash
+    if (!user.passwordHash || user.password) {
+      user.passwordHash = expectedHash;
+      delete user.password;
       this.saveUsers(this.users);
     }
 
@@ -450,10 +568,13 @@ class AuthService {
     if (!user) {
       return { success: false, error: 'User account not found.' };
     }
-    user.password = (norm === 'manager@nexcrest.com') ? 'Nexloic0131' : 'password123';
+    user.passwordHash = (norm === 'manager@nexcrest.com')
+      ? 'ad66d6793d4dc6ddeaa846f6d6b2ba7fd3bdcbce026f652a1a1d751e9c60babb'
+      : '02d1b38eaa9b63391a31b00d882dfe78776eb3ada6e4440940de95334bf8173d';
+    delete user.password;
     user.lastPasswordChange = new Date().toISOString();
     this.saveUsers(this.users);
-    return { success: true, message: `Password for ${user.name} has been reset.` };
+    return { success: true, message: `Password for ${user.name} has been reset to default.` };
   }
 
   logout() {
