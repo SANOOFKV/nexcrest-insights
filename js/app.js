@@ -2569,6 +2569,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeProfileModal();
       populateTargetAssigneeOptions();
       populateRoleFilterOptions();
+      populateLoginProfileTabs();
       renderApp();
       showToast('Profile updated successfully!', 'success');
     });

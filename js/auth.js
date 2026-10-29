@@ -6,6 +6,7 @@
 
 const AUTH_SESSION_KEY = 'nexcrest_active_session_v3';
 const USERS_STORAGE_KEY = 'nexcrest_users_v2';
+const CUSTOM_PROFILES_KEY = 'nexcrest_custom_profiles_v1';
 
 // Pure JavaScript SHA-256 Cryptographic Hash Utility (Zero External Dependencies)
 function hashPassword(password) {
@@ -146,20 +147,80 @@ class AuthService {
     this.initCloudSync();
   }
 
+  loadCustomProfiles() {
+    try {
+      const raw = localStorage.getItem(CUSTOM_PROFILES_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') return parsed;
+      }
+    } catch (e) {}
+    return {};
+  }
+
+  saveCustomProfiles(profiles) {
+    try {
+      localStorage.setItem(CUSTOM_PROFILES_KEY, JSON.stringify(profiles));
+    } catch (e) {}
+  }
+
+  applyCustomProfiles(usersMap) {
+    if (!usersMap || typeof usersMap !== 'object') return;
+    const customProfiles = this.loadCustomProfiles();
+    Object.entries(customProfiles).forEach(([email, custom]) => {
+      const norm = email.toLowerCase().trim();
+      if (usersMap[norm] && custom && custom.name) {
+        usersMap[norm].name = custom.name;
+        usersMap[norm].avatar = this.getInitials(custom.name);
+        if (custom.title) usersMap[norm].title = custom.title;
+      }
+    });
+  }
+
   initCloudSync() {
     if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
       window.firebaseSync.seedUsersIfEmpty(DEFAULT_USERS);
       window.firebaseSync.subscribeUsers((cloudUsers) => {
+        // Enforce user custom profiles over stale cloud defaults
+        const customProfiles = this.loadCustomProfiles();
+        let needsCloudResync = false;
+
+        Object.keys(cloudUsers).forEach(email => {
+          const custom = customProfiles[email];
+          const cloudU = cloudUsers[email];
+          if (custom && custom.name && cloudU) {
+            if (cloudU.name !== custom.name || (custom.title && cloudU.title !== custom.title)) {
+              cloudU.name = custom.name;
+              cloudU.avatar = this.getInitials(custom.name);
+              if (custom.title) cloudU.title = custom.title;
+              needsCloudResync = true;
+            }
+          }
+        });
+
         this.users = { ...this.users, ...cloudUsers };
+        this.applyCustomProfiles(this.users);
+
         try {
           localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(this.users));
         } catch (e) {}
-        if (this.currentUser && cloudUsers[this.currentUser.email.toLowerCase()]) {
-          this.currentUser = { ...this.currentUser, ...cloudUsers[this.currentUser.email.toLowerCase()] };
+
+        if (this.currentUser && this.users[this.currentUser.email.toLowerCase()]) {
+          this.currentUser = { ...this.currentUser, ...this.users[this.currentUser.email.toLowerCase()] };
           try {
             sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(this.currentUser));
           } catch (e) {}
         }
+
+        // If Cloud Firestore held stale default names, push the customized names to Firestore
+        if (needsCloudResync && window.firebaseSync && window.firebaseSync.isActive()) {
+          Object.keys(customProfiles).forEach(email => {
+            if (this.users[email]) {
+              window.firebaseSync.saveUser(this.users[email]);
+            }
+          });
+        }
+
         this.notify();
       });
     }
@@ -167,6 +228,7 @@ class AuthService {
 
   loadUsers() {
     const raw = localStorage.getItem(USERS_STORAGE_KEY);
+    let users = null;
     if (raw) {
       try {
         const parsed = JSON.parse(raw);
@@ -206,15 +268,36 @@ class AuthService {
             migrated = true;
           }
 
+          // If code modified DEFAULT_USERS and user has no manual override, synchronize with code
+          const customProfiles = this.loadCustomProfiles();
+          Object.keys(DEFAULT_USERS).forEach(email => {
+            if (!customProfiles[email] && DEFAULT_USERS[email] && parsed[email]) {
+              if (DEFAULT_USERS[email].name && parsed[email].name !== DEFAULT_USERS[email].name && parsed[email].name === 'Marketing Manager') {
+                parsed[email].name = DEFAULT_USERS[email].name;
+                parsed[email].avatar = this.getInitials(DEFAULT_USERS[email].name);
+                migrated = true;
+              }
+            }
+          });
+
+          // Enforce customized profiles
+          this.applyCustomProfiles(parsed);
+
           if (migrated) this.saveUsers(parsed);
-          return parsed;
+          users = parsed;
         }
       } catch (e) {
         console.error('Failed to parse users', e);
       }
     }
-    this.saveUsers(DEFAULT_USERS);
-    return { ...DEFAULT_USERS };
+
+    if (!users) {
+      users = { ...DEFAULT_USERS };
+      this.applyCustomProfiles(users);
+      this.saveUsers(users);
+    }
+
+    return users;
   }
 
   restoreDefaultUsers() {
@@ -321,6 +404,14 @@ class AuthService {
     if (name && name.trim()) {
       user.name = name.trim();
       user.avatar = this.getInitials(name);
+      const customProfiles = this.loadCustomProfiles();
+      customProfiles[normEmail] = {
+        name: user.name,
+        title: user.title,
+        avatar: user.avatar,
+        updatedAt: Date.now()
+      };
+      this.saveCustomProfiles(customProfiles);
     }
     if (role) {
       user.role = role;
@@ -415,6 +506,16 @@ class AuthService {
       user.title = title.trim();
     }
 
+    // Persist permanently in custom profiles store so new commits/cloud snapshots can never overwrite it!
+    const customProfiles = this.loadCustomProfiles();
+    customProfiles[normEmail] = {
+      name: user.name,
+      title: user.title,
+      avatar: user.avatar,
+      updatedAt: Date.now()
+    };
+    this.saveCustomProfiles(customProfiles);
+
     this.saveUsers(this.users);
 
     if (this.currentUser && this.currentUser.email.toLowerCase() === normEmail) {
@@ -462,9 +563,16 @@ class AuthService {
     if (raw) {
       try {
         const parsed = JSON.parse(raw);
-        // Refresh with latest stored data if available
-        if (parsed && parsed.email && this.users[parsed.email.toLowerCase()]) {
-          return this.users[parsed.email.toLowerCase()];
+        if (parsed && parsed.email) {
+          const norm = parsed.email.toLowerCase();
+          const custom = this.loadCustomProfiles()[norm];
+          if (custom && custom.name) {
+            parsed.name = custom.name;
+            if (custom.title) parsed.title = custom.title;
+          }
+          if (this.users[norm]) {
+            return { ...this.users[norm], ...parsed };
+          }
         }
         return parsed;
       } catch (e) {
