@@ -2675,7 +2675,7 @@ document.addEventListener('DOMContentLoaded', () => {
       assigneeEmail: userMatch ? userMatch.email : undefined,
       brand: elements.targetBrand.value,
       category: elements.targetCategory.value,
-      format: elements.targetFormat.value.trim(),
+      format: (elements.targetFormat && elements.targetFormat.value.trim()) || elements.targetBrand.value || 'Deliverable',
       program: elements.targetProgram.value.trim(),
       targetQty: parseInt(elements.targetQty.value, 10) || 1,
       notes: elements.targetNotes.value.trim()
@@ -2857,7 +2857,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.targetAssignee.value = target.assignee;
         elements.targetBrand.value = target.brand;
         elements.targetCategory.value = target.category;
-        elements.targetFormat.value = target.format;
+        if (elements.targetFormat) elements.targetFormat.value = target.format || '';
         elements.targetProgram.value = target.program;
         elements.targetQty.value = target.targetQty;
         elements.targetNotes.value = target.notes || '';
