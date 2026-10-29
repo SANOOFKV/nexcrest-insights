@@ -373,6 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function formatBrandName(brand) {
     if (!brand) return 'Techschool';
     const b = brand.toString().trim();
+    if (b === 'Both' || b === 'Both Brands') return 'Both';
     if (b === 'IT' || b === 'Nexcrest IT' || b.toUpperCase() === 'IT') return 'IT';
     return 'Techschool';
   }

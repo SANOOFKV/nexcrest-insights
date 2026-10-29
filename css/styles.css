@@ -1560,11 +1560,16 @@ body.dark-theme .badge-role.badge-community {
   display: inline-block;
 }
 
-.badge-brand.Techschool,
-.badge-brand.Both {
+.badge-brand.Techschool {
   background: rgba(239, 36, 36, 0.12);
   color: #EF2424;
   border: 1px solid rgba(239, 36, 36, 0.25);
+}
+
+.badge-brand.Both {
+  background: rgba(0, 139, 165, 0.12);
+  color: #008BA5;
+  border: 1px solid rgba(0, 139, 165, 0.3);
 }
 
 .badge-brand.IT {
@@ -1574,11 +1579,16 @@ body.dark-theme .badge-role.badge-community {
 }
 
 body.dark-theme .badge-brand.Techschool,
-body.dark-theme .badge-brand.Insights,
-body.dark-theme .badge-brand.Both {
+body.dark-theme .badge-brand.Insights {
   background: rgba(239, 36, 36, 0.18);
   color: #FF8080;
   border-color: rgba(239, 36, 36, 0.4);
+}
+
+body.dark-theme .badge-brand.Both {
+  background: rgba(0, 139, 165, 0.2);
+  color: #45B2C3;
+  border-color: rgba(0, 139, 165, 0.45);
 }
 
 body.dark-theme .badge-brand.IT {

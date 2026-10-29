@@ -27,7 +27,7 @@ const DEFAULT_USERS = {
     role: 'designer',
     name: 'Graphic Designer',
     title: 'Visual & Brand Design Specialist',
-    brand: 'Techschool',
+    brand: 'Both',
     avatar: 'GD',
     badgeClass: 'badge-designer',
     password: 'password123',
@@ -40,7 +40,7 @@ const DEFAULT_USERS = {
     role: 'videographer',
     name: 'Videographer + Editor',
     title: 'Video Production & Editing Lead',
-    brand: 'Techschool',
+    brand: 'Both',
     avatar: 'VE',
     badgeClass: 'badge-videographer',
     password: 'password123',
@@ -53,7 +53,7 @@ const DEFAULT_USERS = {
     role: 'marketing',
     name: 'Marketing Executive',
     title: 'Campaigns & Lead Acquisition',
-    brand: 'IT',
+    brand: 'Both',
     avatar: 'ME',
     badgeClass: 'badge-marketing',
     password: 'password123',
@@ -96,13 +96,17 @@ class AuthService {
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object') {
           let migrated = false;
-          // Ensure brand is only Techschool or IT across all user records
+          // Normalize brand display across all user records (Techschool, IT, Both)
           Object.values(parsed).forEach(u => {
-            if (u && (u.brand === 'Both' || u.brand === 'Both Brands' || u.brand === 'Nexcrest Techschool' || !u.brand)) {
+            if (u && (u.brand === 'Nexcrest Techschool' || u.brand === 'Insights')) {
               u.brand = 'Techschool';
               migrated = true;
-            } else if (u && (u.brand === 'Nexcrest IT' || u.brand === 'IT')) {
+            } else if (u && u.brand === 'Nexcrest IT') {
               u.brand = 'IT';
+              migrated = true;
+            } else if (u && (u.brand === 'Both Brands' || !u.brand)) {
+              u.brand = 'Both';
+              migrated = true;
             }
           });
           // Always ensure the core manager admin profile exists and uses official password
@@ -189,7 +193,7 @@ class AuthService {
     return map[role] || 'badge-designer';
   }
 
-  addUser({ name, email, role, title, brand = 'Techschool', password = 'password123' }) {
+  addUser({ name, email, role, title, brand = 'Both', password = 'password123' }) {
     const normEmail = (email || '').trim().toLowerCase();
     if (!normEmail) {
       return { success: false, error: 'Email address is required.' };
@@ -201,13 +205,15 @@ class AuthService {
       return { success: false, error: 'An employee with this email address already exists.' };
     }
 
+    const normBrand = (brand === 'IT' || brand === 'Nexcrest IT') ? 'IT' : (brand === 'Techschool' || brand === 'Nexcrest Techschool' ? 'Techschool' : 'Both');
+
     const newUser = {
       id: 'emp-' + Date.now(),
       email: normEmail,
       name: name.trim(),
       role: role || 'designer',
       title: (title || '').trim() || `${(role || 'Team').toUpperCase()} Specialist`,
-      brand: (brand === 'IT' || brand === 'Nexcrest IT') ? 'IT' : 'Techschool',
+      brand: normBrand,
       avatar: this.getInitials(name),
       badgeClass: this.getRoleBadgeClass(role),
       password: password || 'password123',
@@ -238,7 +244,7 @@ class AuthService {
       user.title = title.trim();
     }
     if (brand) {
-      user.brand = (brand === 'IT' || brand === 'Nexcrest IT') ? 'IT' : 'Techschool';
+      user.brand = (brand === 'IT' || brand === 'Nexcrest IT') ? 'IT' : (brand === 'Techschool' || brand === 'Nexcrest Techschool' ? 'Techschool' : 'Both');
     }
     if (password && password.trim()) {
       user.password = password.trim();
