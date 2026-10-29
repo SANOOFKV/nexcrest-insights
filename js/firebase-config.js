@@ -154,6 +154,18 @@ class FirebaseSyncService {
     }
   }
 
+  // Delete target from cloud
+  async deleteTarget(id) {
+    if (!this.isActive() || !id) return false;
+    try {
+      await this.db.collection('targets').doc(String(id)).delete();
+      return true;
+    } catch (err) {
+      console.error('Failed to delete target from Firestore:', err);
+      return false;
+    }
+  }
+
   // Seed default submissions to cloud if collection is empty
   async seedSubmissionsIfEmpty(seedSubs) {
     if (!this.isActive() || !Array.isArray(seedSubs)) return;

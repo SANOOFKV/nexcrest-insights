@@ -1520,16 +1520,10 @@ body.dark-theme .badge-role.badge-community {
 }
 
 .badge-brand.Techschool,
-.badge-brand.Insights,
 .badge-brand.Both {
   background: rgba(239, 36, 36, 0.12);
   color: #EF2424;
   border: 1px solid rgba(239, 36, 36, 0.25);
-}
-
-.deliverable-card .badge-brand.Insights,
-.deliverable-card .del-badges-row .badge-brand.Insights {
-  display: none !important;
 }
 
 .badge-brand.IT {
@@ -6790,6 +6784,112 @@ body.light-theme .card-header h3 {
 body.light-theme .card-subtitle {
   color: #475569 !important;
 }
+
+/* User Task Management & Delete Modal Styles */
+.user-task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.user-task-item:hover {
+  border-color: rgba(0, 139, 165, 0.4);
+  background: rgba(0, 139, 165, 0.03);
+}
+
+.user-task-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-task-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.user-task-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+}
+
+.user-task-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-emp-view-tasks {
+  background: rgba(0, 139, 165, 0.08);
+  color: var(--teal-primary);
+  border: 1px solid rgba(0, 139, 165, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 7px 11px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-emp-view-tasks:hover {
+  background: var(--teal-primary);
+  color: #FFFFFF;
+  border-color: var(--teal-primary);
+  transform: translateY(-1px);
+}
+
+body.dark-theme .btn-emp-view-tasks {
+  background: rgba(0, 139, 165, 0.15);
+  color: #45B2C3;
+  border-color: rgba(0, 139, 165, 0.35);
+}
+
+body.dark-theme .btn-emp-view-tasks:hover {
+  background: var(--teal-primary);
+  color: #FFFFFF;
+}
+
+.btn-del-task-card {
+  color: var(--rose-light);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 0 10px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-del-task-card:hover {
+  background: var(--rose-danger);
+  border-color: var(--rose-danger);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+}
+
 
 
 

@@ -16,7 +16,7 @@ const SEED_TARGETS = [
   {
     id: 'gd-1',
     assignee: 'designer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Campus Happenings',
     program: 'NexTalk Series',
     format: 'Carousel',
@@ -27,7 +27,7 @@ const SEED_TARGETS = [
   {
     id: 'gd-2',
     assignee: 'designer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Campus Happenings',
     program: "Let's Talk Series",
     format: 'Carousel',
@@ -38,7 +38,7 @@ const SEED_TARGETS = [
   {
     id: 'gd-3',
     assignee: 'designer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Campus Happenings',
     program: 'LinkedIn Contest',
     format: 'Carousel',
@@ -49,7 +49,7 @@ const SEED_TARGETS = [
   {
     id: 'gd-4',
     assignee: 'designer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Campus Happenings',
     program: 'Experts Talk',
     format: 'Poster',
@@ -60,7 +60,7 @@ const SEED_TARGETS = [
   {
     id: 'gd-5',
     assignee: 'designer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Campus Happenings',
     program: 'Experts Talk',
     format: 'Carousel',
@@ -71,7 +71,7 @@ const SEED_TARGETS = [
   {
     id: 'gd-6',
     assignee: 'designer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Branding',
     program: 'Informative Contents',
     format: 'Carousel',
@@ -93,7 +93,7 @@ const SEED_TARGETS = [
   {
     id: 'gd-8',
     assignee: 'designer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Marketing Creatives',
     program: 'Marketing Posters',
     format: 'Poster',
@@ -115,7 +115,7 @@ const SEED_TARGETS = [
   {
     id: 'gd-10',
     assignee: 'designer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Moment Marketing',
     program: 'Viral Tech Memes & Trending Topics',
     format: 'Poster',
@@ -128,7 +128,7 @@ const SEED_TARGETS = [
   {
     id: 've-1',
     assignee: 'videographer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Campus Happenings',
     program: 'NexTalk & Let\'s Talk Coverage',
     format: '9:16 Reel / Highlight',
@@ -139,7 +139,7 @@ const SEED_TARGETS = [
   {
     id: 've-2',
     assignee: 'videographer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Campus Happenings',
     program: 'Experts Talk Speaker Clips & Student Reactions',
     format: 'Vertical Reels',
@@ -150,7 +150,7 @@ const SEED_TARGETS = [
   {
     id: 've-3',
     assignee: 'videographer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Branding',
     program: 'Nexcrest Life & Culture Series',
     format: 'Cinematic 9:16 Reel',
@@ -172,7 +172,7 @@ const SEED_TARGETS = [
   {
     id: 've-5',
     assignee: 'videographer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Marketing Creatives',
     program: 'Course Admission Video Ads',
     format: 'Paid Ad Creative (9:16 & 1:1)',
@@ -194,7 +194,7 @@ const SEED_TARGETS = [
   {
     id: 've-7',
     assignee: 'videographer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Moment Marketing',
     program: 'Trending Audio Tech Skits',
     format: '9:16 Reel / Highlight',
@@ -207,7 +207,7 @@ const SEED_TARGETS = [
   {
     id: 'me-1',
     assignee: 'marketing',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Campus Happenings',
     program: 'NexTalk & Let\'s Talk Audience Registrations',
     format: 'Event Registration Drive',
@@ -218,7 +218,7 @@ const SEED_TARGETS = [
   {
     id: 'me-2',
     assignee: 'marketing',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Campus Happenings',
     program: 'LinkedIn Contest & Student Engagement Campaign',
     format: 'Organic Engagement Sprints',
@@ -229,7 +229,7 @@ const SEED_TARGETS = [
   {
     id: 'me-3',
     assignee: 'marketing',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Branding',
     program: 'Multi-Platform Content Distribution & Growth',
     format: 'Daily Social Publishing',
@@ -251,7 +251,7 @@ const SEED_TARGETS = [
   {
     id: 'me-5',
     assignee: 'marketing',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Marketing Creatives',
     program: 'Meta & Google Lead Acquisition Ads',
     format: 'Paid Lead Funnel (Target: 300 Leads)',
@@ -273,17 +273,17 @@ const SEED_TARGETS = [
 
   // ================= SEPTEMBER 2026 (EXACT MATCH TO USER PHOTO: 40 TARGETS) =================
   // Branding (20 Posts: 13 Reels & Videos, 7 Posters & Carousels)
-  { id: 'sep-1', assignee: 'videographer', brand: 'Insights', category: 'Branding', program: 'Campus Story Reels', format: 'Reel (9:16)', targetQty: 13, month: '2026-09' },
-  { id: 'sep-2', assignee: 'designer', brand: 'Insights', category: 'Branding', program: 'Brand Identity Carousels', format: 'Carousel', targetQty: 7, month: '2026-09' },
+  { id: 'sep-1', assignee: 'videographer', brand: 'Techschool', category: 'Branding', program: 'Campus Story Reels', format: 'Reel (9:16)', targetQty: 13, month: '2026-09' },
+  { id: 'sep-2', assignee: 'designer', brand: 'Techschool', category: 'Branding', program: 'Brand Identity Carousels', format: 'Carousel', targetQty: 7, month: '2026-09' },
   // Campus Happenings (9 Posts: 5 Reels & Videos, 4 Posters & Carousels)
-  { id: 'sep-3', assignee: 'videographer', brand: 'Insights', category: 'Campus Happenings', program: 'Event Recap Highlights', format: 'Reel (9:16)', targetQty: 5, month: '2026-09' },
-  { id: 'sep-4', assignee: 'designer', brand: 'Insights', category: 'Campus Happenings', program: 'Campus Activity Posters', format: 'Poster', targetQty: 4, month: '2026-09' },
+  { id: 'sep-3', assignee: 'videographer', brand: 'Techschool', category: 'Campus Happenings', program: 'Event Recap Highlights', format: 'Reel (9:16)', targetQty: 5, month: '2026-09' },
+  { id: 'sep-4', assignee: 'designer', brand: 'Techschool', category: 'Campus Happenings', program: 'Campus Activity Posters', format: 'Poster', targetQty: 4, month: '2026-09' },
   // Marketing Creatives (8 Posts: 2 Reels & Videos, 6 Posters & Carousels)
-  { id: 'sep-5', assignee: 'videographer', brand: 'Insights', category: 'Marketing Creatives', program: 'Ad Promo Videos', format: 'Video Ad', targetQty: 2, month: '2026-09' },
-  { id: 'sep-6', assignee: 'designer', brand: 'Insights', category: 'Marketing Creatives', program: 'Enrollment Ad Creatives', format: 'Poster', targetQty: 6, month: '2026-09' },
+  { id: 'sep-5', assignee: 'videographer', brand: 'Techschool', category: 'Marketing Creatives', program: 'Ad Promo Videos', format: 'Video Ad', targetQty: 2, month: '2026-09' },
+  { id: 'sep-6', assignee: 'designer', brand: 'Techschool', category: 'Marketing Creatives', program: 'Enrollment Ad Creatives', format: 'Poster', targetQty: 6, month: '2026-09' },
   // Moment Marketing (3 Posts: 2 Posters, 1 Reel)
-  { id: 'sep-7', assignee: 'designer', brand: 'Insights', category: 'Moment Marketing', program: 'Trending Topic Memes', format: 'Poster', targetQty: 2, month: '2026-09' },
-  { id: 'sep-8', assignee: 'videographer', brand: 'Insights', category: 'Moment Marketing', program: 'Viral Sound Clip', format: 'Reel (9:16)', targetQty: 1, month: '2026-09' }
+  { id: 'sep-7', assignee: 'designer', brand: 'Techschool', category: 'Moment Marketing', program: 'Trending Topic Memes', format: 'Poster', targetQty: 2, month: '2026-09' },
+  { id: 'sep-8', assignee: 'videographer', brand: 'Techschool', category: 'Moment Marketing', program: 'Viral Sound Clip', format: 'Reel (9:16)', targetQty: 1, month: '2026-09' }
 ];
 
 // Seed Submissions for realistic demo
@@ -293,7 +293,7 @@ const SEED_SUBMISSIONS = [
     id: 'sub-1',
     targetId: 'gd-1',
     assignee: 'designer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Campus Happenings',
     program: 'NexTalk Series',
     format: 'Carousel',
@@ -308,7 +308,7 @@ const SEED_SUBMISSIONS = [
     id: 'sub-2',
     targetId: 'gd-6',
     assignee: 'designer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Branding',
     program: 'Informative Contents',
     format: 'Carousel',
@@ -323,7 +323,7 @@ const SEED_SUBMISSIONS = [
     id: 'sub-3',
     targetId: 'gd-4',
     assignee: 'designer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Campus Happenings',
     program: 'Experts Talk',
     format: 'Poster',
@@ -338,7 +338,7 @@ const SEED_SUBMISSIONS = [
     id: 'sub-4',
     targetId: 've-1',
     assignee: 'videographer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Campus Happenings',
     program: 'NexTalk & Let\'s Talk Coverage',
     format: '9:16 Reel / Highlight',
@@ -353,7 +353,7 @@ const SEED_SUBMISSIONS = [
     id: 'sub-5',
     targetId: 'me-5',
     assignee: 'marketing',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Marketing Creatives',
     program: 'Meta & Google Lead Acquisition Ads',
     format: 'Paid Lead Funnel (Target: 300 Leads)',
@@ -368,7 +368,7 @@ const SEED_SUBMISSIONS = [
     id: 'sub-6',
     targetId: 've-3',
     assignee: 'videographer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Branding',
     program: 'Nexcrest Life & Culture Series',
     format: 'Cinematic 9:16 Reel',
@@ -383,7 +383,7 @@ const SEED_SUBMISSIONS = [
     id: 'sub-7',
     targetId: 'gd-8',
     assignee: 'designer',
-    brand: 'Insights',
+    brand: 'Techschool',
     category: 'Marketing Creatives',
     program: 'Marketing Posters',
     format: 'Poster',
@@ -459,8 +459,8 @@ class DataStore {
       const parsed = JSON.parse(raw);
       let migrated = false;
       parsed.forEach(t => {
-        if (t.brand === 'Techschool') {
-          t.brand = 'Insights';
+        if (t.brand === 'Insights' || t.brand === 'Nexcrest Insights') {
+          t.brand = 'Techschool';
           migrated = true;
         }
       });
@@ -495,8 +495,8 @@ class DataStore {
       const parsed = JSON.parse(raw);
       let migrated = false;
       parsed.forEach(s => {
-        if (s.brand === 'Techschool') {
-          s.brand = 'Insights';
+        if (s.brand === 'Insights' || s.brand === 'Nexcrest Insights') {
+          s.brand = 'Techschool';
           migrated = true;
         }
       });
@@ -547,9 +547,9 @@ class DataStore {
       }
       if (filters.category && filters.category !== 'all' && t.category !== filters.category) return false;
       if (filters.brand && filters.brand !== 'all') {
-        const normFilter = (filters.brand === 'Techschool' || filters.brand === 'Insights') ? 'Insights' : filters.brand;
-        const normTarget = (t.brand === 'Techschool' || t.brand === 'Insights') ? 'Insights' : t.brand;
-        if (normTarget !== normFilter) return false;
+        const normFilter = (filters.brand === 'Techschool' || filters.brand === 'Insights') ? 'Techschool' : filters.brand;
+        const normTarget = (t.brand === 'Techschool' || t.brand === 'Insights') ? 'Techschool' : t.brand;
+        if (t.brand !== 'Both' && normTarget !== normFilter) return false;
       }
       return true;
     });
@@ -623,6 +623,15 @@ class DataStore {
   deleteTarget(id) {
     this.targets = this.targets.filter(t => t.id !== id);
     this.saveTargets(this.targets);
+    // Also remove associated submissions for this target
+    if (Array.isArray(this.submissions)) {
+      this.submissions = this.submissions.filter(s => s.targetId !== id);
+      this.saveSubmissions(this.submissions);
+    }
+    // Delete from Cloud Firestore
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.deleteTarget(id);
+    }
   }
 
   cloneMonthTargets(sourceMonth = '2026-10', destMonth = null) {

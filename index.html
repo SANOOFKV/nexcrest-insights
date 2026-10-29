@@ -209,8 +209,8 @@
             <label><i data-lucide="building"></i> Brand:</label>
             <select id="filter-brand-select">
               <option value="all">All Brands</option>
-              <option value="Insights">Nexcrest Insights</option>
-              <option value="IT">IT Division</option>
+              <option value="Techschool">Nexcrest Techschool</option>
+              <option value="IT">Nexcrest IT</option>
             </select>
           </div>
 
@@ -779,9 +779,9 @@
           <div class="form-group">
             <label for="target-brand">Brand *</label>
             <select id="target-brand" required>
-              <option value="Insights">Nexcrest Insights</option>
-              <option value="IT">IT Division</option>
-              <option value="Both">Both (Insights & IT)</option>
+              <option value="Techschool">Nexcrest Techschool</option>
+              <option value="IT">Nexcrest IT</option>
+              <option value="Both">Both (Techschool & IT)</option>
             </select>
           </div>
         </div>
@@ -817,11 +817,16 @@
           </div>
         </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-close-modal="assign-target-modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">
-            <i data-lucide="check"></i> Assign Target
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+          <button type="button" id="btn-modal-delete-target" class="btn btn-danger" style="display: none; background: rgba(225, 29, 72, 0.1); border-color: rgba(225, 29, 72, 0.3); color: var(--rose-danger); font-weight: 600;">
+            <i data-lucide="trash-2"></i> Delete Task
           </button>
+          <div style="display: flex; gap: 10px; margin-left: auto;">
+            <button type="button" class="btn btn-secondary" data-close-modal="assign-target-modal">Cancel</button>
+            <button type="submit" id="btn-submit-target-modal" class="btn btn-primary">
+              <i data-lucide="check"></i> <span id="btn-submit-target-text">Assign Target</span>
+            </button>
+          </div>
         </div>
       </form>
     </div>
@@ -883,9 +888,9 @@
           <div class="form-group">
             <label for="new-emp-brand">Brand</label>
             <select id="new-emp-brand">
-              <option value="Both">Both (Insights & IT)</option>
-              <option value="Insights">Nexcrest Insights</option>
-              <option value="IT">IT Division</option>
+              <option value="Both">Both Brands</option>
+              <option value="Techschool">Nexcrest Techschool</option>
+              <option value="IT">Nexcrest IT</option>
             </select>
           </div>
           <div class="form-group">
@@ -939,6 +944,77 @@
     </div>
   </div>
 
+  <!-- MODAL: Delete Assigned Task Confirmation -->
+  <div id="delete-target-modal" class="modal-overlay hidden">
+    <div class="modal-card spotlight-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div style="width: 38px; height: 38px; border-radius: var(--radius-sm); background: rgba(225, 29, 72, 0.15); display: flex; align-items: center; justify-content: center; color: var(--rose-danger); margin-right: 12px;">
+            <i data-lucide="trash-2" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-family: var(--font-heading); font-size: 18px; color: var(--text-main);">Delete Assigned Task</h3>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="delete-target-modal">&times;</button>
+      </div>
+
+      <div style="padding: 16px 0; font-size: 14px; line-height: 1.6; color: var(--text-main);">
+        <p>Are you sure you want to delete this assigned task?</p>
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px 14px; margin: 12px 0;">
+          <div style="font-weight: 700; color: var(--text-main); font-size: 15px; margin-bottom: 6px;" id="delete-target-title-display">Program Title</div>
+          <div style="font-size: 12px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+            <span id="delete-target-brand-badge" class="badge-brand Techschool">Nexcrest Techschool</span>
+            <span id="delete-target-cat-badge" class="badge-category">Category</span>
+            <span id="delete-target-format-badge" class="badge-format">Format</span>
+            <span>•</span>
+            <span id="delete-target-assignee-display">Assigned to: <strong>User</strong></span>
+          </div>
+        </div>
+        <div class="delete-warning-callout">
+          <i data-lucide="alert-triangle"></i>
+          <span>This deliverable task and its progress will be permanently removed.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <button type="button" class="btn btn-secondary" data-close-modal="delete-target-modal">Cancel</button>
+        <button type="button" id="btn-confirm-delete-target" class="btn btn-danger" style="background: var(--rose-danger); border-color: var(--rose-danger); color: #FFFFFF; font-weight: 600;">
+          <i data-lucide="trash-2"></i> Delete Task
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Manage User Assigned Tasks (View & Delete per User) -->
+  <div id="user-tasks-modal" class="modal-overlay hidden">
+    <div class="modal-card spotlight-card" style="max-width: 620px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div style="width: 38px; height: 38px; border-radius: var(--radius-sm); background: rgba(0, 139, 165, 0.15); display: flex; align-items: center; justify-content: center; color: var(--teal-primary); margin-right: 12px;">
+            <i data-lucide="list-checks" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-family: var(--font-heading); font-size: 18px; color: var(--text-main);" id="user-tasks-modal-title">Assigned Tasks</h3>
+            <p style="margin: 0; font-size: 12px; color: var(--text-muted);" id="user-tasks-modal-subtitle">Manage deliverables for team member</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="user-tasks-modal">&times;</button>
+      </div>
+
+      <div style="padding: 16px 0; max-height: 400px; overflow-y: auto;" id="user-tasks-modal-list">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+        <button type="button" id="btn-user-tasks-assign-new" class="btn btn-outline-sm" style="border-color: var(--teal-primary); color: var(--teal-primary);">
+          <i data-lucide="plus-circle"></i> Assign New Target
+        </button>
+        <button type="button" class="btn btn-secondary" data-close-modal="user-tasks-modal">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: Edit Employee Profile (Manager Only) -->
   <div id="edit-employee-modal" class="modal-overlay hidden">
     <div class="modal-card spotlight-card" style="max-width: 560px;">
@@ -987,9 +1063,9 @@
           <div class="form-group">
             <label for="edit-emp-brand">Brand</label>
             <select id="edit-emp-brand">
-              <option value="Nexcrest Insights">Nexcrest Insights</option>
-              <option value="Nexcrest IT Services">Nexcrest IT Services</option>
-              <option value="Both (Insights & IT)">Both (Insights & IT)</option>
+              <option value="Both">Both Brands</option>
+              <option value="Techschool">Nexcrest Techschool</option>
+              <option value="IT">Nexcrest IT</option>
             </select>
           </div>
         </div>
@@ -1350,9 +1426,9 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=39"></script>
-  <script src="js/data.js?v=42"></script>
-  <script src="js/auth.js?v=42"></script>
-  <script src="js/app.js?v=42"></script>
+  <script src="js/firebase-config.js?v=43"></script>
+  <script src="js/data.js?v=43"></script>
+  <script src="js/auth.js?v=43"></script>
+  <script src="js/app.js?v=43"></script>
 </body>
 </html>

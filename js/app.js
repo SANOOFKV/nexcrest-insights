@@ -30,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     pendingDeleteEmail: null,
     pendingDeleteName: null,
+    pendingDeleteTargetId: null,
+    activeTasksUserEmail: null,
     calendarModalYear: 2026
   };
 
@@ -168,6 +170,25 @@ document.addEventListener('DOMContentLoaded', () => {
     targetProgram: document.getElementById('target-program'),
     targetQty: document.getElementById('target-qty'),
     targetNotes: document.getElementById('target-notes'),
+    btnModalDeleteTarget: document.getElementById('btn-modal-delete-target'),
+    btnSubmitTargetModal: document.getElementById('btn-submit-target-modal'),
+    btnSubmitTargetText: document.getElementById('btn-submit-target-text'),
+
+    // Delete Target Modal
+    deleteTargetModal: document.getElementById('delete-target-modal'),
+    btnConfirmDeleteTarget: document.getElementById('btn-confirm-delete-target'),
+    deleteTargetTitleDisplay: document.getElementById('delete-target-title-display'),
+    deleteTargetBrandBadge: document.getElementById('delete-target-brand-badge'),
+    deleteTargetCatBadge: document.getElementById('delete-target-cat-badge'),
+    deleteTargetFormatBadge: document.getElementById('delete-target-format-badge'),
+    deleteTargetAssigneeDisplay: document.getElementById('delete-target-assignee-display'),
+
+    // User Tasks Management Modal
+    userTasksModal: document.getElementById('user-tasks-modal'),
+    userTasksModalTitle: document.getElementById('user-tasks-modal-title'),
+    userTasksModalSubtitle: document.getElementById('user-tasks-modal-subtitle'),
+    userTasksModalList: document.getElementById('user-tasks-modal-list'),
+    btnUserTasksAssignNew: document.getElementById('btn-user-tasks-assign-new'),
 
     // Log Work Form
     logWorkForm: document.getElementById('log-work-form'),
@@ -323,6 +344,14 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
       return isoStr;
     }
+  }
+
+  function formatBrandName(brand) {
+    if (!brand) return 'Both Brands';
+    if (brand === 'Techschool' || brand === 'Insights' || brand === 'Nexcrest Techschool') return 'Nexcrest Techschool';
+    if (brand === 'IT' || brand === 'Nexcrest IT') return 'Nexcrest IT';
+    if (brand === 'Both' || brand === 'Both Brands') return 'Both Brands';
+    return brand;
   }
 
   // Safe URL sanitizer to prevent javascript: pseudo-protocol XSS
@@ -1199,7 +1228,7 @@ document.addEventListener('DOMContentLoaded', () => {
               ${userLookup ? `<span style="font-size: 10px; color: var(--text-dim); margin-left: 4px;">${escapeHtml(userLookup.title)}</span>` : ''}
             </div>
           </td>
-          <td><span class="badge-brand ${escapeHtml(target.brand)}">${escapeHtml(target.brand)}</span></td>
+          <td><span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span></td>
           <td><span class="badge-category">${escapeHtml(target.category)}</span></td>
           <td>
             <strong>${escapeHtml(target.program)}</strong>
@@ -1270,7 +1299,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="sub-meta">
               <span><strong>${escapeHtml(roleNameMap[sub.assignee] || sub.authorName || sub.assignee)}</strong></span>
               <span>•</span>
-              <span class="badge-brand ${escapeHtml(sub.brand)}">${escapeHtml(sub.brand)}</span>
+              <span class="badge-brand ${escapeHtml(sub.brand)}">${formatBrandName(sub.brand)}</span>
               <span>•</span>
               <span class="badge-category">${escapeHtml(sub.category)}</span>
               <span>•</span>
@@ -1327,7 +1356,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <td>${formatDate(sub.submittedAt)}</td>
           <td><strong>${escapeHtml(subAuthorName)}</strong></td>
           <td>
-            <span class="badge-brand ${escapeHtml(sub.brand)}">${escapeHtml(sub.brand)}</span>
+            <span class="badge-brand ${escapeHtml(sub.brand)}">${formatBrandName(sub.brand)}</span>
             <span style="margin-left: 4px;">${escapeHtml(sub.program)}</span>
           </td>
           <td>${escapeHtml(sub.title)}</td>
@@ -1466,7 +1495,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="badge-role ${escapeHtml(emp.badgeClass || 'badge-designer')}">
                   ${escapeHtml((emp.role || '').toUpperCase())}
                 </span>
-                <span class="badge-brand ${escapeHtml(emp.brand || 'Both')}">${escapeHtml(emp.brand || 'Both Brands')}</span>
+                <span class="badge-brand ${escapeHtml(emp.brand || 'Both')}">${formatBrandName(emp.brand)}</span>
               </div>
             </div>
           </div>
@@ -1508,9 +1537,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <!-- Card Actions Footer -->
           <div class="employee-card-footer">
-            <div class="emp-action-buttons">
+            <div class="emp-action-buttons" style="display: flex; gap: 6px; flex-wrap: wrap;">
               <button type="button" class="btn-emp-assign btn-card-assign-task" data-emp-email="${escapeHtml(emp.email)}" data-emp-role="${escapeHtml(emp.role)}" data-emp-name="${escapeHtml(emp.name)}" title="Assign Target">
-                <i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i> Assign Target
+                <i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i> Assign
+              </button>
+              <button type="button" class="btn-emp-view-tasks btn-card-view-tasks" data-emp-email="${escapeHtml(emp.email)}" data-emp-name="${escapeHtml(emp.name)}" data-emp-role="${escapeHtml(emp.role)}" title="Manage & Delete Assigned Tasks">
+                <i data-lucide="list-checks" style="width: 14px; height: 14px;"></i> Tasks (${stats.targetsCount})
               </button>
             </div>
             <div style="display: flex; gap: 6px; align-items: center;">
@@ -1588,7 +1620,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div>
               <div class="del-card-header">
                 <div class="del-badges-row">
-                  ${target.brand && target.brand.toLowerCase() !== 'insights' ? `<span class="badge-brand ${escapeHtml(target.brand)}">${escapeHtml(target.brand)}</span>` : ''}
+                  <span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span>
                   <span class="badge-category">${escapeHtml(target.category)}</span>
                   <span class="badge-format">${escapeHtml(target.format)}</span>
                 </div>
@@ -1609,9 +1641,12 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
               ${prog.pending > 0 ? `<div style="font-size: 11px; color: var(--amber-light); margin-top: 4px;">⏳ ${prog.pending} in review</div>` : ''}
 
-              <div class="del-card-actions">
+              <div class="del-card-actions" style="display: flex; gap: 8px; align-items: center;">
                 <button class="btn btn-primary btn-sm btn-block btn-open-log-modal" data-target-id="${target.id}">
                   <i data-lucide="upload-cloud"></i> + Submit Deliverable
+                </button>
+                <button class="btn btn-outline-sm btn-action-delete btn-del-task-card" data-id="${target.id}" title="Delete Assigned Task" aria-label="Delete Task">
+                  <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>
                 </button>
               </div>
             </div>
@@ -2099,6 +2134,8 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.editTargetId.value = '';
     populateTargetAssigneeOptions(preselectedAssignee);
     elements.assignTargetModal.querySelector('h3').textContent = 'Assign Target Deliverable';
+    if (elements.btnSubmitTargetText) elements.btnSubmitTargetText.textContent = 'Assign Target';
+    if (elements.btnModalDeleteTarget) elements.btnModalDeleteTarget.style.display = 'none';
     elements.assignTargetModal.classList.remove('hidden');
     refreshIcons();
   }
@@ -2209,7 +2246,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (editEmpName) editEmpName.value = user.name || '';
     if (editEmpRole) editEmpRole.value = user.role || 'designer';
     if (editEmpTitle) editEmpTitle.value = user.title || '';
-    if (editEmpBrand) editEmpBrand.value = user.brand || 'All Nexcrest Brands';
+    if (editEmpBrand) editEmpBrand.value = user.brand || 'Both';
     if (editEmpPassword) editEmpPassword.value = '';
 
     if (editEmployeeModal) {
@@ -2271,7 +2308,7 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.profileModalRoleBadge.className = `user-role-badge ${user.badgeClass || (user.role === 'manager' ? 'badge-lead' : 'badge-member')}`;
     }
     if (elements.profileModalBrandBadge) {
-      elements.profileModalBrandBadge.textContent = user.brand || 'All Nexcrest Brands';
+      elements.profileModalBrandBadge.textContent = formatBrandName(user.brand);
     }
 
     // Populate personal details form
@@ -2282,7 +2319,7 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.profileEditTitle.value = user.title || '';
     }
     if (elements.profileEditBrandReadonly) {
-      elements.profileEditBrandReadonly.value = user.brand || 'All Nexcrest Brands';
+      elements.profileEditBrandReadonly.value = formatBrandName(user.brand);
     }
 
     // Reset password form
@@ -2573,7 +2610,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     elements.logTargetSelect.innerHTML = availableTargets.map(t => `
       <option value="${t.id}" ${t.id === preselectedTargetId ? 'selected' : ''}>
-        [${t.brand} - ${t.category}] ${t.program} (${t.format})
+        [${formatBrandName(t.brand)} - ${t.category}] ${t.program} (${t.format})
       </option>
     `).join('');
 
@@ -2673,7 +2710,15 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-
+    // Card View/Delete Tasks per Employee (Roster)
+    const viewTasksBtn = e.target.closest('.btn-card-view-tasks');
+    if (viewTasksBtn) {
+      const email = viewTasksBtn.dataset.empEmail;
+      const name = viewTasksBtn.dataset.empName;
+      const role = viewTasksBtn.dataset.empRole;
+      openUserTasksModal(email, name, role);
+      return;
+    }
 
     // Card Edit Employee Profile (Roster or Overview)
     const cardEditBtn = e.target.closest('.btn-card-edit-emp');
@@ -2722,20 +2767,20 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.targetQty.value = target.targetQty;
         elements.targetNotes.value = target.notes || '';
         elements.assignTargetModal.querySelector('h3').textContent = 'Edit Target Deliverable';
+        if (elements.btnSubmitTargetText) elements.btnSubmitTargetText.textContent = 'Update Target';
+        if (elements.btnModalDeleteTarget) elements.btnModalDeleteTarget.style.display = 'inline-flex';
         elements.assignTargetModal.classList.remove('hidden');
         refreshIcons();
       }
       return;
     }
 
-    // Delete Target button (Manager)
+    // Delete Target button (Manager or Member)
     const deleteBtn = e.target.closest('.btn-action-delete');
     if (deleteBtn) {
       const targetId = deleteBtn.dataset.id;
-      if (confirm('Are you sure you want to remove this deliverable target from the plan?')) {
-        window.dataStore.deleteTarget(targetId);
-        showToast('Target removed successfully', 'info');
-        renderApp();
+      if (targetId) {
+        openDeleteTargetModal(targetId);
       }
       return;
     }
@@ -2748,7 +2793,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (sub) {
         elements.reviewSubmissionId.value = sub.id;
         const roleLabels = { designer: 'Graphic Designer', videographer: 'Videographer', marketing: 'Marketing Exec' };
-        elements.reviewModalAuthor.textContent = `${roleLabels[sub.assignee] || sub.assignee} (${sub.brand})`;
+        elements.reviewModalAuthor.textContent = `${roleLabels[sub.assignee] || sub.assignee} (${formatBrandName(sub.brand)})`;
         elements.reviewModalProgram.textContent = `${sub.program} - ${sub.title}`;
         elements.reviewModalFormat.textContent = sub.format;
         elements.reviewModalDate.textContent = formatDate(sub.submittedAt);
@@ -2798,6 +2843,147 @@ document.addEventListener('DOMContentLoaded', () => {
       renderApp();
     }
   });
+
+  // Open Delete Target Confirmation Modal
+  function openDeleteTargetModal(targetId) {
+    const target = window.dataStore.getTargetById(targetId);
+    if (!target) return;
+
+    state.pendingDeleteTargetId = targetId;
+
+    const userLookup = window.authService.getUserByEmail(target.assignee) ||
+                       (target.assigneeEmail ? window.authService.getUserByEmail(target.assigneeEmail) : null);
+    const roleLabels = { designer: 'Graphic Designer', videographer: 'Videographer', marketing: 'Marketing Executive', manager: 'Marketing Lead' };
+    const assigneeName = userLookup ? userLookup.name : (target.assigneeName || roleLabels[target.assignee] || target.assignee);
+
+    if (elements.deleteTargetTitleDisplay) {
+      elements.deleteTargetTitleDisplay.textContent = target.program || 'Deliverable Target';
+    }
+    if (elements.deleteTargetBrandBadge) {
+      elements.deleteTargetBrandBadge.textContent = formatBrandName(target.brand);
+      elements.deleteTargetBrandBadge.className = `badge-brand ${target.brand || 'Techschool'}`;
+    }
+    if (elements.deleteTargetCatBadge) {
+      elements.deleteTargetCatBadge.textContent = target.category || 'General';
+    }
+    if (elements.deleteTargetFormatBadge) {
+      elements.deleteTargetFormatBadge.textContent = target.format || 'Creative';
+    }
+    if (elements.deleteTargetAssigneeDisplay) {
+      elements.deleteTargetAssigneeDisplay.innerHTML = `Assigned to: <strong>${escapeHtml(assigneeName)}</strong>`;
+    }
+
+    if (elements.deleteTargetModal) {
+      elements.deleteTargetModal.classList.remove('hidden');
+      refreshIcons();
+    } else if (confirm(`Are you sure you want to delete assigned task "${target.program}"?`)) {
+      window.dataStore.deleteTarget(targetId);
+      showToast('Assigned task deleted successfully', 'success');
+      renderApp();
+    }
+  }
+
+  // Confirm Delete Target Action
+  if (elements.btnConfirmDeleteTarget) {
+    elements.btnConfirmDeleteTarget.addEventListener('click', () => {
+      if (state.pendingDeleteTargetId) {
+        const idToDelete = state.pendingDeleteTargetId;
+        window.dataStore.deleteTarget(idToDelete);
+        if (elements.deleteTargetModal) elements.deleteTargetModal.classList.add('hidden');
+        if (elements.assignTargetModal) elements.assignTargetModal.classList.add('hidden');
+
+        if (state.activeTasksUserEmail) {
+          renderUserTasksModal(state.activeTasksUserEmail);
+        }
+
+        showToast('Assigned deliverable task deleted successfully.', 'success');
+        state.pendingDeleteTargetId = null;
+        renderApp();
+      }
+    });
+  }
+
+  // Delete button inside Assign/Edit Target Modal
+  if (elements.btnModalDeleteTarget) {
+    elements.btnModalDeleteTarget.addEventListener('click', () => {
+      const targetId = elements.editTargetId ? elements.editTargetId.value : null;
+      if (targetId) {
+        openDeleteTargetModal(targetId);
+      }
+    });
+  }
+
+  // Open User Tasks Management Modal (View & Delete per User)
+  function openUserTasksModal(userEmail, userName = null, userRole = null) {
+    state.activeTasksUserEmail = userEmail;
+    renderUserTasksModal(userEmail, userName, userRole);
+    if (elements.userTasksModal) {
+      elements.userTasksModal.classList.remove('hidden');
+      refreshIcons();
+    }
+  }
+
+  function renderUserTasksModal(userEmail, userName = null, userRole = null) {
+    if (!elements.userTasksModalList) return;
+    const userObj = window.authService.getUserByEmail(userEmail) || {
+      email: userEmail,
+      name: userName || userEmail,
+      role: userRole || 'designer'
+    };
+
+    const targets = window.dataStore.getTargetsForUser(userObj);
+
+    if (elements.userTasksModalTitle) {
+      elements.userTasksModalTitle.textContent = `Assigned Tasks – ${userObj.name}`;
+    }
+    if (elements.userTasksModalSubtitle) {
+      elements.userTasksModalSubtitle.textContent = `${targets.length} deliverable task${targets.length === 1 ? '' : 's'} assigned for ${window.dataStore.getActiveMonth()}`;
+    }
+
+    if (targets.length === 0) {
+      elements.userTasksModalList.innerHTML = `
+        <div style="text-align: center; padding: 32px 16px; color: var(--text-muted);">
+          <i data-lucide="check-circle" style="width: 36px; height: 36px; color: var(--teal-primary); margin-bottom: 8px;"></i>
+          <p style="margin: 0; font-weight: 600; color: var(--text-main);">No tasks currently assigned to ${escapeHtml(userObj.name)}.</p>
+          <p style="margin: 4px 0 0; font-size: 12px;">Click 'Assign New Target' below to add a deliverable for this team member.</p>
+        </div>
+      `;
+    } else {
+      elements.userTasksModalList.innerHTML = targets.map(t => {
+        const prog = window.dataStore.getTargetProgress(t.id);
+        return `
+          <div class="user-task-item">
+            <div class="user-task-info">
+              <div class="user-task-title" title="${escapeHtml(t.program)}">${escapeHtml(t.program)}</div>
+              <div class="user-task-meta">
+                <span class="badge-brand ${escapeHtml(t.brand)}">${formatBrandName(t.brand)}</span>
+                <span class="badge-category">${escapeHtml(t.category)}</span>
+                <span class="badge-format">${escapeHtml(t.format)}</span>
+                <span>• Target: <strong>${t.targetQty}</strong></span>
+                <span style="color: var(--mint-light); font-weight: 600;">• Done: ${prog.completed}</span>
+                ${prog.pending > 0 ? `<span style="color: var(--amber-light); font-weight: 600;">• ${prog.pending} in review</span>` : ''}
+              </div>
+            </div>
+            <div class="user-task-actions">
+              <button type="button" class="btn btn-outline-sm btn-action-delete" data-id="${t.id}" title="Delete Task" style="color: var(--rose-light); border-color: rgba(239, 68, 68, 0.35);">
+                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Delete
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    refreshIcons();
+  }
+
+  if (elements.btnUserTasksAssignNew) {
+    elements.btnUserTasksAssignNew.addEventListener('click', () => {
+      const email = state.activeTasksUserEmail;
+      if (elements.userTasksModal) elements.userTasksModal.classList.add('hidden');
+      openAssignTargetModal(email);
+    });
+  }
 
   // Export Report Dropdown & Handlers (CSV, JSON, Print)
   const exportMenu = document.getElementById('export-dropdown-menu');
@@ -2866,7 +3052,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       return [
         month,
-        t.brand || '',
+        formatBrandName(t.brand),
         t.category || '',
         t.program || '',
         t.format || '',
