@@ -17,7 +17,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=45">
+  <link rel="stylesheet" href="css/styles.css?v=46">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -1452,11 +1452,16 @@
 
   <!-- MODAL: HISTORICAL MONTH & ARCHIVE CALENDAR -->
   <div id="historical-calendar-modal" class="modal-overlay hidden">
-    <div class="modal-card spotlight-card" style="max-width: 440px;">
+    <div class="modal-card spotlight-card">
       <div class="modal-header">
-        <div class="modal-header-title">
-          <i data-lucide="calendar" class="modal-title-icon" style="color: var(--teal-primary);"></i>
-          <h3>Cycle Calendar</h3>
+        <div class="modal-title-group">
+          <div class="modal-title-icon-pill">
+            <i data-lucide="calendar" class="modal-icon"></i>
+          </div>
+          <div>
+            <h3>Cycle Calendar</h3>
+            <p class="modal-subtitle">Switch active cycle or explore historical archives</p>
+          </div>
         </div>
         <button type="button" class="btn-close-modal" id="btn-close-calendar-modal" aria-label="Close calendar modal">
           <i data-lucide="x"></i>
@@ -1466,13 +1471,14 @@
       <div class="calendar-modal-body">
         <!-- Year Navigation Header -->
         <div class="calendar-year-nav">
-          <button type="button" id="btn-cal-prev-year" class="cal-nav-btn" title="Previous Year">
+          <button type="button" id="btn-cal-prev-year" class="cal-nav-btn" title="Previous Year" aria-label="Previous Year">
             <i data-lucide="chevron-left"></i>
           </button>
           <div class="cal-year-display">
             <span id="cal-selected-year-text" class="cal-year-text">2026</span>
+            <span class="cal-year-sublabel">Select Cycle Month</span>
           </div>
-          <button type="button" id="btn-cal-next-year" class="cal-nav-btn" title="Next Year">
+          <button type="button" id="btn-cal-next-year" class="cal-nav-btn" title="Next Year" aria-label="Next Year">
             <i data-lucide="chevron-right"></i>
           </button>
         </div>
@@ -1483,7 +1489,7 @@
         </div>
 
         <!-- Quick Jump & Actions -->
-        <div class="modal-footer split" style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+        <div class="modal-footer split">
           <button type="button" id="btn-cal-jump-current" class="btn btn-outline-sm">
             <i data-lucide="clock"></i> Current Month
           </button>
@@ -1502,9 +1508,9 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=45"></script>
-  <script src="js/data.js?v=45"></script>
-  <script src="js/auth.js?v=45"></script>
-  <script src="js/app.js?v=45"></script>
+  <script src="js/firebase-config.js?v=46"></script>
+  <script src="js/data.js?v=46"></script>
+  <script src="js/auth.js?v=46"></script>
+  <script src="js/app.js?v=46"></script>
 </body>
 </html>

@@ -2051,20 +2051,26 @@ document.addEventListener('DOMContentLoaded', () => {
       const hasData = totalTargets > 0;
 
       let badgeHtml = '';
-      if (isCurrent) {
-        badgeHtml = `<span class="cal-month-badge">Current</span>`;
+      if (isActive && isCurrent) {
+        badgeHtml = `<span class="cal-month-badge badge-active">Current Cycle</span>`;
+      } else if (isActive) {
+        badgeHtml = `<span class="cal-month-badge badge-active">Active Cycle</span>`;
+      } else if (isCurrent) {
+        badgeHtml = `<span class="cal-month-badge badge-current">Current</span>`;
       } else if (hasData) {
-        badgeHtml = `<span class="cal-month-badge">${totalTargets} targets</span>`;
+        badgeHtml = `<span class="cal-month-badge badge-data">${totalTargets} ${totalTargets === 1 ? 'target' : 'targets'}</span>`;
       } else if (ym < curYm) {
-        badgeHtml = `<span class="cal-month-badge" style="opacity: 0.6;">Past</span>`;
+        badgeHtml = `<span class="cal-month-badge badge-past">Past</span>`;
       } else {
-        badgeHtml = `<span class="cal-month-badge" style="opacity: 0.6;">Future</span>`;
+        badgeHtml = `<span class="cal-month-badge badge-future">Upcoming</span>`;
       }
 
       return `
-        <button type="button" class="cal-month-btn ${isActive ? 'active' : ''} ${hasData ? 'has-data' : ''}" data-ym="${ym}">
+        <button type="button" class="cal-month-btn ${isActive ? 'active' : ''} ${isCurrent ? 'is-current' : ''} ${hasData ? 'has-data' : ''}" data-ym="${ym}">
           <span class="cal-month-name">${shortName}</span>
-          ${badgeHtml}
+          <div class="cal-month-badge-wrap">
+            ${badgeHtml}
+          </div>
         </button>
       `;
     }).join('');
