@@ -634,6 +634,28 @@ class DataStore {
     }
   }
 
+  deleteMultipleTargets(targetIds) {
+    if (!Array.isArray(targetIds) || targetIds.length === 0) return 0;
+    const idSet = new Set(targetIds.map(String));
+    const initialLen = this.targets.length;
+    this.targets = this.targets.filter(t => !idSet.has(String(t.id)));
+    const deletedCount = initialLen - this.targets.length;
+    this.saveTargets(this.targets);
+
+    // Also remove associated submissions
+    if (Array.isArray(this.submissions)) {
+      this.submissions = this.submissions.filter(s => !idSet.has(String(s.targetId)));
+      this.saveSubmissions(this.submissions);
+    }
+
+    // Delete in Cloud Firestore
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.deleteMultipleTargets(targetIds);
+    }
+
+    return deletedCount;
+  }
+
   cloneMonthTargets(sourceMonth = '2026-10', destMonth = null) {
     const targetMonth = destMonth || this.activeMonth;
     const sourceTargets = this.targets.filter(t => t.month === sourceMonth);

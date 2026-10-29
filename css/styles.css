@@ -6931,6 +6931,42 @@ body.dark-theme .btn-emp-view-tasks:hover {
   transform: translateY(-1px);
 }
 
+/* Batch Task Deletion & Selection Styles */
+.targets-batch-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.data-table tbody tr.row-selected {
+  background: rgba(0, 139, 165, 0.08) !important;
+}
+
+body.dark-theme .data-table tbody tr.row-selected {
+  background: rgba(0, 139, 165, 0.16) !important;
+}
+
+.deliverable-card.card-selected {
+  border-color: var(--teal-primary) !important;
+  box-shadow: 0 0 0 1px var(--teal-primary), var(--shadow-md) !important;
+}
+
+.user-task-item.item-selected {
+  border-color: var(--teal-primary) !important;
+  background: rgba(0, 139, 165, 0.06) !important;
+}
+
+.task-checkbox,
+.target-row-checkbox,
+.del-card-checkbox,
+.user-task-row-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--teal-primary);
+  border-radius: 4px;
+}
+
 
 
 

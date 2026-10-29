@@ -166,6 +166,28 @@ class FirebaseSyncService {
     }
   }
 
+  // Batch delete multiple targets from cloud
+  async deleteMultipleTargets(targetIds) {
+    if (!this.isActive() || !Array.isArray(targetIds) || targetIds.length === 0) return false;
+    try {
+      const batch = this.db.batch();
+      targetIds.forEach(id => {
+        const ref = this.db.collection('targets').doc(String(id));
+        batch.delete(ref);
+      });
+      await batch.commit();
+      return true;
+    } catch (err) {
+      console.error('Failed to batch delete targets from Firestore:', err);
+      try {
+        await Promise.all(targetIds.map(id => this.deleteTarget(id)));
+      } catch (e) {
+        console.error('Fallback delete targets error:', e);
+      }
+      return false;
+    }
+  }
+
   // Seed default submissions to cloud if collection is empty
   async seedSubmissionsIfEmpty(seedSubs) {
     if (!this.isActive() || !Array.isArray(seedSubs)) return;

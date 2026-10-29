@@ -17,7 +17,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=44">
+  <link rel="stylesheet" href="css/styles.css?v=45">
 </head>
 <body class="light-theme">
   <!-- Dynamic Ambient Glow Mesh for Glassmorphism Reflections -->
@@ -485,12 +485,29 @@
         </div>
 
         <div class="card table-card">
-          <div class="card-header">
-            <div>
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
               <h3>Assigned Targets</h3>
-            </div>
-            <div class="card-actions">
               <span class="badge-info" id="table-row-count">9 items</span>
+            </div>
+            <div class="card-actions" style="display: flex; align-items: center; gap: 8px;">
+              <!-- Batch Actions (visible when 1+ checkboxes checked) -->
+              <div id="targets-batch-actions" style="display: none; align-items: center; gap: 8px;">
+                <span class="batch-count-badge" id="batch-selected-count-badge" style="font-size: 12px; font-weight: 700; color: var(--teal-primary); background: rgba(0, 139, 165, 0.12); padding: 4px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(0, 139, 165, 0.25);">
+                  0 Selected
+                </span>
+                <button type="button" id="btn-batch-delete-targets" class="btn btn-danger-sm" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600; background: var(--rose-danger); border-color: var(--rose-danger); color: #fff; padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer;">
+                  <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Delete Selected
+                </button>
+                <button type="button" id="btn-batch-clear-selection" class="btn btn-outline-sm" style="padding: 6px 10px; font-size: 12px; cursor: pointer;">
+                  Clear
+                </button>
+              </div>
+
+              <!-- Quick Select All Toggle Button -->
+              <button type="button" id="btn-select-all-targets-toggle" class="btn btn-outline-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                <i data-lucide="check-square" style="width: 14px; height: 14px;"></i> <span id="select-all-btn-text">Select All Tasks</span>
+              </button>
             </div>
           </div>
 
@@ -498,6 +515,9 @@
             <table class="data-table">
               <thead>
                 <tr>
+                  <th style="width: 44px; text-align: center; padding: 10px 8px;">
+                    <input type="checkbox" id="select-all-targets-checkbox" class="task-checkbox" title="Select All Tasks" aria-label="Select All Tasks" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--teal-primary);">
+                  </th>
                   <th class="sortable-th" data-sort-col="assignee">
                     <div class="th-content">
                       <span>Assignee</span>
@@ -714,6 +734,22 @@
         <button class="member-cat-btn" data-category="Moment Marketing">
           <i data-lucide="zap"></i> Moment Marketing (<span id="count-moment-tasks">0</span>)
         </button>
+      </div>
+
+      <!-- Member Deliverables Batch Action Bar -->
+      <div id="member-batch-actions-bar" class="member-batch-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; background: var(--bg-surface); border: 1px solid var(--border-color); padding: 10px 16px; border-radius: var(--radius-md);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-main); cursor: pointer; margin: 0;">
+            <input type="checkbox" id="member-select-all-checkbox" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--teal-primary);">
+            <span>Select All Tasks</span>
+          </label>
+          <span id="member-selected-count-badge" style="display: none; font-size: 11px; font-weight: 700; color: var(--teal-primary); background: rgba(0, 139, 165, 0.12); padding: 3px 8px; border-radius: var(--radius-sm);">0 selected</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" id="btn-member-batch-delete" class="btn btn-danger-sm" style="display: none; align-items: center; gap: 6px; font-weight: 600; background: var(--rose-danger); border-color: var(--rose-danger); color: #fff; padding: 6px 14px; border-radius: var(--radius-sm); cursor: pointer;">
+            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Delete Selected
+          </button>
+        </div>
       </div>
 
       <!-- Member Deliverables Cards Grid -->
@@ -983,6 +1019,38 @@
     </div>
   </div>
 
+  <!-- MODAL: Batch / Total Delete Tasks Confirmation -->
+  <div id="delete-batch-targets-modal" class="modal-overlay hidden">
+    <div class="modal-card spotlight-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div style="width: 38px; height: 38px; border-radius: var(--radius-sm); background: rgba(225, 29, 72, 0.15); display: flex; align-items: center; justify-content: center; color: var(--rose-danger); margin-right: 12px;">
+            <i data-lucide="trash-2" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-family: var(--font-heading); font-size: 18px; color: var(--text-main);" id="delete-batch-modal-title">Delete Selected Tasks</h3>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="delete-batch-targets-modal">&times;</button>
+      </div>
+
+      <div style="padding: 16px 0; font-size: 14px; line-height: 1.6; color: var(--text-main);">
+        <p>Are you sure you want to delete <strong id="delete-batch-count-display" style="color: var(--rose-danger); font-size: 16px;">0</strong> assigned tasks?</p>
+        <div class="delete-warning-callout">
+          <i data-lucide="alert-triangle"></i>
+          <span>All selected deliverable tasks, quota progress, and related submissions will be permanently removed across all devices.</span>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <button type="button" class="btn btn-secondary" data-close-modal="delete-batch-targets-modal">Cancel</button>
+        <button type="button" id="btn-confirm-delete-batch" class="btn btn-danger" style="background: var(--rose-danger); border-color: var(--rose-danger); color: #FFFFFF; font-weight: 600;">
+          <i data-lucide="trash-2"></i> Delete All Selected Tasks
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: Manage User Assigned Tasks (View & Delete per User) -->
   <div id="user-tasks-modal" class="modal-overlay hidden">
     <div class="modal-card spotlight-card" style="max-width: 620px;">
@@ -997,6 +1065,17 @@
           </div>
         </div>
         <button class="modal-close-btn" data-close-modal="user-tasks-modal">&times;</button>
+      </div>
+
+      <!-- User Tasks Select All & Batch Toolbar -->
+      <div id="user-tasks-batch-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; margin-top: 10px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+        <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-main); cursor: pointer; margin: 0;">
+          <input type="checkbox" id="user-tasks-select-all-checkbox" style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--teal-primary);">
+          <span>Select All Tasks</span>
+        </label>
+        <button type="button" id="btn-user-tasks-batch-delete" class="btn btn-danger-sm" style="display: none; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; background: var(--rose-danger); border-color: var(--rose-danger); color: #fff; padding: 6px 12px; border-radius: var(--radius-sm); cursor: pointer;">
+          <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i> Delete Selected (<span id="user-tasks-selected-count">0</span>)
+        </button>
       </div>
 
       <div style="padding: 16px 0; max-height: 400px; overflow-y: auto;" id="user-tasks-modal-list">
@@ -1423,9 +1502,9 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=44"></script>
-  <script src="js/data.js?v=44"></script>
-  <script src="js/auth.js?v=44"></script>
-  <script src="js/app.js?v=44"></script>
+  <script src="js/firebase-config.js?v=45"></script>
+  <script src="js/data.js?v=45"></script>
+  <script src="js/auth.js?v=45"></script>
+  <script src="js/app.js?v=45"></script>
 </body>
 </html>

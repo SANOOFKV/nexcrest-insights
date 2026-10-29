@@ -32,7 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
     pendingDeleteName: null,
     pendingDeleteTargetId: null,
     activeTasksUserEmail: null,
-    calendarModalYear: 2026
+    calendarModalYear: 2026,
+    selectedTargetIds: new Set(),
+    selectedMemberTargetIds: new Set(),
+    selectedUserModalTargetIds: new Set(),
+    pendingBatchDeleteIds: [],
+    pendingBatchDeleteSource: null
   };
 
   // DOM Element Selectors
@@ -183,12 +188,36 @@ document.addEventListener('DOMContentLoaded', () => {
     deleteTargetFormatBadge: document.getElementById('delete-target-format-badge'),
     deleteTargetAssigneeDisplay: document.getElementById('delete-target-assignee-display'),
 
+    // Batch Target Actions (Manager Table)
+    targetsBatchActions: document.getElementById('targets-batch-actions'),
+    batchSelectedCountBadge: document.getElementById('batch-selected-count-badge'),
+    btnBatchDeleteTargets: document.getElementById('btn-batch-delete-targets'),
+    btnBatchClearSelection: document.getElementById('btn-batch-clear-selection'),
+    btnSelectAllTargetsToggle: document.getElementById('btn-select-all-targets-toggle'),
+    selectAllBtnText: document.getElementById('select-all-btn-text'),
+    selectAllTargetsCheckbox: document.getElementById('select-all-targets-checkbox'),
+
+    // Batch Delete Confirmation Modal
+    deleteBatchTargetsModal: document.getElementById('delete-batch-targets-modal'),
+    deleteBatchCountDisplay: document.getElementById('delete-batch-count-display'),
+    deleteBatchModalTitle: document.getElementById('delete-batch-modal-title'),
+    btnConfirmDeleteBatch: document.getElementById('btn-confirm-delete-batch'),
+
+    // Member Batch Action Elements
+    memberBatchActionsBar: document.getElementById('member-batch-actions-bar'),
+    memberSelectAllCheckbox: document.getElementById('member-select-all-checkbox'),
+    memberSelectedCountBadge: document.getElementById('member-selected-count-badge'),
+    btnMemberBatchDelete: document.getElementById('btn-member-batch-delete'),
+
     // User Tasks Management Modal
     userTasksModal: document.getElementById('user-tasks-modal'),
     userTasksModalTitle: document.getElementById('user-tasks-modal-title'),
     userTasksModalSubtitle: document.getElementById('user-tasks-modal-subtitle'),
     userTasksModalList: document.getElementById('user-tasks-modal-list'),
     btnUserTasksAssignNew: document.getElementById('btn-user-tasks-assign-new'),
+    userTasksSelectAllCheckbox: document.getElementById('user-tasks-select-all-checkbox'),
+    btnUserTasksBatchDelete: document.getElementById('btn-user-tasks-batch-delete'),
+    userTasksSelectedCount: document.getElementById('user-tasks-selected-count'),
 
     // Log Work Form
     logWorkForm: document.getElementById('log-work-form'),
@@ -1048,7 +1077,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function renderManagerTargetsTable() {
+  function getFilteredManagerTargets() {
     let targets = window.dataStore.getTargets({
       assignee: state.filters.role,
       category: state.filters.category,
@@ -1132,7 +1161,67 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    return targets;
+  }
+
+  function updateTargetsBatchBar(currentTargets = null) {
+    if (!currentTargets) {
+      currentTargets = getFilteredManagerTargets();
+    }
+    const displayedCount = currentTargets.length;
+    let selectedDisplayed = 0;
+    currentTargets.forEach(t => {
+      if (state.selectedTargetIds.has(String(t.id))) selectedDisplayed++;
+    });
+
+    // Update Header Checkbox
+    if (elements.selectAllTargetsCheckbox) {
+      if (displayedCount > 0 && selectedDisplayed === displayedCount) {
+        elements.selectAllTargetsCheckbox.checked = true;
+        elements.selectAllTargetsCheckbox.indeterminate = false;
+      } else if (selectedDisplayed > 0) {
+        elements.selectAllTargetsCheckbox.checked = false;
+        elements.selectAllTargetsCheckbox.indeterminate = true;
+      } else {
+        elements.selectAllTargetsCheckbox.checked = false;
+        elements.selectAllTargetsCheckbox.indeterminate = false;
+      }
+    }
+
+    // Update Select All Button text
+    if (elements.selectAllBtnText) {
+      if (displayedCount > 0 && selectedDisplayed === displayedCount) {
+        elements.selectAllBtnText.textContent = 'Deselect All';
+      } else {
+        elements.selectAllBtnText.textContent = `Select All (${displayedCount})`;
+      }
+    }
+
+    // Update Batch Bar
+    const totalSelected = state.selectedTargetIds.size;
+    if (elements.targetsBatchActions) {
+      if (totalSelected > 0) {
+        elements.targetsBatchActions.style.display = 'inline-flex';
+        if (elements.batchSelectedCountBadge) {
+          elements.batchSelectedCountBadge.textContent = `${totalSelected} Selected`;
+        }
+        if (elements.btnBatchDeleteTargets) {
+          elements.btnBatchDeleteTargets.innerHTML = `<i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Delete Selected (${totalSelected})`;
+        }
+      } else {
+        elements.targetsBatchActions.style.display = 'none';
+      }
+    }
+
+    refreshIcons();
+  }
+
+  function renderManagerTargetsTable() {
+    const targets = getFilteredManagerTargets();
+
     // Update active sort indicator in table headers
+    const sortCol = state.tableSort ? state.tableSort.col : 'program';
+    const sortOrder = state.tableSort ? state.tableSort.order : 'asc';
     document.querySelectorAll('#tab-all-targets .sortable-th').forEach(th => {
       const col = th.dataset.sortCol;
       const icon = th.querySelector('.sort-icon');
@@ -1154,7 +1243,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (isFilterMismatch) {
         elements.managerTargetsTableBody.innerHTML = `
           <tr>
-            <td colspan="11" class="text-center" style="padding: 36px; color: var(--text-muted);">
+            <td colspan="12" class="text-center" style="padding: 36px; color: var(--text-muted);">
               <i data-lucide="search-x" style="width: 32px; height: 32px; margin-bottom: 8px; opacity: 0.6;"></i>
               <div>No deliverables match the filters.</div>
             </td>
@@ -1164,7 +1253,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const activeMonth = window.dataStore.getActiveMonth();
         elements.managerTargetsTableBody.innerHTML = `
           <tr>
-            <td colspan="11">
+            <td colspan="12">
               <div class="empty-cycle-banner">
                 <i data-lucide="calendar-plus" style="width: 42px; height: 42px; color: var(--teal-primary);"></i>
                 <h4>No Targets Assigned for ${escapeHtml(activeMonth)}</h4>
@@ -1185,6 +1274,7 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         }
       }
+      updateTargetsBatchBar([]);
       refreshIcons();
       return;
     }
@@ -1192,6 +1282,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.managerTargetsTableBody.innerHTML = targets.map(target => {
       const prog = window.dataStore.getTargetProgress(target.id);
       const isDone = prog.completed >= prog.target;
+      const isChecked = state.selectedTargetIds.has(String(target.id));
       const roleLabels = {
         designer: 'Graphic Designer',
         videographer: 'Videographer',
@@ -1218,7 +1309,10 @@ document.addEventListener('DOMContentLoaded', () => {
           : `<span class="status-pill not-started">Not Started</span>`;
 
       return `
-        <tr>
+        <tr class="${isChecked ? 'row-selected' : ''}">
+          <td style="text-align: center; width: 44px; padding: 10px 8px;">
+            <input type="checkbox" class="target-row-checkbox task-checkbox" data-target-id="${target.id}" ${isChecked ? 'checked' : ''} style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--teal-primary);" aria-label="Select target ${escapeHtml(target.program)}">
+          </td>
           <td>
             <div style="display: flex; flex-direction: column; gap: 3px;">
               <span class="badge-role">
@@ -1266,6 +1360,8 @@ document.addEventListener('DOMContentLoaded', () => {
         </tr>
       `;
     }).join('');
+
+    updateTargetsBatchBar(targets);
   }
 
   function renderManagerReviewQueue() {
@@ -1561,6 +1657,49 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshIcons();
   }
 
+  function updateMemberBatchBar(filteredTargets = []) {
+    if (!elements.memberBatchActionsBar) return;
+    const displayedCount = filteredTargets.length;
+    let selectedDisplayed = 0;
+    filteredTargets.forEach(t => {
+      if (state.selectedMemberTargetIds.has(String(t.id))) selectedDisplayed++;
+    });
+
+    if (elements.memberSelectAllCheckbox) {
+      if (displayedCount > 0 && selectedDisplayed === displayedCount) {
+        elements.memberSelectAllCheckbox.checked = true;
+        elements.memberSelectAllCheckbox.indeterminate = false;
+      } else if (selectedDisplayed > 0) {
+        elements.memberSelectAllCheckbox.checked = false;
+        elements.memberSelectAllCheckbox.indeterminate = true;
+      } else {
+        elements.memberSelectAllCheckbox.checked = false;
+        elements.memberSelectAllCheckbox.indeterminate = false;
+      }
+    }
+
+    const totalSelected = state.selectedMemberTargetIds.size;
+    if (elements.memberSelectedCountBadge) {
+      if (totalSelected > 0) {
+        elements.memberSelectedCountBadge.style.display = 'inline-block';
+        elements.memberSelectedCountBadge.textContent = `${totalSelected} selected`;
+      } else {
+        elements.memberSelectedCountBadge.style.display = 'none';
+      }
+    }
+
+    if (elements.btnMemberBatchDelete) {
+      if (totalSelected > 0) {
+        elements.btnMemberBatchDelete.style.display = 'inline-flex';
+        elements.btnMemberBatchDelete.innerHTML = `<i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Delete Selected (${totalSelected})`;
+      } else {
+        elements.btnMemberBatchDelete.style.display = 'none';
+      }
+    }
+
+    refreshIcons();
+  }
+
   // =========================================================================
   // TEAM MEMBER VIEW CONTROLLER (Graphic Designer / Video / Marketing)
   // =========================================================================
@@ -1608,6 +1747,7 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.memberDeliverablesGrid.innerHTML = filteredTargets.map(target => {
         const prog = window.dataStore.getTargetProgress(target.id);
         const isDone = prog.completed >= prog.target;
+        const isSelected = state.selectedMemberTargetIds.has(String(target.id));
 
         const statusPill = isDone
           ? `<span class="status-pill completed"><i data-lucide="check"></i> Quota Met</span>`
@@ -1616,13 +1756,16 @@ document.addEventListener('DOMContentLoaded', () => {
             : `<span class="status-pill not-started">Pending</span>`;
 
         return `
-          <div class="deliverable-card spotlight-card tilt-card ${target.category === 'Campus Happenings' ? 'priority-hologram' : ''}">
+          <div class="deliverable-card spotlight-card tilt-card ${isSelected ? 'card-selected' : ''} ${target.category === 'Campus Happenings' ? 'priority-hologram' : ''}">
             <div>
               <div class="del-card-header">
-                <div class="del-badges-row">
-                  <span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span>
-                  <span class="badge-category">${escapeHtml(target.category)}</span>
-                  <span class="badge-format">${escapeHtml(target.format)}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <input type="checkbox" class="del-card-checkbox task-checkbox" data-target-id="${target.id}" ${isSelected ? 'checked' : ''} style="width: 17px; height: 17px; cursor: pointer; accent-color: var(--teal-primary);" title="Select task for batch actions">
+                  <div class="del-badges-row">
+                    <span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span>
+                    <span class="badge-category">${escapeHtml(target.category)}</span>
+                    <span class="badge-format">${escapeHtml(target.format)}</span>
+                  </div>
                 </div>
                 ${statusPill}
               </div>
@@ -1654,6 +1797,8 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }).join('');
     }
+
+    updateMemberBatchBar(filteredTargets);
 
     // Render Member Submissions Table
     const userSubs = window.dataStore.getSubmissions({ assignee: user.role });
@@ -2923,6 +3068,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function updateUserTasksBatchBar(targets = []) {
+    if (!elements.btnUserTasksBatchDelete || !elements.userTasksSelectAllCheckbox) return;
+    const displayedCount = targets.length;
+    let selectedCount = 0;
+    targets.forEach(t => {
+      if (state.selectedUserModalTargetIds.has(String(t.id))) selectedCount++;
+    });
+
+    if (displayedCount > 0 && selectedCount === displayedCount) {
+      elements.userTasksSelectAllCheckbox.checked = true;
+      elements.userTasksSelectAllCheckbox.indeterminate = false;
+    } else if (selectedCount > 0) {
+      elements.userTasksSelectAllCheckbox.checked = false;
+      elements.userTasksSelectAllCheckbox.indeterminate = true;
+    } else {
+      elements.userTasksSelectAllCheckbox.checked = false;
+      elements.userTasksSelectAllCheckbox.indeterminate = false;
+    }
+
+    if (selectedCount > 0) {
+      elements.btnUserTasksBatchDelete.style.display = 'inline-flex';
+      if (elements.userTasksSelectedCount) {
+        elements.userTasksSelectedCount.textContent = selectedCount;
+      }
+    } else {
+      elements.btnUserTasksBatchDelete.style.display = 'none';
+    }
+
+    refreshIcons();
+  }
+
   function renderUserTasksModal(userEmail, userName = null, userRole = null) {
     if (!elements.userTasksModalList) return;
     const userObj = window.authService.getUserByEmail(userEmail) || {
@@ -2951,8 +3127,10 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       elements.userTasksModalList.innerHTML = targets.map(t => {
         const prog = window.dataStore.getTargetProgress(t.id);
+        const isChecked = state.selectedUserModalTargetIds.has(String(t.id));
         return `
-          <div class="user-task-item">
+          <div class="user-task-item ${isChecked ? 'item-selected' : ''}">
+            <input type="checkbox" class="user-task-row-checkbox task-checkbox" data-target-id="${t.id}" ${isChecked ? 'checked' : ''} style="width: 16px; height: 16px; cursor: pointer; accent-color: var(--teal-primary); margin-right: 8px;" title="Select task">
             <div class="user-task-info">
               <div class="user-task-title" title="${escapeHtml(t.program)}">${escapeHtml(t.program)}</div>
               <div class="user-task-meta">
@@ -2974,8 +3152,236 @@ document.addEventListener('DOMContentLoaded', () => {
       }).join('');
     }
 
+    updateUserTasksBatchBar(targets);
     refreshIcons();
   }
+
+  // Open Batch Delete Modal
+  function openBatchDeleteModal(count) {
+    if (elements.deleteBatchCountDisplay) {
+      elements.deleteBatchCountDisplay.textContent = count;
+    }
+    if (elements.deleteBatchModalTitle) {
+      elements.deleteBatchModalTitle.textContent = `Delete ${count} Selected Tasks`;
+    }
+    if (elements.deleteBatchTargetsModal) {
+      elements.deleteBatchTargetsModal.classList.remove('hidden');
+      refreshIcons();
+    } else if (confirm(`Are you sure you want to delete ${count} assigned tasks?`)) {
+      executeBatchDelete();
+    }
+  }
+
+  // Execute Batch Delete
+  function executeBatchDelete() {
+    const ids = state.pendingBatchDeleteIds;
+    if (!ids || ids.length === 0) return;
+
+    const count = window.dataStore.deleteMultipleTargets(ids);
+    if (elements.deleteBatchTargetsModal) {
+      elements.deleteBatchTargetsModal.classList.add('hidden');
+    }
+
+    if (state.pendingBatchDeleteSource === 'manager-table') {
+      state.selectedTargetIds.clear();
+      renderManagerTargetsTable();
+    } else if (state.pendingBatchDeleteSource === 'member-cards') {
+      state.selectedMemberTargetIds.clear();
+      renderMemberDeliverables();
+    } else if (state.pendingBatchDeleteSource === 'user-modal') {
+      state.selectedUserModalTargetIds.clear();
+      if (state.activeTasksUserEmail) {
+        renderUserTasksModal(state.activeTasksUserEmail);
+      }
+    }
+
+    state.pendingBatchDeleteIds = [];
+    state.pendingBatchDeleteSource = null;
+
+    showToast(`Successfully deleted ${count} assigned tasks.`, 'success');
+    renderApp();
+  }
+
+  if (elements.btnConfirmDeleteBatch) {
+    elements.btnConfirmDeleteBatch.addEventListener('click', () => {
+      executeBatchDelete();
+    });
+  }
+
+  // Button: Select All Tasks in Manager Table
+  if (elements.btnSelectAllTargetsToggle) {
+    elements.btnSelectAllTargetsToggle.addEventListener('click', () => {
+      const displayed = getFilteredManagerTargets();
+      let allDisplayedSelected = displayed.length > 0;
+      displayed.forEach(t => {
+        if (!state.selectedTargetIds.has(String(t.id))) allDisplayedSelected = false;
+      });
+
+      if (allDisplayedSelected) {
+        displayed.forEach(t => state.selectedTargetIds.delete(String(t.id)));
+      } else {
+        displayed.forEach(t => state.selectedTargetIds.add(String(t.id)));
+      }
+      renderManagerTargetsTable();
+    });
+  }
+
+  // Button: Clear Selection in Manager Table
+  if (elements.btnBatchClearSelection) {
+    elements.btnBatchClearSelection.addEventListener('click', () => {
+      state.selectedTargetIds.clear();
+      renderManagerTargetsTable();
+    });
+  }
+
+  // Button: Delete Selected in Manager Table
+  if (elements.btnBatchDeleteTargets) {
+    elements.btnBatchDeleteTargets.addEventListener('click', () => {
+      if (state.selectedTargetIds.size === 0) {
+        showToast('No tasks selected.', 'warning');
+        return;
+      }
+      state.pendingBatchDeleteIds = Array.from(state.selectedTargetIds);
+      state.pendingBatchDeleteSource = 'manager-table';
+      openBatchDeleteModal(state.pendingBatchDeleteIds.length);
+    });
+  }
+
+  // Button: Delete Selected in Member View
+  if (elements.btnMemberBatchDelete) {
+    elements.btnMemberBatchDelete.addEventListener('click', () => {
+      if (state.selectedMemberTargetIds.size === 0) {
+        showToast('No tasks selected.', 'warning');
+        return;
+      }
+      state.pendingBatchDeleteIds = Array.from(state.selectedMemberTargetIds);
+      state.pendingBatchDeleteSource = 'member-cards';
+      openBatchDeleteModal(state.pendingBatchDeleteIds.length);
+    });
+  }
+
+  // Button: Delete Selected in User Tasks Modal
+  if (elements.btnUserTasksBatchDelete) {
+    elements.btnUserTasksBatchDelete.addEventListener('click', () => {
+      if (state.selectedUserModalTargetIds.size === 0) {
+        showToast('No tasks selected.', 'warning');
+        return;
+      }
+      state.pendingBatchDeleteIds = Array.from(state.selectedUserModalTargetIds);
+      state.pendingBatchDeleteSource = 'user-modal';
+      openBatchDeleteModal(state.pendingBatchDeleteIds.length);
+    });
+  }
+
+  // Global Checkbox Change Delegation
+  document.addEventListener('change', (e) => {
+    // 1. Manager Table Header Select All
+    if (e.target && e.target.id === 'select-all-targets-checkbox') {
+      const isChecked = e.target.checked;
+      const displayed = getFilteredManagerTargets();
+      displayed.forEach(t => {
+        if (isChecked) {
+          state.selectedTargetIds.add(String(t.id));
+        } else {
+          state.selectedTargetIds.delete(String(t.id));
+        }
+      });
+      renderManagerTargetsTable();
+      return;
+    }
+
+    // 2. Manager Table Row Checkbox
+    if (e.target && e.target.classList.contains('target-row-checkbox')) {
+      const targetId = e.target.dataset.targetId;
+      if (targetId) {
+        if (e.target.checked) {
+          state.selectedTargetIds.add(String(targetId));
+        } else {
+          state.selectedTargetIds.delete(String(targetId));
+        }
+        updateTargetsBatchBar();
+      }
+      return;
+    }
+
+    // 3. Member Select All Checkbox
+    if (e.target && e.target.id === 'member-select-all-checkbox') {
+      const isChecked = e.target.checked;
+      const user = state.user;
+      if (user) {
+        const allUserTargets = window.dataStore.getTargetsForUser(user);
+        const filtered = state.memberCategory === 'all'
+          ? allUserTargets
+          : allUserTargets.filter(t => t.category === state.memberCategory);
+        filtered.forEach(t => {
+          if (isChecked) {
+            state.selectedMemberTargetIds.add(String(t.id));
+          } else {
+            state.selectedMemberTargetIds.delete(String(t.id));
+          }
+        });
+        renderMemberDeliverables();
+      }
+      return;
+    }
+
+    // 4. Member Card Checkbox
+    if (e.target && e.target.classList.contains('del-card-checkbox')) {
+      const targetId = e.target.dataset.targetId;
+      if (targetId) {
+        if (e.target.checked) {
+          state.selectedMemberTargetIds.add(String(targetId));
+        } else {
+          state.selectedMemberTargetIds.delete(String(targetId));
+        }
+        const user = state.user;
+        if (user) {
+          const allUserTargets = window.dataStore.getTargetsForUser(user);
+          const filtered = state.memberCategory === 'all'
+            ? allUserTargets
+            : allUserTargets.filter(t => t.category === state.memberCategory);
+          updateMemberBatchBar(filtered);
+        }
+      }
+      return;
+    }
+
+    // 5. User Tasks Modal Select All Checkbox
+    if (e.target && e.target.id === 'user-tasks-select-all-checkbox') {
+      const isChecked = e.target.checked;
+      if (state.activeTasksUserEmail) {
+        const userObj = window.authService.getUserByEmail(state.activeTasksUserEmail) || { email: state.activeTasksUserEmail };
+        const targets = window.dataStore.getTargetsForUser(userObj);
+        targets.forEach(t => {
+          if (isChecked) {
+            state.selectedUserModalTargetIds.add(String(t.id));
+          } else {
+            state.selectedUserModalTargetIds.delete(String(t.id));
+          }
+        });
+        renderUserTasksModal(state.activeTasksUserEmail);
+      }
+      return;
+    }
+
+    // 6. User Tasks Modal Row Checkbox
+    if (e.target && e.target.classList.contains('user-task-row-checkbox')) {
+      const targetId = e.target.dataset.targetId;
+      if (targetId) {
+        if (e.target.checked) {
+          state.selectedUserModalTargetIds.add(String(targetId));
+        } else {
+          state.selectedUserModalTargetIds.delete(String(targetId));
+        }
+        if (state.activeTasksUserEmail) {
+          const userObj = window.authService.getUserByEmail(state.activeTasksUserEmail) || { email: state.activeTasksUserEmail };
+          const targets = window.dataStore.getTargetsForUser(userObj);
+          updateUserTasksBatchBar(targets);
+        }
+      }
+      return;
+    }
+  });
 
   if (elements.btnUserTasksAssignNew) {
     elements.btnUserTasksAssignNew.addEventListener('click', () => {
