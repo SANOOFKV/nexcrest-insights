@@ -215,7 +215,7 @@ class FirebaseSyncService {
 
   // Seed default submissions to cloud if collection is empty
   async seedSubmissionsIfEmpty(seedSubs) {
-    if (!this.isActive() || !Array.isArray(seedSubs)) return;
+    if (!this.isActive() || !Array.isArray(seedSubs) || seedSubs.length === 0) return;
     try {
       const snap = await this.db.collection('submissions').limit(1).get();
       if (snap.empty) {
@@ -275,6 +275,29 @@ class FirebaseSyncService {
       return true;
     } catch (err) {
       console.error('Failed to delete submission from Firestore:', err);
+      return false;
+    }
+  }
+
+  // Batch delete multiple submissions from cloud
+  async deleteMultipleSubmissions(subIds) {
+    if (!this.isActive() || !Array.isArray(subIds) || subIds.length === 0) return false;
+    try {
+      subIds.forEach(id => this.deletedSubmissionIds.add(String(id)));
+      const batch = this.db.batch();
+      subIds.forEach(id => {
+        const ref = this.db.collection('submissions').doc(String(id));
+        batch.delete(ref);
+      });
+      await batch.commit();
+      return true;
+    } catch (err) {
+      console.error('Failed to batch delete submissions from Firestore:', err);
+      try {
+        await Promise.all(subIds.map(id => this.deleteSubmission(id)));
+      } catch (e) {
+        console.error('Fallback delete submissions error:', e);
+      }
       return false;
     }
   }

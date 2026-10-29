@@ -286,115 +286,8 @@ const SEED_TARGETS = [
   { id: 'sep-8', assignee: 'videographer', brand: 'Techschool', category: 'Moment Marketing', program: 'Viral Sound Clip', format: 'Reel (9:16)', targetQty: 1, month: '2026-09' }
 ];
 
-// Seed Submissions for realistic demo
-const SEED_SUBMISSIONS = [
-  // October Submissions
-  {
-    id: 'sub-1',
-    targetId: 'gd-1',
-    assignee: 'designer',
-    brand: 'Techschool',
-    category: 'Campus Happenings',
-    program: 'NexTalk Series',
-    format: 'Carousel',
-    title: 'NexTalk Episode 4: Future of AI in Cloud Systems',
-    url: 'https://figma.com/file/demo-nextalk-carousel',
-    notes: 'Designed 6 slides in brand teal with key takeaways and quote cards.',
-    submittedAt: '2026-10-14T11:20:00Z',
-    status: 'approved',
-    feedback: 'Excellent color harmony and typography hierarchy. Approved!'
-  },
-  {
-    id: 'sub-2',
-    targetId: 'gd-6',
-    assignee: 'designer',
-    brand: 'Techschool',
-    category: 'Branding',
-    program: 'Informative Contents',
-    format: 'Carousel',
-    title: 'Top 7 Git Commands Every Developer Must Know',
-    url: 'https://drive.google.com/drive/folders/demo-git-carousel',
-    notes: 'Carousel #1 of 5. Includes code snippets.',
-    submittedAt: '2026-10-15T09:45:00Z',
-    status: 'approved',
-    feedback: 'Great format, carousel verified.'
-  },
-  {
-    id: 'sub-3',
-    targetId: 'gd-4',
-    assignee: 'designer',
-    brand: 'Techschool',
-    category: 'Campus Happenings',
-    program: 'Experts Talk',
-    format: 'Poster',
-    title: 'Experts Talk with Google VP of Engineering Poster',
-    url: 'https://drive.google.com/file/d/demo-experts-poster/view',
-    notes: 'Draft 2 poster with updated speaker headshot and registration QR code.',
-    submittedAt: '2026-10-16T10:15:00Z',
-    status: 'approved',
-    feedback: 'Clear typography and good contrast. Approved!'
-  },
-  {
-    id: 'sub-4',
-    targetId: 've-1',
-    assignee: 'videographer',
-    brand: 'Techschool',
-    category: 'Campus Happenings',
-    program: 'NexTalk & Let\'s Talk Coverage',
-    format: '9:16 Reel / Highlight',
-    title: 'NexTalk Ep. 4 Flash Reel - 45s Cut',
-    url: 'https://drive.google.com/file/d/demo-reel-nextalk/view',
-    notes: 'Exported with dynamic auto-captions and upbeat soundtrack.',
-    submittedAt: '2026-10-16T12:30:00Z',
-    status: 'approved',
-    feedback: 'Smooth cuts and great engagement hook. Approved!'
-  },
-  {
-    id: 'sub-5',
-    targetId: 'me-5',
-    assignee: 'marketing',
-    brand: 'Techschool',
-    category: 'Marketing Creatives',
-    program: 'Meta & Google Lead Acquisition Ads',
-    format: 'Paid Lead Funnel (Target: 300 Leads)',
-    title: 'October Admissions Meta Campaign Setup',
-    url: 'https://adsmanager.facebook.com/campaign/demo-ads',
-    notes: 'Campaign live. Generated first 85 verified leads at ₹92 CPL.',
-    submittedAt: '2026-10-16T13:00:00Z',
-    status: 'approved',
-    feedback: 'Good lead quality and healthy CTR.'
-  },
-  {
-    id: 'sub-6',
-    targetId: 've-3',
-    assignee: 'videographer',
-    brand: 'Techschool',
-    category: 'Branding',
-    program: 'Nexcrest Life & Culture Series',
-    format: 'Cinematic 9:16 Reel',
-    title: 'Tech Lab Tour & Student Coding Sprint',
-    url: 'https://drive.google.com/file/d/demo-lab-tour/view',
-    notes: 'High-production 60fps cinematic vertical reel.',
-    submittedAt: '2026-10-16T14:15:00Z',
-    status: 'pending',
-    feedback: ''
-  },
-  {
-    id: 'sub-7',
-    targetId: 'gd-8',
-    assignee: 'designer',
-    brand: 'Techschool',
-    category: 'Marketing Creatives',
-    program: 'Marketing Posters',
-    format: 'Poster',
-    title: 'Fullstack Batch Admissions Poster #1',
-    url: 'https://drive.google.com/file/d/demo-fullstack-poster/view',
-    notes: '1080x1350 format for Instagram and WhatsApp status.',
-    submittedAt: '2026-10-16T14:30:00Z',
-    status: 'pending',
-    feedback: ''
-  }
-];
+// Seed Submissions for realistic demo (October starts pristine with 0 submissions)
+const SEED_SUBMISSIONS = [];
 
 // Generate 40 approved submissions for September 2026 so September displays 100% complete
 (function generateSeptemberApproved() {
@@ -432,6 +325,11 @@ class DataStore {
     if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
       window.firebaseSync.seedTargetsIfEmpty(SEED_TARGETS);
       window.firebaseSync.seedSubmissionsIfEmpty(SEED_SUBMISSIONS);
+
+      // Permanently remove all old demo & recent October submissions from Cloud Firestore
+      const staleDemoSubIds = ['sub-1', 'sub-2', 'sub-3', 'sub-4', 'sub-5', 'sub-6', 'sub-7'];
+      window.firebaseSync.deleteMultipleSubmissions(staleDemoSubIds);
+
       window.firebaseSync.subscribeTargets((cloudTargets) => {
         if (Array.isArray(cloudTargets) && cloudTargets.length > 0) {
           this.targets = cloudTargets;
@@ -441,7 +339,14 @@ class DataStore {
       });
       window.firebaseSync.subscribeSubmissions((cloudSubs) => {
         if (Array.isArray(cloudSubs)) {
-          this.submissions = cloudSubs;
+          // Filter out stale demo submissions and recent October items
+          this.submissions = cloudSubs.filter(s => {
+            if (!s || !s.id) return false;
+            if (staleDemoSubIds.includes(String(s.id))) return false;
+            if (String(s.id).startsWith('sub-')) return false;
+            if (s.submittedAt && s.submittedAt.startsWith('2026-10')) return false;
+            return true;
+          });
           try { localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(this.submissions)); } catch (e) {}
           if (typeof this.notify === 'function') this.notify();
         }
@@ -498,8 +403,21 @@ class DataStore {
       return [...SEED_SUBMISSIONS];
     }
     try {
-      const parsed = JSON.parse(raw);
+      let parsed = JSON.parse(raw);
       let migrated = false;
+
+      // Automatically purge all old demo and recent October submissions (sub-1 .. sub-7 & recent sub-*)
+      const initialCount = parsed.length;
+      parsed = parsed.filter(s => {
+        if (!s || !s.id) return false;
+        if (String(s.id).startsWith('sub-')) return false;
+        if (s.submittedAt && s.submittedAt.startsWith('2026-10')) return false;
+        return true;
+      });
+      if (parsed.length !== initialCount) {
+        migrated = true;
+      }
+
       parsed.forEach(s => {
         if (s.brand === 'Insights' || s.brand === 'Nexcrest Insights' || s.brand === 'Nexcrest Techschool') {
           s.brand = 'Techschool';
@@ -507,7 +425,7 @@ class DataStore {
         } else if (s.brand === 'Nexcrest IT') {
           s.brand = 'IT';
           migrated = true;
-        } else if (s.brand === 'Both Brands') {
+        } else if (s.brand === 'Both Brands' || !s.brand) {
           s.brand = 'Both';
           migrated = true;
         }
@@ -734,6 +652,51 @@ class DataStore {
       sub.reviewedAt = new Date().toISOString();
       this.saveSubmissions(this.submissions);
     }
+  }
+
+  deleteSubmission(id) {
+    if (!id) return false;
+    const initialLen = this.submissions.length;
+    this.submissions = this.submissions.filter(s => s.id !== id);
+    if (this.submissions.length !== initialLen) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(this.submissions));
+      } catch (e) {}
+      if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+        window.firebaseSync.deleteSubmission(id);
+      }
+      if (typeof this.notify === 'function') this.notify();
+      return true;
+    }
+    return false;
+  }
+
+  clearAllRecentSubmissions(month = null) {
+    const targetMonth = month || this.activeMonth || '2026-10';
+    const toRemove = [];
+    this.submissions = this.submissions.filter(s => {
+      if (!s) return false;
+      const target = this.getTargetById(s.targetId);
+      const isTargetMonth = (target && target.month === targetMonth) ||
+                            (s.submittedAt && s.submittedAt.startsWith(targetMonth)) ||
+                            (s.id && String(s.id).startsWith('sub-'));
+      if (isTargetMonth) {
+        if (s.id) toRemove.push(String(s.id));
+        return false;
+      }
+      return true;
+    });
+
+    try {
+      localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(this.submissions));
+    } catch (e) {}
+
+    if (toRemove.length > 0 && typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.deleteMultipleSubmissions(toRemove);
+    }
+
+    if (typeof this.notify === 'function') this.notify();
+    return toRemove.length;
   }
 
   // Calculated Progress Metrics

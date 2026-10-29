@@ -1781,10 +1781,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Render Member Submissions Table
     const userSubs = window.dataStore.getSubmissions({ assignee: user.role });
+    const btnClearSubs = document.getElementById('btn-clear-recent-subs');
+    if (btnClearSubs) {
+      btnClearSubs.style.display = userSubs.length > 0 ? 'inline-flex' : 'none';
+      if (!btnClearSubs.dataset.wired) {
+        btnClearSubs.dataset.wired = 'true';
+        btnClearSubs.addEventListener('click', () => {
+          if (confirm('Are you sure you want to remove all recent submissions for this month?')) {
+            const count = window.dataStore.clearAllRecentSubmissions();
+            showToast(`Removed all recent submissions (${count} cleared)`, 'success');
+            renderApp();
+          }
+        });
+      }
+    }
+
     if (userSubs.length === 0) {
       elements.memberSubmissionsTableBody.innerHTML = `
         <tr>
-          <td colspan="7" class="text-center" style="padding: 24px; color: var(--text-muted);">
+          <td colspan="8" class="text-center" style="padding: 24px; color: var(--text-muted);">
             No submissions yet this month.
           </td>
         </tr>
@@ -1809,9 +1824,26 @@ document.addEventListener('DOMContentLoaded', () => {
             <td>${sub.notes ? escapeHtml(sub.notes) : '-'}</td>
             <td>${statusBadge}</td>
             <td>${sub.feedback ? `<span class="feedback-table-text">${escapeHtml(sub.feedback)}</span>` : '<span style="color: var(--text-dim);">-</span>'}</td>
+            <td style="text-align: center;">
+              <button type="button" class="btn btn-icon btn-sm btn-delete-sub" data-sub-id="${escapeHtml(sub.id)}" title="Delete submission" style="color: var(--accent-red); background: transparent; border: none; cursor: pointer; padding: 4px;">
+                <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>
+              </button>
+            </td>
           </tr>
         `;
       }).join('');
+
+      elements.memberSubmissionsTableBody.querySelectorAll('.btn-delete-sub').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const subId = btn.dataset.subId;
+          if (confirm('Delete this deliverable submission permanently?')) {
+            window.dataStore.deleteSubmission(subId);
+            showToast('Submission deleted successfully', 'success');
+            renderApp();
+          }
+        });
+      });
     }
 
     refreshFuturisticEffects();
