@@ -3565,7 +3565,7 @@ html, body {
     grid-template-columns: 1fr 1fr !important;
   }
   .charts-grid-2col {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr) !important;
     gap: 16px;
   }
 }
@@ -3848,21 +3848,75 @@ html, body {
     gap: 12px;
   }
 
-  /* Charts Section */
+  /* Performance Analytics Graphs: 2-Column x 2-Row Matrix on Mobile */
+  .analytics-graphs-section {
+    margin-top: 6px !important;
+    margin-bottom: 20px !important;
+  }
+  .graphs-section-header {
+    margin-bottom: 10px !important;
+  }
+  .graphs-section-title {
+    font-size: 15px !important;
+  }
   .charts-grid-2col {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
   }
   .chart-card {
-    padding: 16px 14px;
+    padding: 10px 8px 10px !important;
+    border-radius: var(--radius-md) !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
   }
-  .chart-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+  .chart-card-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 2px !important;
+    margin-bottom: 6px !important;
   }
-  .chart-container {
-    height: 220px !important;
+  .chart-card-header h4 {
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
+  }
+  .chart-sub {
+    font-size: 9px !important;
+  }
+  .chart-legend-custom {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    font-size: 8px !important;
+    flex-wrap: wrap !important;
+  }
+  .chart-legend-custom .legend-dot {
+    width: 6px !important;
+    height: 6px !important;
+  }
+  .chart-legend-custom .legend-item {
+    gap: 3px !important;
+    font-size: 8px !important;
+  }
+  .chart-canvas-wrapper {
+    position: relative !important;
+    height: 140px !important;
+    max-height: 140px !important;
+    width: 100% !important;
+  }
+  .chart-canvas-wrapper.doughnut-wrap {
+    height: 140px !important;
+    max-height: 140px !important;
+  }
+  .chart-canvas-wrapper canvas {
+    max-height: 140px !important;
     width: 100% !important;
   }
 
@@ -4554,6 +4608,18 @@ html, body {
   }
   .telemetry-stat-pills {
     grid-template-columns: 1fr;
+  }
+  .charts-grid-2col {
+    gap: 6px !important;
+  }
+  .chart-card {
+    padding: 8px 6px 10px !important;
+  }
+  .chart-canvas-wrapper,
+  .chart-canvas-wrapper.doughnut-wrap,
+  .chart-canvas-wrapper canvas {
+    height: 130px !important;
+    max-height: 130px !important;
   }
 }
 

@@ -818,6 +818,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderCharts(ov) {
     if (!window.Chart) return;
 
+    // Responsive Detection for Compact 2x2 Mobile Presentation
+    const isMobile = window.innerWidth <= 768;
+
     // Pure Light Theme Chart Styling
     const textColor = '#475569';
     const gridColor = 'rgba(0, 0, 0, 0.06)';
@@ -827,9 +830,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (ctxCat) {
       if (state.charts.category) state.charts.category.destroy();
 
-      const catLabels = ['Branding', 'Campus Happenings', 'Marketing Creatives', 'Moment Marketing'];
-      const catTargets = catLabels.map(k => ov.categories[k] ? ov.categories[k].total : 0);
-      const catAchieved = catLabels.map(k => ov.categories[k] ? ov.categories[k].published : 0);
+      const catLabels = isMobile
+        ? ['Branding', 'Campus', 'Marketing', 'Moment']
+        : ['Branding', 'Campus Happenings', 'Marketing Creatives', 'Moment Marketing'];
+      const catKeys = ['Branding', 'Campus Happenings', 'Marketing Creatives', 'Moment Marketing'];
+      const catTargets = catKeys.map(k => ov.categories[k] ? ov.categories[k].total : 0);
+      const catAchieved = catKeys.map(k => ov.categories[k] ? ov.categories[k].published : 0);
 
       const targetColor = '#EF2424';
       const achievedColor = '#10B981';
@@ -844,15 +850,15 @@ document.addEventListener('DOMContentLoaded', () => {
               label: 'Target Quota',
               data: catTargets,
               backgroundColor: targetColor,
-              borderRadius: 6,
-              barPercentage: 0.65
+              borderRadius: isMobile ? 4 : 6,
+              barPercentage: isMobile ? 0.75 : 0.65
             },
             {
               label: 'Achieved / Published',
               data: catAchieved,
               backgroundColor: achievedColor,
-              borderRadius: 6,
-              barPercentage: 0.65
+              borderRadius: isMobile ? 4 : 6,
+              barPercentage: isMobile ? 0.75 : 0.65
             }
           ]
         },
@@ -865,18 +871,23 @@ document.addEventListener('DOMContentLoaded', () => {
               backgroundColor: '#0F172A',
               titleColor: '#FFFFFF',
               bodyColor: '#E2E8F0',
-              padding: 10,
+              padding: isMobile ? 8 : 10,
               cornerRadius: 8
             }
           },
           scales: {
             x: {
-              ticks: { color: textColor, font: { family: 'Inter', size: 11, weight: '600' } },
+              ticks: {
+                color: textColor,
+                font: { family: 'Inter', size: isMobile ? 8 : 11, weight: '600' },
+                maxRotation: 0,
+                autoSkip: false
+              },
               grid: { display: false }
             },
             y: {
               beginAtZero: true,
-              ticks: { color: textColor, stepSize: 5 },
+              ticks: { color: textColor, stepSize: 5, font: { family: 'Inter', size: isMobile ? 8 : 10 } },
               grid: { color: gridColor }
             }
           }
@@ -893,7 +904,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const memberData = employees.map(emp => {
         const stats = window.dataStore.getEmployeeStats(emp);
         return {
-          label: emp.name,
+          label: isMobile ? (emp.name.split(' ')[0] || emp.name) : emp.name,
           target: stats.totalTarget,
           completed: stats.totalCompleted
         };
@@ -911,15 +922,15 @@ document.addEventListener('DOMContentLoaded', () => {
               label: 'Assigned Target',
               data: memberData.map(r => r.target),
               backgroundColor: roleTargetColor,
-              borderRadius: 6,
-              barPercentage: 0.65
+              borderRadius: isMobile ? 4 : 6,
+              barPercentage: isMobile ? 0.75 : 0.65
             },
             {
               label: 'Completed / Approved',
               data: memberData.map(r => r.completed),
               backgroundColor: roleAchievedColor,
-              borderRadius: 6,
-              barPercentage: 0.65
+              borderRadius: isMobile ? 4 : 6,
+              barPercentage: isMobile ? 0.75 : 0.65
             }
           ]
         },
@@ -930,7 +941,7 @@ document.addEventListener('DOMContentLoaded', () => {
             legend: { display: false },
             tooltip: {
               backgroundColor: '#0F172A',
-              padding: 10,
+              padding: isMobile ? 8 : 10,
               cornerRadius: 8,
               callbacks: {
                 label: function(context) {
@@ -941,12 +952,17 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           scales: {
             x: {
-              ticks: { color: textColor, font: { family: 'Inter', size: 11, weight: '600' } },
+              ticks: {
+                color: textColor,
+                font: { family: 'Inter', size: isMobile ? 8 : 11, weight: '600' },
+                maxRotation: isMobile ? 45 : 0,
+                autoSkip: false
+              },
               grid: { display: false }
             },
             y: {
               beginAtZero: true,
-              ticks: { color: textColor, precision: 0 },
+              ticks: { color: textColor, precision: 0, font: { family: 'Inter', size: isMobile ? 8 : 10 } },
               grid: { color: gridColor }
             }
           }
@@ -965,13 +981,13 @@ document.addEventListener('DOMContentLoaded', () => {
       state.charts.format = new Chart(ctxFmt, {
         type: 'doughnut',
         data: {
-          labels: ['Reels & Videos', 'Posters & Carousels'],
+          labels: isMobile ? ['Reels', 'Posters'] : ['Reels & Videos', 'Posters & Carousels'],
           datasets: [
             {
               data: [reelsVal, postersVal],
               backgroundColor: ['#EF2424', '#B11414'],
               borderWidth: 0,
-              hoverOffset: 6
+              hoverOffset: 4
             }
           ]
         },
@@ -981,15 +997,20 @@ document.addEventListener('DOMContentLoaded', () => {
           plugins: {
             legend: {
               position: 'bottom',
-              labels: { color: textColor, font: { family: 'Inter', size: 12, weight: '600' }, padding: 14 }
+              labels: {
+                color: textColor,
+                font: { family: 'Inter', size: isMobile ? 8.5 : 12, weight: '600' },
+                padding: isMobile ? 4 : 14,
+                boxWidth: isMobile ? 8 : 12
+              }
             },
             tooltip: {
               backgroundColor: '#0F172A',
-              padding: 10,
+              padding: isMobile ? 8 : 10,
               cornerRadius: 8
             }
           },
-          cutout: '72%'
+          cutout: isMobile ? '65%' : '72%'
         }
       });
     }
@@ -1016,27 +1037,31 @@ document.addEventListener('DOMContentLoaded', () => {
         totalPub
       ];
 
+      const pacingLabels = isMobile
+        ? ['W1', 'W2', 'W3', 'W4']
+        : ['Week 1', 'Week 2', 'Week 3', 'Week 4 (End)'];
+
       state.charts.pacing = new Chart(ctxPacing, {
         type: 'line',
         data: {
-          labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4 (End)'],
+          labels: pacingLabels,
           datasets: [
             {
-              label: 'Ideal Pace Target',
+              label: isMobile ? 'Ideal' : 'Ideal Pace Target',
               data: idealCurve,
               borderColor: '#94A3B8',
-              borderDash: [5, 5],
+              borderDash: [4, 4],
               tension: 0.3,
-              pointRadius: 4,
+              pointRadius: isMobile ? 2 : 4,
               fill: false
             },
             {
-              label: 'Actual Achievements',
+              label: isMobile ? 'Actual' : 'Actual Achievements',
               data: actualCurve,
               borderColor: '#B11414',
               backgroundColor: 'rgba(239, 36, 36, 0.12)',
               tension: 0.3,
-              pointRadius: 6,
+              pointRadius: isMobile ? 3 : 6,
               pointBackgroundColor: '#B11414',
               fill: true
             }
@@ -1048,22 +1073,27 @@ document.addEventListener('DOMContentLoaded', () => {
           plugins: {
             legend: {
               position: 'top',
-              labels: { color: textColor, font: { family: 'Inter', size: 11, weight: '600' } }
+              labels: {
+                color: textColor,
+                font: { family: 'Inter', size: isMobile ? 8 : 11, weight: '600' },
+                boxWidth: isMobile ? 10 : 30,
+                padding: isMobile ? 4 : 10
+              }
             },
             tooltip: {
               backgroundColor: '#0F172A',
-              padding: 10,
+              padding: isMobile ? 8 : 10,
               cornerRadius: 8
             }
           },
           scales: {
             x: {
-              ticks: { color: textColor, font: { family: 'Inter', size: 11 } },
+              ticks: { color: textColor, font: { family: 'Inter', size: isMobile ? 8 : 11 } },
               grid: { display: false }
             },
             y: {
               beginAtZero: true,
-              ticks: { color: textColor },
+              ticks: { color: textColor, font: { family: 'Inter', size: isMobile ? 8 : 10 } },
               grid: { color: gridColor }
             }
           }
