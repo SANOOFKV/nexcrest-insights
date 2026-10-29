@@ -3479,16 +3479,27 @@ document.addEventListener('DOMContentLoaded', () => {
     clearAuthError();
     const email = (elements.loginEmail ? elements.loginEmail.value : '').trim();
     const pass = (elements.loginPassword ? elements.loginPassword.value : '');
-    const res = window.authService.login(email, pass);
-    if (res.success) {
-      state.user = res.user;
-      clearAuthError();
-      showToast(`Welcome back, ${res.user.name}!`, 'success');
-      renderApp();
-    } else {
-      const errorMsg = res.error || 'Incorrect password. Please try again.';
-      showAuthError(errorMsg);
-      showToast(errorMsg, 'error');
+
+    try {
+      const res = window.authService.login(email, pass);
+      if (res && res.success) {
+        state.user = res.user;
+        clearAuthError();
+        showToast(`Welcome back, ${res.user.name}!`, 'success');
+        renderApp();
+      } else {
+        const errorMsg = (res && res.error) || 'Incorrect password. Please try again.';
+        showAuthError(errorMsg);
+        showToast(errorMsg, 'error');
+        if (elements.loginPassword) {
+          elements.loginPassword.focus();
+          elements.loginPassword.select();
+        }
+      }
+    } catch (err) {
+      console.error('Login process error:', err);
+      showAuthError('An unexpected authentication error occurred. Please try again.');
+      showToast('Login error: ' + err.message, 'error');
     }
   });
 
