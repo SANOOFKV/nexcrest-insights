@@ -371,11 +371,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function formatBrandName(brand) {
-    if (!brand) return 'Both Brands';
-    if (brand === 'Techschool' || brand === 'Insights' || brand === 'Nexcrest Techschool') return 'Nexcrest Techschool';
-    if (brand === 'IT' || brand === 'Nexcrest IT') return 'Nexcrest IT';
-    if (brand === 'Both' || brand === 'Both Brands') return 'Both Brands';
-    return brand;
+    if (!brand) return 'Techschool';
+    const b = brand.toString().trim();
+    if (b === 'IT' || b === 'Nexcrest IT' || b.toUpperCase() === 'IT') return 'IT';
+    return 'Techschool';
   }
 
   // Safe URL sanitizer to prevent javascript: pseudo-protocol XSS

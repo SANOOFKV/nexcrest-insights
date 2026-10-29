@@ -459,8 +459,11 @@ class DataStore {
       const parsed = JSON.parse(raw);
       let migrated = false;
       parsed.forEach(t => {
-        if (t.brand === 'Insights' || t.brand === 'Nexcrest Insights') {
+        if (t.brand === 'Insights' || t.brand === 'Nexcrest Insights' || t.brand === 'Both' || t.brand === 'Both Brands' || t.brand === 'Nexcrest Techschool') {
           t.brand = 'Techschool';
+          migrated = true;
+        } else if (t.brand === 'Nexcrest IT') {
+          t.brand = 'IT';
           migrated = true;
         }
       });
@@ -495,8 +498,11 @@ class DataStore {
       const parsed = JSON.parse(raw);
       let migrated = false;
       parsed.forEach(s => {
-        if (s.brand === 'Insights' || s.brand === 'Nexcrest Insights') {
+        if (s.brand === 'Insights' || s.brand === 'Nexcrest Insights' || s.brand === 'Both' || s.brand === 'Both Brands' || s.brand === 'Nexcrest Techschool') {
           s.brand = 'Techschool';
+          migrated = true;
+        } else if (s.brand === 'Nexcrest IT') {
+          s.brand = 'IT';
           migrated = true;
         }
       });
@@ -547,9 +553,9 @@ class DataStore {
       }
       if (filters.category && filters.category !== 'all' && t.category !== filters.category) return false;
       if (filters.brand && filters.brand !== 'all') {
-        const normFilter = (filters.brand === 'Techschool' || filters.brand === 'Insights') ? 'Techschool' : filters.brand;
-        const normTarget = (t.brand === 'Techschool' || t.brand === 'Insights') ? 'Techschool' : t.brand;
-        if (t.brand !== 'Both' && normTarget !== normFilter) return false;
+        const normFilter = (filters.brand === 'IT' || filters.brand === 'Nexcrest IT') ? 'IT' : 'Techschool';
+        const normTarget = (t.brand === 'IT' || t.brand === 'Nexcrest IT') ? 'IT' : 'Techschool';
+        if (normTarget !== normFilter) return false;
       }
       return true;
     });

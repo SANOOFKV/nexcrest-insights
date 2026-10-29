@@ -27,7 +27,7 @@ const DEFAULT_USERS = {
     role: 'designer',
     name: 'Graphic Designer',
     title: 'Visual & Brand Design Specialist',
-    brand: 'Both',
+    brand: 'Techschool',
     avatar: 'GD',
     badgeClass: 'badge-designer',
     password: 'password123',
@@ -40,7 +40,7 @@ const DEFAULT_USERS = {
     role: 'videographer',
     name: 'Videographer + Editor',
     title: 'Video Production & Editing Lead',
-    brand: 'Both',
+    brand: 'Techschool',
     avatar: 'VE',
     badgeClass: 'badge-videographer',
     password: 'password123',
@@ -53,7 +53,7 @@ const DEFAULT_USERS = {
     role: 'marketing',
     name: 'Marketing Executive',
     title: 'Campaigns & Lead Acquisition',
-    brand: 'Both',
+    brand: 'IT',
     avatar: 'ME',
     badgeClass: 'badge-marketing',
     password: 'password123',
@@ -95,16 +95,28 @@ class AuthService {
       try {
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object') {
+          let migrated = false;
+          // Ensure brand is only Techschool or IT across all user records
+          Object.values(parsed).forEach(u => {
+            if (u && (u.brand === 'Both' || u.brand === 'Both Brands' || u.brand === 'Nexcrest Techschool' || !u.brand)) {
+              u.brand = 'Techschool';
+              migrated = true;
+            } else if (u && (u.brand === 'Nexcrest IT' || u.brand === 'IT')) {
+              u.brand = 'IT';
+            }
+          });
           // Always ensure the core manager admin profile exists and uses official password
           if (!parsed['manager@nexcrest.com']) {
             parsed['manager@nexcrest.com'] = { ...DEFAULT_USERS['manager@nexcrest.com'] };
+            migrated = true;
           } else {
             // Automatically upgrade manager account if it held the old placeholder password
             if (!parsed['manager@nexcrest.com'].password || parsed['manager@nexcrest.com'].password === 'password123') {
               parsed['manager@nexcrest.com'].password = 'Nexloic0131';
-              this.saveUsers(parsed);
+              migrated = true;
             }
           }
+          if (migrated) this.saveUsers(parsed);
           return parsed;
         }
       } catch (e) {
@@ -177,7 +189,7 @@ class AuthService {
     return map[role] || 'badge-designer';
   }
 
-  addUser({ name, email, role, title, brand = 'Both', password = 'password123' }) {
+  addUser({ name, email, role, title, brand = 'Techschool', password = 'password123' }) {
     const normEmail = (email || '').trim().toLowerCase();
     if (!normEmail) {
       return { success: false, error: 'Email address is required.' };
@@ -195,7 +207,7 @@ class AuthService {
       name: name.trim(),
       role: role || 'designer',
       title: (title || '').trim() || `${(role || 'Team').toUpperCase()} Specialist`,
-      brand: brand || 'Both',
+      brand: (brand === 'IT' || brand === 'Nexcrest IT') ? 'IT' : 'Techschool',
       avatar: this.getInitials(name),
       badgeClass: this.getRoleBadgeClass(role),
       password: password || 'password123',
@@ -226,7 +238,7 @@ class AuthService {
       user.title = title.trim();
     }
     if (brand) {
-      user.brand = brand;
+      user.brand = (brand === 'IT' || brand === 'Nexcrest IT') ? 'IT' : 'Techschool';
     }
     if (password && password.trim()) {
       user.password = password.trim();
