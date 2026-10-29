@@ -621,6 +621,11 @@ class DataStore {
   }
 
   deleteTarget(id) {
+    const currentUser = (typeof window !== 'undefined' && window.authService) ? window.authService.getCurrentUser() : null;
+    if (currentUser && currentUser.role !== 'manager' && currentUser.email !== 'manager@nexcrest.com') {
+      console.warn('Unauthorized deleteTarget blocked: only the Marketing Manager (Admin) can delete assigned tasks.');
+      return false;
+    }
     this.targets = this.targets.filter(t => t.id !== id);
     this.saveTargets(this.targets);
     // Also remove associated submissions for this target
@@ -635,6 +640,11 @@ class DataStore {
   }
 
   deleteMultipleTargets(targetIds) {
+    const currentUser = (typeof window !== 'undefined' && window.authService) ? window.authService.getCurrentUser() : null;
+    if (currentUser && currentUser.role !== 'manager' && currentUser.email !== 'manager@nexcrest.com') {
+      console.warn('Unauthorized deleteMultipleTargets blocked: only the Marketing Manager (Admin) can delete assigned tasks.');
+      return 0;
+    }
     if (!Array.isArray(targetIds) || targetIds.length === 0) return 0;
     const idSet = new Set(targetIds.map(String));
     const initialLen = this.targets.length;

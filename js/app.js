@@ -203,11 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
     deleteBatchModalTitle: document.getElementById('delete-batch-modal-title'),
     btnConfirmDeleteBatch: document.getElementById('btn-confirm-delete-batch'),
 
-    // Member Batch Action Elements
-    memberBatchActionsBar: document.getElementById('member-batch-actions-bar'),
-    memberSelectAllCheckbox: document.getElementById('member-select-all-checkbox'),
-    memberSelectedCountBadge: document.getElementById('member-selected-count-badge'),
-    btnMemberBatchDelete: document.getElementById('btn-member-batch-delete'),
 
     // User Tasks Management Modal
     userTasksModal: document.getElementById('user-tasks-modal'),
@@ -1657,48 +1652,6 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshIcons();
   }
 
-  function updateMemberBatchBar(filteredTargets = []) {
-    if (!elements.memberBatchActionsBar) return;
-    const displayedCount = filteredTargets.length;
-    let selectedDisplayed = 0;
-    filteredTargets.forEach(t => {
-      if (state.selectedMemberTargetIds.has(String(t.id))) selectedDisplayed++;
-    });
-
-    if (elements.memberSelectAllCheckbox) {
-      if (displayedCount > 0 && selectedDisplayed === displayedCount) {
-        elements.memberSelectAllCheckbox.checked = true;
-        elements.memberSelectAllCheckbox.indeterminate = false;
-      } else if (selectedDisplayed > 0) {
-        elements.memberSelectAllCheckbox.checked = false;
-        elements.memberSelectAllCheckbox.indeterminate = true;
-      } else {
-        elements.memberSelectAllCheckbox.checked = false;
-        elements.memberSelectAllCheckbox.indeterminate = false;
-      }
-    }
-
-    const totalSelected = state.selectedMemberTargetIds.size;
-    if (elements.memberSelectedCountBadge) {
-      if (totalSelected > 0) {
-        elements.memberSelectedCountBadge.style.display = 'inline-block';
-        elements.memberSelectedCountBadge.textContent = `${totalSelected} selected`;
-      } else {
-        elements.memberSelectedCountBadge.style.display = 'none';
-      }
-    }
-
-    if (elements.btnMemberBatchDelete) {
-      if (totalSelected > 0) {
-        elements.btnMemberBatchDelete.style.display = 'inline-flex';
-        elements.btnMemberBatchDelete.innerHTML = `<i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Delete Selected (${totalSelected})`;
-      } else {
-        elements.btnMemberBatchDelete.style.display = 'none';
-      }
-    }
-
-    refreshIcons();
-  }
 
   // =========================================================================
   // TEAM MEMBER VIEW CONTROLLER (Graphic Designer / Video / Marketing)
@@ -1747,7 +1700,6 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.memberDeliverablesGrid.innerHTML = filteredTargets.map(target => {
         const prog = window.dataStore.getTargetProgress(target.id);
         const isDone = prog.completed >= prog.target;
-        const isSelected = state.selectedMemberTargetIds.has(String(target.id));
 
         const statusPill = isDone
           ? `<span class="status-pill completed"><i data-lucide="check"></i> Quota Met</span>`
@@ -1756,16 +1708,13 @@ document.addEventListener('DOMContentLoaded', () => {
             : `<span class="status-pill not-started">Pending</span>`;
 
         return `
-          <div class="deliverable-card spotlight-card tilt-card ${isSelected ? 'card-selected' : ''} ${target.category === 'Campus Happenings' ? 'priority-hologram' : ''}">
+          <div class="deliverable-card spotlight-card tilt-card ${target.category === 'Campus Happenings' ? 'priority-hologram' : ''}">
             <div>
               <div class="del-card-header">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <input type="checkbox" class="del-card-checkbox task-checkbox" data-target-id="${target.id}" ${isSelected ? 'checked' : ''} style="width: 17px; height: 17px; cursor: pointer; accent-color: var(--teal-primary);" title="Select task for batch actions">
-                  <div class="del-badges-row">
-                    <span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span>
-                    <span class="badge-category">${escapeHtml(target.category)}</span>
-                    <span class="badge-format">${escapeHtml(target.format)}</span>
-                  </div>
+                <div class="del-badges-row">
+                  <span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span>
+                  <span class="badge-category">${escapeHtml(target.category)}</span>
+                  <span class="badge-format">${escapeHtml(target.format)}</span>
                 </div>
                 ${statusPill}
               </div>
@@ -1784,12 +1733,9 @@ document.addEventListener('DOMContentLoaded', () => {
               </div>
               ${prog.pending > 0 ? `<div style="font-size: 11px; color: var(--amber-light); margin-top: 4px;">⏳ ${prog.pending} in review</div>` : ''}
 
-              <div class="del-card-actions" style="display: flex; gap: 8px; align-items: center;">
+              <div class="del-card-actions">
                 <button class="btn btn-primary btn-sm btn-block btn-open-log-modal" data-target-id="${target.id}">
                   <i data-lucide="upload-cloud"></i> + Submit Deliverable
-                </button>
-                <button class="btn btn-outline-sm btn-action-delete btn-del-task-card" data-id="${target.id}" title="Delete Assigned Task" aria-label="Delete Task">
-                  <i data-lucide="trash-2" style="width: 15px; height: 15px;"></i>
                 </button>
               </div>
             </div>
@@ -1797,8 +1743,6 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       }).join('');
     }
-
-    updateMemberBatchBar(filteredTargets);
 
     // Render Member Submissions Table
     const userSubs = window.dataStore.getSubmissions({ assignee: user.role });
@@ -2926,9 +2870,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Delete Target button (Manager or Member)
+    // Delete Target button (Admin / Marketing Manager Only)
     const deleteBtn = e.target.closest('.btn-action-delete');
     if (deleteBtn) {
+      if (!state.user || (state.user.role !== 'manager' && state.user.email !== 'manager@nexcrest.com')) {
+        showToast('Permission denied: Only the Marketing Manager (Admin) can delete assigned tasks.', 'error');
+        return;
+      }
       const targetId = deleteBtn.dataset.id;
       if (targetId) {
         openDeleteTargetModal(targetId);
@@ -2995,8 +2943,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Open Delete Target Confirmation Modal
+  // Open Delete Target Confirmation Modal (Admin / Marketing Manager Only)
   function openDeleteTargetModal(targetId) {
+    if (!state.user || (state.user.role !== 'manager' && state.user.email !== 'manager@nexcrest.com')) {
+      showToast('Permission denied: Only the Marketing Manager (Admin) can delete assigned tasks.', 'error');
+      return;
+    }
     const target = window.dataStore.getTargetById(targetId);
     if (!target) return;
 
@@ -3034,9 +2986,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Confirm Delete Target Action
+  // Confirm Delete Target Action (Admin / Marketing Manager Only)
   if (elements.btnConfirmDeleteTarget) {
     elements.btnConfirmDeleteTarget.addEventListener('click', () => {
+      if (!state.user || (state.user.role !== 'manager' && state.user.email !== 'manager@nexcrest.com')) {
+        showToast('Permission denied: Only the Marketing Manager (Admin) can delete assigned tasks.', 'error');
+        if (elements.deleteTargetModal) elements.deleteTargetModal.classList.add('hidden');
+        return;
+      }
       if (state.pendingDeleteTargetId) {
         const idToDelete = state.pendingDeleteTargetId;
         window.dataStore.deleteTarget(idToDelete);
@@ -3054,9 +3011,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Delete button inside Assign/Edit Target Modal
+  // Delete button inside Assign/Edit Target Modal (Admin / Marketing Manager Only)
   if (elements.btnModalDeleteTarget) {
     elements.btnModalDeleteTarget.addEventListener('click', () => {
+      if (!state.user || (state.user.role !== 'manager' && state.user.email !== 'manager@nexcrest.com')) {
+        showToast('Permission denied: Only the Marketing Manager (Admin) can delete assigned tasks.', 'error');
+        return;
+      }
       const targetId = elements.editTargetId ? elements.editTargetId.value : null;
       if (targetId) {
         openDeleteTargetModal(targetId);
@@ -3064,8 +3025,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Open User Tasks Management Modal (View & Delete per User)
+  // Open User Tasks Management Modal (Admin / Marketing Manager Only)
   function openUserTasksModal(userEmail, userName = null, userRole = null) {
+    if (!state.user || (state.user.role !== 'manager' && state.user.email !== 'manager@nexcrest.com')) {
+      showToast('Permission denied: Only the Marketing Manager (Admin) can view assigned task management.', 'error');
+      return;
+    }
     state.activeTasksUserEmail = userEmail;
     renderUserTasksModal(userEmail, userName, userRole);
     if (elements.userTasksModal) {
@@ -3162,8 +3127,12 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshIcons();
   }
 
-  // Open Batch Delete Modal
+  // Open Batch Delete Modal (Admin / Marketing Manager Only)
   function openBatchDeleteModal(count) {
+    if (!state.user || (state.user.role !== 'manager' && state.user.email !== 'manager@nexcrest.com')) {
+      showToast('Permission denied: Only the Marketing Manager (Admin) can delete assigned tasks.', 'error');
+      return;
+    }
     if (elements.deleteBatchCountDisplay) {
       elements.deleteBatchCountDisplay.textContent = count;
     }
@@ -3178,8 +3147,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Execute Batch Delete
+  // Execute Batch Delete (Admin / Marketing Manager Only)
   function executeBatchDelete() {
+    if (!state.user || (state.user.role !== 'manager' && state.user.email !== 'manager@nexcrest.com')) {
+      showToast('Permission denied: Only the Marketing Manager (Admin) can delete assigned tasks.', 'error');
+      if (elements.deleteBatchTargetsModal) elements.deleteBatchTargetsModal.classList.add('hidden');
+      return;
+    }
     const ids = state.pendingBatchDeleteIds;
     if (!ids || ids.length === 0) return;
 
@@ -3191,9 +3165,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (state.pendingBatchDeleteSource === 'manager-table') {
       state.selectedTargetIds.clear();
       renderManagerTargetsTable();
-    } else if (state.pendingBatchDeleteSource === 'member-cards') {
-      state.selectedMemberTargetIds.clear();
-      renderMemberDeliverables();
     } else if (state.pendingBatchDeleteSource === 'user-modal') {
       state.selectedUserModalTargetIds.clear();
       if (state.activeTasksUserEmail) {
@@ -3240,9 +3211,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Button: Delete Selected in Manager Table
+  // Button: Delete Selected in Manager Table (Admin Only)
   if (elements.btnBatchDeleteTargets) {
     elements.btnBatchDeleteTargets.addEventListener('click', () => {
+      if (!state.user || (state.user.role !== 'manager' && state.user.email !== 'manager@nexcrest.com')) {
+        showToast('Permission denied: Only the Marketing Manager (Admin) can delete assigned tasks.', 'error');
+        return;
+      }
       if (state.selectedTargetIds.size === 0) {
         showToast('No tasks selected.', 'warning');
         return;
@@ -3253,22 +3228,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Button: Delete Selected in Member View
-  if (elements.btnMemberBatchDelete) {
-    elements.btnMemberBatchDelete.addEventListener('click', () => {
-      if (state.selectedMemberTargetIds.size === 0) {
-        showToast('No tasks selected.', 'warning');
-        return;
-      }
-      state.pendingBatchDeleteIds = Array.from(state.selectedMemberTargetIds);
-      state.pendingBatchDeleteSource = 'member-cards';
-      openBatchDeleteModal(state.pendingBatchDeleteIds.length);
-    });
-  }
-
-  // Button: Delete Selected in User Tasks Modal
+  // Button: Delete Selected in User Tasks Modal (Admin Only)
   if (elements.btnUserTasksBatchDelete) {
     elements.btnUserTasksBatchDelete.addEventListener('click', () => {
+      if (!state.user || (state.user.role !== 'manager' && state.user.email !== 'manager@nexcrest.com')) {
+        showToast('Permission denied: Only the Marketing Manager (Admin) can delete assigned tasks.', 'error');
+        return;
+      }
       if (state.selectedUserModalTargetIds.size === 0) {
         showToast('No tasks selected.', 'warning');
         return;
@@ -3310,47 +3276,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // 3. Member Select All Checkbox
-    if (e.target && e.target.id === 'member-select-all-checkbox') {
-      const isChecked = e.target.checked;
-      const user = state.user;
-      if (user) {
-        const allUserTargets = window.dataStore.getTargetsForUser(user);
-        const filtered = state.memberCategory === 'all'
-          ? allUserTargets
-          : allUserTargets.filter(t => t.category === state.memberCategory);
-        filtered.forEach(t => {
-          if (isChecked) {
-            state.selectedMemberTargetIds.add(String(t.id));
-          } else {
-            state.selectedMemberTargetIds.delete(String(t.id));
-          }
-        });
-        renderMemberDeliverables();
-      }
-      return;
-    }
-
-    // 4. Member Card Checkbox
-    if (e.target && e.target.classList.contains('del-card-checkbox')) {
-      const targetId = e.target.dataset.targetId;
-      if (targetId) {
-        if (e.target.checked) {
-          state.selectedMemberTargetIds.add(String(targetId));
-        } else {
-          state.selectedMemberTargetIds.delete(String(targetId));
-        }
-        const user = state.user;
-        if (user) {
-          const allUserTargets = window.dataStore.getTargetsForUser(user);
-          const filtered = state.memberCategory === 'all'
-            ? allUserTargets
-            : allUserTargets.filter(t => t.category === state.memberCategory);
-          updateMemberBatchBar(filtered);
-        }
-      }
-      return;
-    }
 
     // 5. User Tasks Modal Select All Checkbox
     if (e.target && e.target.id === 'user-tasks-select-all-checkbox') {
