@@ -7618,6 +7618,158 @@ body.dark-theme .data-table tbody tr.row-selected {
   border-radius: 4px;
 }
 
+/* =========================================================================
+   EXTRA WORK & SELF-INITIATED DELIVERABLES STYLES (AIMER DESIGN SYSTEM)
+   ========================================================================= */
+
+.btn-log-extra-accent {
+  background: rgba(206, 243, 228, 0.12) !important;
+  color: #006C80 !important;
+  border: 1px solid rgba(0, 139, 165, 0.3) !important;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-log-extra-accent:hover {
+  background: rgba(206, 243, 228, 0.25) !important;
+  border-color: var(--teal-primary, #008BA5) !important;
+  color: var(--teal-primary, #008BA5) !important;
+  transform: translateY(-1px);
+}
+
+body.dark-theme .btn-log-extra-accent {
+  background: rgba(206, 243, 228, 0.15) !important;
+  color: #CEF3E4 !important;
+  border-color: rgba(206, 243, 228, 0.35) !important;
+}
+
+/* Submit Deliverable Modal Mode Switcher */
+.submit-mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  background: #F1F5F9;
+  padding: 5px;
+  border-radius: 12px;
+  border: 1px solid #E2E8F0;
+  margin-bottom: 18px;
+}
+
+body.dark-theme .submit-mode-tabs {
+  background: #132737;
+  border-color: #1F3748;
+}
+
+.mode-tab-btn {
+  padding: 8px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: #64748B;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.mode-tab-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.mode-tab-btn.active {
+  background: linear-gradient(135deg, #008BA5, #2B557A);
+  color: #FFFFFF;
+  box-shadow: 0 3px 10px rgba(0, 139, 165, 0.25);
+}
+
+.extra-notice-box {
+  background: rgba(0, 139, 165, 0.08);
+  border: 1px dashed #008BA5;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: #006C80;
+  line-height: 1.45;
+}
+
+body.dark-theme .extra-notice-box {
+  color: #45B2C3;
+  background: rgba(0, 139, 165, 0.12);
+}
+
+.extra-notice-box svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #008BA5;
+}
+
+/* Over-Achievement Badges */
+.badge-exceeded {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(16, 185, 129, 0.14);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  animation: pulse-glow 2.5s infinite;
+  white-space: nowrap;
+}
+
+body.dark-theme .badge-exceeded {
+  background: rgba(206, 243, 228, 0.18);
+  color: #CEF3E4;
+  border-color: rgba(206, 243, 228, 0.35);
+}
+
+.badge-extra-work {
+  background: rgba(0, 139, 165, 0.14);
+  color: #006C80;
+  border: 1px solid rgba(0, 139, 165, 0.28);
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+body.dark-theme .badge-extra-work {
+  background: rgba(206, 243, 228, 0.16);
+  color: #CEF3E4;
+  border-color: rgba(206, 243, 228, 0.35);
+}
+
+.submission-item-card.extra-deliverable {
+  border-left: 3px solid #008BA5 !important;
+}
+
+body.dark-theme .submission-item-card.extra-deliverable {
+  border-left: 3px solid #CEF3E4 !important;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
 
 
 

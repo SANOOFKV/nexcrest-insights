@@ -220,6 +220,16 @@ document.addEventListener('DOMContentLoaded', () => {
     logWorkTitle: document.getElementById('log-work-title'),
     logWorkUrl: document.getElementById('log-work-url'),
     logWorkNotes: document.getElementById('log-work-notes'),
+    btnMemberLogExtraWork: document.getElementById('btn-member-log-extra-work'),
+    btnModeAssigned: document.getElementById('btn-mode-assigned'),
+    btnModeExtra: document.getElementById('btn-mode-extra'),
+    logWorkMode: document.getElementById('log-work-mode'),
+    logAssignedFields: document.getElementById('log-assigned-fields'),
+    logExtraFields: document.getElementById('log-extra-fields'),
+    logExtraBrand: document.getElementById('log-extra-brand'),
+    logExtraCategory: document.getElementById('log-extra-category'),
+    logExtraProgram: document.getElementById('log-extra-program'),
+    logExtraFormat: document.getElementById('log-extra-format'),
 
     // Review Modal Form & Fields
     reviewDecisionForm: document.getElementById('review-decision-form'),
@@ -737,14 +747,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Circular Progress Ring Telemetry
     const circumference = 295.3;
-    const offset = circumference - (circumference * (ov.pct / 100));
+    const clampedPct = Math.min(100, Math.max(0, ov.pct));
+    const offset = circumference - (circumference * (clampedPct / 100));
     if (elements.ovRingFill) {
       elements.ovRingFill.style.strokeDashoffset = offset;
       elements.ovRingFill.style.stroke = ov.pct >= 100 ? '#10B981' : '#0284C7';
     }
     animateCounter(elements.ovProgressPct, ov.pct, 750, '%');
     if (elements.ovProgressRatio) elements.ovProgressRatio.textContent = `${ov.totalPublished} / ${ov.totalTarget}`;
-    animateCounter(elements.ovRemainingCount, ov.remaining);
+    if (ov.extraCompleted > 0 && elements.ovRemainingCount) {
+      elements.ovRemainingCount.innerHTML = `0 <span style="font-size: 11px; color: var(--mint-accent, #10B981); font-weight: 700; margin-left: 2px;">(+${ov.extraCompleted} 🚀)</span>`;
+    } else {
+      animateCounter(elements.ovRemainingCount, ov.remaining);
+    }
 
     // Business Days vs Calendar Days Telemetry Pacing
     const ovDaysLeftLabel = document.getElementById('ov-days-left-label');
@@ -1359,6 +1374,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <td><span class="badge-category">${escapeHtml(target.category)}</span></td>
           <td>
             <strong>${escapeHtml(target.program)}</strong>
+            ${target.isExtra ? `<span class="badge-extra-work" style="font-size: 10px; padding: 1px 6px; margin-left: 4px;">⭐ Extra</span>` : ''}
             ${target.notes ? `<div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">${escapeHtml(target.notes)}</div>` : ''}
           </td>
           <td><span class="badge-format">${escapeHtml(target.format)}</span></td>
@@ -1373,7 +1389,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <span>${prog.completed}/${prog.target}</span>
             </div>
             <div class="progress-bar-container" style="margin-bottom: 0;">
-              <div class="progress-bar-fill" style="width: ${prog.pct}%"></div>
+              <div class="progress-bar-fill" style="width: ${Math.min(100, prog.pct)}%"></div>
             </div>
           </td>
           <td>${statusBadge}</td>
@@ -1417,14 +1433,19 @@ document.addEventListener('DOMContentLoaded', () => {
       marketing: 'Marketing Executive'
     };
 
-    elements.reviewCardsList.innerHTML = pendingSubs.map(sub => `
-      <div class="submission-item-card" data-sub-id="${sub.id}">
+    elements.reviewCardsList.innerHTML = pendingSubs.map(sub => {
+      const isExtra = Boolean(sub.isExtra);
+      return `
+      <div class="submission-item-card ${isExtra ? 'extra-deliverable' : ''}" data-sub-id="${sub.id}">
         <div class="sub-info-group">
           <div class="sub-avatar" style="background: ${sub.assignee === 'designer' ? 'linear-gradient(135deg, #7C3AED, #A78BFA)' : sub.assignee === 'videographer' ? 'linear-gradient(135deg, #1D4ED8, #38BDF8)' : 'linear-gradient(135deg, #EF2424, #B11414)'}">
             ${escapeHtml((sub.authorName || sub.assignee || 'U').substring(0, 2).toUpperCase())}
           </div>
           <div class="sub-details">
-            <h4 class="sub-title">${escapeHtml(sub.title)}</h4>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <h4 class="sub-title">${escapeHtml(sub.title)}</h4>
+              ${isExtra ? `<span class="badge-extra-work"><i data-lucide="star" style="width: 12px; height: 12px;"></i> ⭐ Extra Work (Bonus)</span>` : ''}
+            </div>
             <div class="sub-meta">
               <span><strong>${escapeHtml(sub.authorName || roleNameMap[sub.assignee] || sub.assignee)}</strong></span>
               <span>•</span>
@@ -1448,7 +1469,8 @@ document.addEventListener('DOMContentLoaded', () => {
           </button>
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
   }
 
   function renderManagerActivityLog() {
@@ -1487,6 +1509,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <td>
             <span class="badge-brand ${escapeHtml(sub.brand)}">${formatBrandName(sub.brand)}</span>
             <span style="margin-left: 4px;">${escapeHtml(sub.program)}</span>
+            ${sub.isExtra ? `<span class="badge-extra-work" style="font-size: 10px; padding: 1px 6px; margin-left: 4px;">⭐ Extra</span>` : ''}
           </td>
           <td>${escapeHtml(sub.title)}</td>
           <td>${renderProofChip(sub.url)}</td>
@@ -1649,18 +1672,18 @@ document.addEventListener('DOMContentLoaded', () => {
               <span class="emp-stat-lbl">Review</span>
             </div>
             <div class="emp-stat-item">
-              <span class="emp-stat-val" style="color: ${isAhead ? 'var(--mint-success)' : 'var(--teal-primary)'};">${stats.pct}%</span>
+              <span class="emp-stat-val" style="color: ${stats.extraCompleted > 0 ? 'var(--mint-accent, #10B981)' : isAhead ? 'var(--mint-success)' : 'var(--teal-primary)'};">${stats.pct}%</span>
               <span class="emp-stat-lbl">Pace</span>
             </div>
           </div>
 
           <div class="employee-pacing-section">
             <div class="emp-pacing-header">
-              <span>Completion</span>
+              <span>Completion ${stats.extraCompleted > 0 ? `<span class="badge-exceeded" style="font-size: 10px; padding: 1px 6px;">+${stats.extraCompleted} Extra!</span>` : ''}</span>
               <span>${stats.totalCompleted} / ${stats.totalTarget}</span>
             </div>
             <div class="progress-bar-container" style="margin: 0;">
-              <div class="progress-bar-fill ${isAhead ? 'mint' : 'teal'}" style="width: ${stats.pct}%;"></div>
+              <div class="progress-bar-fill ${stats.extraCompleted > 0 ? 'mint' : isAhead ? 'mint' : 'teal'}" style="width: ${Math.min(100, stats.pct)}%;"></div>
             </div>
           </div>
 
@@ -1705,9 +1728,26 @@ document.addEventListener('DOMContentLoaded', () => {
     animateCounter(elements.memberKpiTarget, stats.totalTarget);
     animateCounter(elements.memberKpiCompleted, stats.totalCompleted);
     animateCounter(elements.memberKpiReview, stats.totalPending);
-    animateCounter(elements.memberKpiRemaining, remaining);
-    animateCounter(elements.memberKpiPct, stats.pct, 750, '%');
-    elements.memberKpiProgressBar.style.width = `${stats.pct}%`;
+
+    if (stats.extraCompleted > 0) {
+      if (elements.memberKpiRemaining) {
+        elements.memberKpiRemaining.innerHTML = `0 <span class="badge-exceeded"><i data-lucide="zap" style="width:11px;height:11px;"></i> +${stats.extraCompleted} Exceeded!</span>`;
+      }
+      if (elements.memberKpiPct) {
+        elements.memberKpiPct.textContent = `${stats.pct}% 🚀`;
+      }
+      if (elements.memberKpiProgressBar) {
+        elements.memberKpiProgressBar.style.width = '100%';
+        elements.memberKpiProgressBar.style.boxShadow = '0 0 14px rgba(206, 243, 228, 0.6)';
+      }
+    } else {
+      animateCounter(elements.memberKpiRemaining, remaining);
+      animateCounter(elements.memberKpiPct, stats.pct, 750, '%');
+      if (elements.memberKpiProgressBar) {
+        elements.memberKpiProgressBar.style.width = `${Math.min(100, stats.pct)}%`;
+        elements.memberKpiProgressBar.style.boxShadow = 'none';
+      }
+    }
 
     // Category Task Counts
     const allUserTargets = window.dataStore.getTargetsForUser(user);
@@ -1739,11 +1779,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const prog = window.dataStore.getTargetProgress(target.id);
         const isDone = prog.completed >= prog.target;
 
-        const statusPill = isDone
-          ? `<span class="status-pill completed"><i data-lucide="check"></i> Quota Met</span>`
-          : prog.completed > 0
-            ? `<span class="status-pill in-progress"><i data-lucide="loader"></i> ${prog.completed}/${prog.target} Completed</span>`
-            : `<span class="status-pill not-started">Pending</span>`;
+        const statusPill = (prog.extra > 0)
+          ? `<span class="status-pill completed" style="background: rgba(206, 243, 228, 0.15); color: #CEF3E4; border: 1px solid rgba(206, 243, 228, 0.3);"><i data-lucide="zap"></i> Quota Met (+${prog.extra} Extra!)</span>`
+          : isDone
+            ? `<span class="status-pill completed"><i data-lucide="check"></i> Quota Met</span>`
+            : prog.completed > 0
+              ? `<span class="status-pill in-progress"><i data-lucide="loader"></i> ${prog.completed}/${prog.target} Completed</span>`
+              : `<span class="status-pill not-started">Pending</span>`;
 
         return `
           <div class="deliverable-card spotlight-card tilt-card ${target.category === 'Campus Happenings' ? 'priority-hologram' : ''}">
@@ -1753,6 +1795,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   <span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span>
                   <span class="badge-category">${escapeHtml(target.category)}</span>
                   <span class="badge-format">${escapeHtml(target.format)}</span>
+                  ${target.isExtra ? '<span class="badge-extra-work" style="font-size: 10px; padding: 1px 6px;">⭐ Extra</span>' : ''}
                 </div>
                 ${statusPill}
               </div>
@@ -1764,10 +1807,10 @@ document.addEventListener('DOMContentLoaded', () => {
             <div>
               <div class="del-progress-metric">
                 <span>Target: <strong>${prog.target}</strong></span>
-                <span>Approved: <strong style="color: var(--mint-light);">${prog.completed}</strong></span>
+                <span>Approved: <strong style="color: var(--mint-light);">${prog.completed}</strong> ${prog.extra > 0 ? `<span class="badge-exceeded" style="font-size: 10px; padding: 1px 5px;">+${prog.extra}</span>` : ''}</span>
               </div>
               <div class="progress-bar-container">
-                <div class="progress-bar-fill" style="width: ${prog.pct}%"></div>
+                <div class="progress-bar-fill" style="width: ${Math.min(100, prog.pct)}%"></div>
               </div>
               ${prog.pending > 0 ? `<div style="font-size: 11px; color: var(--amber-light); margin-top: 4px;">⏳ ${prog.pending} in review</div>` : ''}
 
@@ -1820,6 +1863,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <td>${formatDate(sub.submittedAt)}</td>
             <td>
               <strong>${escapeHtml(sub.program)}</strong>
+              ${sub.isExtra ? `<span class="badge-extra-work" style="font-size: 10px; padding: 1px 6px; margin-left: 4px;">⭐ Extra</span>` : ''}
               <div style="font-size: 11px; color: var(--text-dim);">${escapeHtml(sub.title)}</div>
             </td>
             <td><span class="badge-format">${escapeHtml(sub.format)}</span></td>
@@ -2758,8 +2802,38 @@ document.addEventListener('DOMContentLoaded', () => {
     renderApp();
   });
 
+  // Set Log Work Modal Mode (Assigned Target vs Extra Work)
+  function setLogWorkMode(mode) {
+    if (!elements.logWorkMode) return;
+    elements.logWorkMode.value = mode;
+
+    if (mode === 'extra') {
+      if (elements.btnModeExtra) elements.btnModeExtra.classList.add('active');
+      if (elements.btnModeAssigned) elements.btnModeAssigned.classList.remove('active');
+      if (elements.logAssignedFields) elements.logAssignedFields.classList.add('hidden');
+      if (elements.logExtraFields) elements.logExtraFields.classList.remove('hidden');
+      if (elements.logTargetSelect) elements.logTargetSelect.removeAttribute('required');
+      if (elements.logExtraProgram) elements.logExtraProgram.setAttribute('required', 'required');
+    } else {
+      if (elements.btnModeAssigned) elements.btnModeAssigned.classList.add('active');
+      if (elements.btnModeExtra) elements.btnModeExtra.classList.remove('active');
+      if (elements.logAssignedFields) elements.logAssignedFields.classList.remove('hidden');
+      if (elements.logExtraFields) elements.logExtraFields.classList.add('hidden');
+      if (elements.logTargetSelect) elements.logTargetSelect.setAttribute('required', 'required');
+      if (elements.logExtraProgram) elements.logExtraProgram.removeAttribute('required');
+    }
+    refreshIcons();
+  }
+
+  if (elements.btnModeAssigned) {
+    elements.btnModeAssigned.addEventListener('click', () => setLogWorkMode('assigned'));
+  }
+  if (elements.btnModeExtra) {
+    elements.btnModeExtra.addEventListener('click', () => setLogWorkMode('extra'));
+  }
+
   // Open Log Work Modal (Global Button or Card Button)
-  function openLogWorkModal(preselectedTargetId = null) {
+  function openLogWorkModal(preselectedTargetId = null, initialMode = 'assigned') {
     let availableTargets = [];
     if (state.user && state.user.role === 'manager') {
       availableTargets = window.dataStore.getTargets();
@@ -2769,53 +2843,104 @@ document.addEventListener('DOMContentLoaded', () => {
       availableTargets = window.dataStore.getTargets();
     }
 
-    if (availableTargets.length === 0) {
-      showToast('No targets available to submit for.', 'warning');
-      return;
+    if (elements.logTargetSelect) {
+      if (availableTargets.length > 0) {
+        elements.logTargetSelect.innerHTML = availableTargets.map(t => `
+          <option value="${t.id}" ${t.id === preselectedTargetId ? 'selected' : ''}>
+            [${formatBrandName(t.brand)} - ${t.category}] ${t.program} (${t.format})
+          </option>
+        `).join('');
+      } else {
+        elements.logTargetSelect.innerHTML = `<option value="">No assigned targets (switch to Extra Work)</option>`;
+      }
     }
-
-    elements.logTargetSelect.innerHTML = availableTargets.map(t => `
-      <option value="${t.id}" ${t.id === preselectedTargetId ? 'selected' : ''}>
-        [${formatBrandName(t.brand)} - ${t.category}] ${t.program} (${t.format})
-      </option>
-    `).join('');
 
     elements.logWorkForm.reset();
-    if (preselectedTargetId) {
+    if (preselectedTargetId && elements.logTargetSelect) {
       elements.logTargetSelect.value = preselectedTargetId;
     }
+
+    // Default to 'extra' if user requested extra mode or if no assigned targets exist
+    const mode = (initialMode === 'extra' || availableTargets.length === 0) ? 'extra' : 'assigned';
+    setLogWorkMode(mode);
+
     elements.logWorkModal.classList.remove('hidden');
     refreshIcons();
   }
 
-  elements.btnMemberLogWork.addEventListener('click', () => openLogWorkModal());
+  if (elements.btnMemberLogWork) {
+    elements.btnMemberLogWork.addEventListener('click', () => openLogWorkModal(null, 'assigned'));
+  }
+  if (elements.btnMemberLogExtraWork) {
+    elements.btnMemberLogExtraWork.addEventListener('click', () => openLogWorkModal(null, 'extra'));
+  }
 
-  // Submit Completed Work Form
+  // Submit Completed Work Form (Handles both Assigned Targets and Extra Work Tasks)
   elements.logWorkForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const targetId = elements.logTargetSelect.value;
-    const target = window.dataStore.getTargetById(targetId);
-    if (!target) return;
+    const mode = elements.logWorkMode ? elements.logWorkMode.value : 'assigned';
 
-    const submissionData = {
-      targetId: target.id,
-      assignee: target.assignee,
-      assigneeName: target.assigneeName || (state.user ? state.user.name : ''),
-      authorName: state.user ? state.user.name : (target.assigneeName || target.assignee),
-      authorEmail: state.user ? state.user.email : '',
-      brand: target.brand,
-      category: target.category,
-      program: target.program,
-      format: target.format,
-      title: elements.logWorkTitle.value.trim(),
-      url: elements.logWorkUrl.value.trim(),
-      notes: elements.logWorkNotes.value.trim(),
-      month: target.month || window.dataStore.getActiveMonth()
-    };
+    let submissionData = null;
+
+    if (mode === 'extra') {
+      const brand = elements.logExtraBrand ? elements.logExtraBrand.value : 'Both';
+      const category = elements.logExtraCategory ? elements.logExtraCategory.value : 'Branding';
+      const program = elements.logExtraProgram ? elements.logExtraProgram.value.trim() : 'Self-Initiated Task';
+      const format = elements.logExtraFormat ? elements.logExtraFormat.value : 'Poster';
+
+      if (!program) {
+        showToast('Please enter a program or task name.', 'warning');
+        if (elements.logExtraProgram) elements.logExtraProgram.focus();
+        return;
+      }
+
+      submissionData = {
+        isExtra: true,
+        assignee: state.user ? state.user.role : 'designer',
+        assigneeName: state.user ? state.user.name : '',
+        authorName: state.user ? state.user.name : '',
+        authorEmail: state.user ? state.user.email : '',
+        brand,
+        category,
+        program,
+        format,
+        title: elements.logWorkTitle.value.trim(),
+        url: elements.logWorkUrl.value.trim(),
+        notes: elements.logWorkNotes.value.trim(),
+        month: window.dataStore.getActiveMonth()
+      };
+    } else {
+      const targetId = elements.logTargetSelect ? elements.logTargetSelect.value : null;
+      const target = window.dataStore.getTargetById(targetId);
+      if (!target) {
+        showToast('Please select a deliverable task or switch to Extra Work.', 'warning');
+        return;
+      }
+
+      submissionData = {
+        targetId: target.id,
+        assignee: target.assignee,
+        assigneeName: target.assigneeName || (state.user ? state.user.name : ''),
+        authorName: state.user ? state.user.name : (target.assigneeName || target.assignee),
+        authorEmail: state.user ? state.user.email : '',
+        brand: target.brand,
+        category: target.category,
+        program: target.program,
+        format: target.format,
+        title: elements.logWorkTitle.value.trim(),
+        url: elements.logWorkUrl.value.trim(),
+        notes: elements.logWorkNotes.value.trim(),
+        month: target.month || window.dataStore.getActiveMonth(),
+        isExtra: false
+      };
+    }
 
     window.dataStore.addSubmission(submissionData);
     elements.logWorkModal.classList.add('hidden');
-    showToast('Deliverable submitted successfully! Sent to Marketing Manager for review.', 'success');
+    const toastMsg = mode === 'extra'
+      ? '⭐ Extra deliverable submitted! Sent to Marketing Manager for review and bonus achievement credit.'
+      : 'Deliverable submitted successfully! Sent to Marketing Manager for review.';
+    showToast(toastMsg, 'success');
     renderApp();
   });
 
@@ -2966,7 +3091,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (sub) {
         elements.reviewSubmissionId.value = sub.id;
         const roleLabels = { designer: 'Graphic Designer', videographer: 'Videographer', marketing: 'Marketing Exec' };
-        elements.reviewModalAuthor.textContent = `${roleLabels[sub.assignee] || sub.assignee} (${formatBrandName(sub.brand)})`;
+        const authorBase = `${roleLabels[sub.assignee] || sub.assignee} (${formatBrandName(sub.brand)})`;
+        elements.reviewModalAuthor.textContent = sub.isExtra ? `⭐ [Extra Work] ${authorBase}` : authorBase;
         elements.reviewModalProgram.textContent = `${sub.program} - ${sub.title}`;
         elements.reviewModalFormat.textContent = sub.format;
         elements.reviewModalDate.textContent = formatDate(sub.submittedAt);
@@ -2985,10 +3111,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Review Actions: Approve or Request Rework
   elements.btnApproveWork.addEventListener('click', () => {
     const subId = elements.reviewSubmissionId.value;
-    const feedback = elements.reviewFeedbackInput.value.trim() || 'Approved by Marketing Manager!';
+    const sub = window.dataStore.getSubmissions().find(s => s.id === subId);
+    const isExtra = sub && sub.isExtra;
+    const feedback = elements.reviewFeedbackInput.value.trim() || (isExtra ? '⭐ Extra work approved! Over-achievement bonus counted.' : 'Approved by Marketing Manager!');
     window.dataStore.updateSubmissionStatus(subId, 'approved', feedback);
     elements.reviewActionModal.classList.add('hidden');
-    showToast('Deliverable approved! Target count updated.', 'success');
+    showToast(isExtra ? '⭐ Extra work deliverable approved! Over-achievement bonus counted.' : 'Deliverable approved! Target count updated.', 'success');
     renderApp();
   });
 

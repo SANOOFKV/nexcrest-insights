@@ -1,17 +1,17 @@
 /**
  * Nexcrest Insights - Service Worker for Offline PWA Capabilities
- * Version: v58
+ * Version: v59
  */
 
-const CACHE_NAME = 'nexcrest-insights-shell-v58';
+const CACHE_NAME = 'nexcrest-insights-shell-v59';
 const CORE_ASSETS = [
   './',
   './index.html',
-  './css/styles.css?v=58',
-  './js/firebase-config.js?v=58',
-  './js/data.js?v=58',
-  './js/auth.js?v=58',
-  './js/app.js?v=58',
+  './css/styles.css?v=59',
+  './js/firebase-config.js?v=59',
+  './js/data.js?v=59',
+  './js/auth.js?v=59',
+  './js/app.js?v=59',
   './assets/nexcrest_icon.png',
   './manifest.webmanifest'
 ];

@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=58">
+  <link rel="stylesheet" href="css/styles.css?v=59">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -688,9 +688,12 @@
     <section id="member-view" class="view-section hidden">
       <!-- Member Actions Bar -->
       <div class="section-header" style="justify-content: flex-end; margin-bottom: 20px; gap: 12px;">
-        <div class="header-action-buttons" style="display: flex; gap: 10px;">
-          <button id="btn-member-log-work" class="btn btn-primary">
+        <div class="header-action-buttons" style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button id="btn-member-log-work" class="btn btn-primary" title="Submit completed deliverable against assigned targets">
             <i data-lucide="upload-cloud"></i> + Submit Work
+          </button>
+          <button id="btn-member-log-extra-work" class="btn btn-secondary btn-log-extra-accent" title="Log an extra deliverable or self-initiated task beyond monthly quota">
+            <i data-lucide="star"></i> ⭐ + Log Extra Work
           </button>
         </div>
       </div>
@@ -1209,11 +1212,81 @@
       </div>
 
       <form id="log-work-form" class="modal-form">
-        <div class="form-group">
-          <label for="log-target-select">Deliverable *</label>
-          <select id="log-target-select" required>
-            <!-- Injected dynamically based on current user's assigned targets -->
-          </select>
+        <!-- Mode Switcher: Assigned Target vs Extra Work -->
+        <div class="submit-mode-tabs" id="submit-mode-tabs">
+          <button type="button" class="mode-tab-btn active" id="btn-mode-assigned" data-mode="assigned">
+            <i data-lucide="target"></i> Assigned Quota
+          </button>
+          <button type="button" class="mode-tab-btn" id="btn-mode-extra" data-mode="extra">
+            <i data-lucide="star"></i> ⭐ Log Extra / Self-Initiated Work
+          </button>
+        </div>
+        <input type="hidden" id="log-work-mode" value="assigned">
+
+        <!-- Mode 1: Assigned Target Fields -->
+        <div id="log-assigned-fields" class="submit-mode-section">
+          <div class="form-group">
+            <label for="log-target-select">Deliverable Task *</label>
+            <select id="log-target-select">
+              <!-- Injected dynamically based on current user's assigned targets -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Mode 2: Extra Work Fields -->
+        <div id="log-extra-fields" class="submit-mode-section hidden">
+          <div class="extra-notice-box">
+            <i data-lucide="info"></i>
+            <span>Logging an extra deliverable beyond your assigned monthly targets. Upon manager approval, it will be credited as an over-achievement to your monthly score!</span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="log-extra-brand"><i data-lucide="briefcase"></i> Brand Track *</label>
+              <select id="log-extra-brand">
+                <option value="Techschool">Nexcrest Techschool</option>
+                <option value="IT">Nexcrest IT</option>
+                <option value="Both">Both Brands</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="log-extra-category"><i data-lucide="layers"></i> Category *</label>
+              <select id="log-extra-category">
+                <option value="Campus Happenings">Campus Happenings</option>
+                <option value="Branding" selected>Branding</option>
+                <option value="Marketing Creatives">Marketing Creatives</option>
+                <option value="Moment Marketing">Moment Marketing</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="log-extra-program"><i data-lucide="file-text"></i> Program / Task Name *</label>
+              <input type="text" id="log-extra-program" placeholder="e.g. Special Deepavali Festival Campaign" list="common-program-list">
+              <datalist id="common-program-list">
+                <option value="NexTalk Series">
+                <option value="Let's Talk Series">
+                <option value="Informative Contents">
+                <option value="Experts Talk">
+                <option value="Admissions Campaign">
+                <option value="Life & Culture Series">
+                <option value="Trending Topic Meme">
+                <option value="Festival Special Creative">
+              </datalist>
+            </div>
+            <div class="form-group">
+              <label for="log-extra-format"><i data-lucide="palette"></i> Deliverable Format *</label>
+              <select id="log-extra-format">
+                <option value="Carousel">Carousel (Multi-Slide)</option>
+                <option value="Poster">Poster (Single Creative)</option>
+                <option value="Reel (9:16)">Reel (9:16 Video)</option>
+                <option value="Motion Graphic">Motion Graphic</option>
+                <option value="Long Form Video">Long Form Video</option>
+                <option value="Lead Ad Creative">Lead Ad Creative</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -1236,7 +1309,7 @@
 
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-close-modal="log-work-modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" class="btn btn-primary" id="btn-submit-deliverable">
             <i data-lucide="send"></i> Submit
           </button>
         </div>
@@ -1530,10 +1603,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=58"></script>
-  <script src="js/data.js?v=58"></script>
-  <script src="js/auth.js?v=58"></script>
-  <script src="js/app.js?v=58"></script>
+  <script src="js/firebase-config.js?v=59"></script>
+  <script src="js/data.js?v=59"></script>
+  <script src="js/auth.js?v=59"></script>
+  <script src="js/app.js?v=59"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

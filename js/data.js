@@ -532,7 +532,7 @@ class DataStore {
   }
 
   getEmployeeStats(user) {
-    if (!user) return { totalTarget: 0, totalCompleted: 0, totalPending: 0, pct: 0, targetsCount: 0 };
+    if (!user) return { totalTarget: 0, totalCompleted: 0, totalPending: 0, pct: 0, extraCompleted: 0, remaining: 0, targetsCount: 0 };
     const targets = this.getTargetsForUser(user);
     let totalTarget = 0;
     let totalCompleted = 0;
@@ -540,13 +540,18 @@ class DataStore {
 
     targets.forEach(t => {
       const prog = this.getTargetProgress(t.id);
-      totalTarget += prog.target;
+      if (!t.isExtra) {
+        totalTarget += prog.target;
+      }
       totalCompleted += prog.completed;
       totalPending += prog.pending;
     });
 
-    const pct = totalTarget > 0 ? Math.min(100, Math.round((totalCompleted / totalTarget) * 100)) : 0;
-    return { totalTarget, totalCompleted, totalPending, pct, targetsCount: targets.length };
+    const pct = totalTarget > 0 ? Math.round((totalCompleted / totalTarget) * 100) : (totalCompleted > 0 ? 100 : 0);
+    const extraCompleted = Math.max(0, totalCompleted - totalTarget);
+    const remaining = Math.max(0, totalTarget - totalCompleted);
+
+    return { totalTarget, totalCompleted, totalPending, pct, extraCompleted, remaining, targetsCount: targets.length };
   }
 
   getTargetById(id) {
@@ -660,14 +665,41 @@ class DataStore {
 
   addSubmission(subData) {
     if (!Array.isArray(this.submissions)) this.submissions = [];
-    const target = this.getTargetById(subData.targetId);
+
+    let target = this.getTargetById(subData.targetId);
+
+    // If this is an extra / self-initiated task without a pre-assigned target, automatically generate a linked target record
+    if (!target && subData.isExtra) {
+      const newTarget = {
+        id: 'target-extra-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+        assignee: subData.assignee || 'designer',
+        assigneeName: subData.assigneeName || subData.authorName || '',
+        assigneeEmail: subData.authorEmail || '',
+        brand: subData.brand || 'Both',
+        category: subData.category || 'Branding',
+        program: subData.program || 'Self-Initiated Task',
+        format: subData.format || 'Poster',
+        targetQty: 1,
+        month: subData.month || this.activeMonth,
+        notes: subData.notes || 'Self-logged extra deliverable task',
+        isSelfInitiated: true,
+        isExtra: true
+      };
+      this.targets.push(newTarget);
+      this.saveTargets(this.targets);
+      target = newTarget;
+      subData.targetId = newTarget.id;
+    }
+
     const newSubmission = {
       ...subData,
       id: 'sub-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+      targetId: subData.targetId || (target ? target.id : 'unassigned'),
       submittedAt: new Date().toISOString(),
-      month: (target && target.month) || this.activeMonth,
+      month: (target && target.month) || subData.month || this.activeMonth,
       status: 'pending',
-      feedback: ''
+      feedback: '',
+      isExtra: Boolean(subData.isExtra || (target && target.isExtra))
     };
     this.submissions.unshift(newSubmission);
     this.saveSubmissions(this.submissions);
@@ -732,15 +764,16 @@ class DataStore {
   // Calculated Progress Metrics
   getTargetProgress(targetId) {
     const target = this.getTargetById(targetId);
-    if (!target) return { completed: 0, pending: 0, target: 0, pct: 0 };
+    if (!target) return { completed: 0, pending: 0, target: 0, pct: 0, extra: 0 };
 
     const subs = this.submissions.filter(s => s.targetId === targetId);
     const completed = subs.filter(s => s.status === 'approved').length;
     const pending = subs.filter(s => s.status === 'pending').length;
     const targetQty = Number(target.targetQty) || 1;
-    const pct = Math.min(100, Math.round((completed / targetQty) * 100));
+    const pct = targetQty > 0 ? Math.round((completed / targetQty) * 100) : (completed > 0 ? 100 : 0);
+    const extra = Math.max(0, completed - targetQty);
 
-    return { completed, pending, target: targetQty, pct };
+    return { completed, pending, target: targetQty, pct, extra };
   }
 
   getRoleStats(assignee) {
@@ -757,13 +790,16 @@ class DataStore {
 
     targets.forEach(t => {
       const prog = this.getTargetProgress(t.id);
-      totalTarget += prog.target;
+      if (!t.isExtra) {
+        totalTarget += prog.target;
+      }
       totalCompleted += prog.completed;
       totalPending += prog.pending;
     });
 
-    const pct = totalTarget > 0 ? Math.min(100, Math.round((totalCompleted / totalTarget) * 100)) : 0;
-    return { totalTarget, totalCompleted, totalPending, pct };
+    const pct = totalTarget > 0 ? Math.round((totalCompleted / totalTarget) * 100) : (totalCompleted > 0 ? 100 : 0);
+    const extraCompleted = Math.max(0, totalCompleted - totalTarget);
+    return { totalTarget, totalCompleted, totalPending, pct, extraCompleted };
   }
 
   getOverallStats() {
@@ -774,13 +810,15 @@ class DataStore {
     const totalTarget = designerStats.totalTarget + videoStats.totalTarget + marketingStats.totalTarget;
     const totalCompleted = designerStats.totalCompleted + videoStats.totalCompleted + marketingStats.totalCompleted;
     const totalPending = designerStats.totalPending + videoStats.totalPending + marketingStats.totalPending;
-    const pct = totalTarget > 0 ? Math.min(100, Math.round((totalCompleted / totalTarget) * 100)) : 0;
+    const pct = totalTarget > 0 ? Math.round((totalCompleted / totalTarget) * 100) : (totalCompleted > 0 ? 100 : 0);
+    const extraCompleted = Math.max(0, totalCompleted - totalTarget);
 
     return {
       totalTarget,
       totalCompleted,
       totalPending,
       pct,
+      extraCompleted,
       designer: designerStats,
       video: videoStats,
       marketing: marketingStats
@@ -820,20 +858,26 @@ class DataStore {
 
     targets.forEach(t => {
       const q = Number(t.targetQty) || 1;
-      totalTarget += q;
+      if (!t.isExtra) {
+        totalTarget += q;
+      }
 
       const normCat = normalizeCat(t.category);
-      if (catBuckets[normCat]) {
+      if (catBuckets[normCat] && !t.isExtra) {
         catBuckets[normCat].total += q;
       }
 
       const isVideo = isVideoFormat(t.format);
       if (isVideo) {
-        reelsVideosTarget += q;
-        if (catBuckets[normCat]) catBuckets[normCat].reelsTarget += q;
+        if (!t.isExtra) {
+          reelsVideosTarget += q;
+          if (catBuckets[normCat]) catBuckets[normCat].reelsTarget += q;
+        }
       } else {
-        postersCarouselsTarget += q;
-        if (catBuckets[normCat]) catBuckets[normCat].postersTarget += q;
+        if (!t.isExtra) {
+          postersCarouselsTarget += q;
+          if (catBuckets[normCat]) catBuckets[normCat].postersTarget += q;
+        }
       }
 
       // Check completions for this target
@@ -854,8 +898,9 @@ class DataStore {
       }
     });
 
-    const pct = totalTarget > 0 ? Math.min(100, Math.round((totalPublished / totalTarget) * 100)) : 0;
+    const pct = totalTarget > 0 ? Math.round((totalPublished / totalTarget) * 100) : (totalPublished > 0 ? 100 : 0);
     const remaining = Math.max(0, totalTarget - totalPublished);
+    const extraCompleted = Math.max(0, totalPublished - totalTarget);
 
     // Days left calculation (Calendar Days & Mon-Fri Working Days)
     let daysLeft = 0;
@@ -904,6 +949,7 @@ class DataStore {
       postersCarouselsPublished,
       pct,
       remaining,
+      extraCompleted,
       daysLeft,
       workingDaysLeft,
       categories: catBuckets,
