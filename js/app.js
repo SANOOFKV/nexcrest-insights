@@ -292,7 +292,6 @@ document.addEventListener('DOMContentLoaded', () => {
     profileDetailsForm: document.getElementById('profile-details-form'),
     profileEditName: document.getElementById('profile-edit-name'),
     profileEditTitle: document.getElementById('profile-edit-title'),
-    profileTitleLockTag: document.getElementById('profile-title-lock-tag'),
     profileEditBrandReadonly: document.getElementById('profile-edit-brand-readonly'),
     profilePasswordForm: document.getElementById('profile-password-form'),
     profileCurrentPass: document.getElementById('profile-current-pass'),
@@ -2883,13 +2882,11 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.profileEditTitle.removeAttribute('disabled');
         elements.profileEditTitle.style.cursor = 'text';
         elements.profileEditTitle.style.opacity = '1';
-        if (elements.profileTitleLockTag) elements.profileTitleLockTag.style.display = 'none';
       } else {
         elements.profileEditTitle.setAttribute('readonly', 'true');
         elements.profileEditTitle.setAttribute('disabled', 'true');
         elements.profileEditTitle.style.cursor = 'not-allowed';
         elements.profileEditTitle.style.opacity = '0.75';
-        if (elements.profileTitleLockTag) elements.profileTitleLockTag.style.display = 'inline-flex';
       }
     }
     if (elements.profileEditBrandReadonly) {
