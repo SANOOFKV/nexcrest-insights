@@ -174,6 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
     targetFormat: document.getElementById('target-format'),
     targetProgram: document.getElementById('target-program'),
     targetQty: document.getElementById('target-qty'),
+    targetDeadline: document.getElementById('target-deadline'),
     targetNotes: document.getElementById('target-notes'),
     btnModalDeleteTarget: document.getElementById('btn-modal-delete-target'),
     btnSubmitTargetModal: document.getElementById('btn-submit-target-modal'),
@@ -381,6 +382,42 @@ document.addEventListener('DOMContentLoaded', () => {
       return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     } catch (e) {
       return isoStr;
+    }
+  }
+
+  function formatDeadlineBadge(deadlineStr, isCompleted = false) {
+    if (!deadlineStr) return '';
+    try {
+      const parts = deadlineStr.split('-');
+      if (parts.length < 3) return `<span class="badge-deadline"><i data-lucide="calendar"></i> Due ${escapeHtml(deadlineStr)}</span>`;
+      const dueYear = parseInt(parts[0], 10);
+      const dueMonth = parseInt(parts[1], 10) - 1;
+      const dueDay = parseInt(parts[2], 10);
+      const dueDate = new Date(dueYear, dueMonth, dueDay, 23, 59, 59);
+
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const dueStart = new Date(dueYear, dueMonth, dueDay);
+      const diffMs = dueStart - todayStart;
+      const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+      const formattedDate = dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+      if (isCompleted) {
+        return `<span class="badge-deadline completed" title="Due on ${formattedDate} (Task Completed)"><i data-lucide="calendar-check"></i> Due ${formattedDate}</span>`;
+      }
+
+      if (diffDays < 0) {
+        return `<span class="badge-deadline overdue" title="Overdue by ${Math.abs(diffDays)} day(s)"><i data-lucide="alert-circle"></i> Overdue (${formattedDate})</span>`;
+      } else if (diffDays === 0) {
+        return `<span class="badge-deadline today" title="Due Today!"><i data-lucide="clock"></i> Due Today</span>`;
+      } else if (diffDays === 1) {
+        return `<span class="badge-deadline soon" title="Due Tomorrow"><i data-lucide="calendar"></i> Due Tomorrow</span>`;
+      } else {
+        return `<span class="badge-deadline" title="Due on ${formattedDate}"><i data-lucide="calendar"></i> Due ${formattedDate}</span>`;
+      }
+    } catch (e) {
+      return `<span class="badge-deadline"><i data-lucide="calendar"></i> Due ${escapeHtml(deadlineStr)}</span>`;
     }
   }
 
@@ -1377,8 +1414,11 @@ document.addEventListener('DOMContentLoaded', () => {
           <td><span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span></td>
           <td><span class="badge-category">${escapeHtml(target.category)}</span></td>
           <td>
-            <strong>${escapeHtml(target.program)}</strong>
-            ${target.isExtra ? `<span class="badge-extra-work" style="font-size: 10px; padding: 1px 6px; margin-left: 4px;">⭐ Extra</span>` : ''}
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <strong>${escapeHtml(target.program)}</strong>
+              ${target.isExtra ? `<span class="badge-extra-work" style="font-size: 10px; padding: 1px 6px;">⭐ Extra</span>` : ''}
+              ${target.deadline ? formatDeadlineBadge(target.deadline, isDone) : ''}
+            </div>
             ${target.notes ? `<div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">${escapeHtml(target.notes)}</div>` : ''}
           </td>
           <td><span class="badge-format">${escapeHtml(target.format)}</span></td>
@@ -1809,6 +1849,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   <span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span>
                   <span class="badge-category">${escapeHtml(target.category)}</span>
                   <span class="badge-format">${escapeHtml(target.format)}</span>
+                  ${target.deadline ? formatDeadlineBadge(target.deadline, isDone) : ''}
                   ${target.isExtra ? '<span class="badge-extra-work" style="font-size: 10px; padding: 1px 6px;">⭐ Extra</span>' : ''}
                 </div>
                 ${statusPill}
@@ -2355,6 +2396,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function openAssignTargetModal(preselectedAssignee = null) {
     elements.assignTargetForm.reset();
     elements.editTargetId.value = '';
+    if (elements.targetDeadline) elements.targetDeadline.value = '';
     populateTargetAssigneeOptions(preselectedAssignee);
     elements.assignTargetModal.querySelector('h3').textContent = 'Assign Target Deliverable';
     if (elements.btnSubmitTargetText) elements.btnSubmitTargetText.textContent = 'Assign Target';
@@ -2807,6 +2849,7 @@ document.addEventListener('DOMContentLoaded', () => {
       format: (elements.targetFormat && elements.targetFormat.value.trim()) || elements.targetBrand.value || 'Deliverable',
       program: elements.targetProgram.value.trim(),
       targetQty: parseInt(elements.targetQty.value, 10) || 1,
+      deadline: (elements.targetDeadline && elements.targetDeadline.value) ? elements.targetDeadline.value : undefined,
       notes: elements.targetNotes.value.trim()
     };
 
@@ -2869,11 +2912,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (elements.logTargetSelect) {
       if (availableTargets.length > 0) {
-        elements.logTargetSelect.innerHTML = availableTargets.map(t => `
-          <option value="${t.id}" ${t.id === preselectedTargetId ? 'selected' : ''}>
-            [${formatBrandName(t.brand)} - ${t.category}] ${t.program} (${t.format})
-          </option>
-        `).join('');
+        elements.logTargetSelect.innerHTML = availableTargets.map(t => {
+          const deadlineText = t.deadline ? ` [Due: ${t.deadline}]` : '';
+          return `
+            <option value="${t.id}" ${t.id === preselectedTargetId ? 'selected' : ''}>
+              [${formatBrandName(t.brand)} - ${t.category}] ${t.program} (${t.format})${deadlineText}
+            </option>
+          `;
+        }).join('');
       } else {
         elements.logTargetSelect.innerHTML = `<option value="">No assigned targets (use Log Extra Work tab)</option>`;
       }
@@ -3095,6 +3141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (elements.targetFormat) elements.targetFormat.value = target.format || '';
         elements.targetProgram.value = target.program;
         elements.targetQty.value = target.targetQty;
+        if (elements.targetDeadline) elements.targetDeadline.value = target.deadline || '';
         elements.targetNotes.value = target.notes || '';
         elements.assignTargetModal.querySelector('h3').textContent = 'Edit Target Deliverable';
         if (elements.btnSubmitTargetText) elements.btnSubmitTargetText.textContent = 'Update Target';
@@ -3346,6 +3393,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="badge-brand ${escapeHtml(t.brand)}">${formatBrandName(t.brand)}</span>
                 <span class="badge-category">${escapeHtml(t.category)}</span>
                 <span class="badge-format">${escapeHtml(t.format)}</span>
+                ${t.deadline ? formatDeadlineBadge(t.deadline, prog.completed >= (Number(t.targetQty) || 1)) : ''}
                 <span>• Target: <strong>${t.targetQty}</strong></span>
                 <span style="color: var(--mint-light); font-weight: 600;">• Done: ${prog.completed}</span>
                 ${prog.pending > 0 ? `<span style="color: var(--amber-light); font-weight: 600;">• ${prog.pending} in review</span>` : ''}

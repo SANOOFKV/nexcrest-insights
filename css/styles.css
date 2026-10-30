@@ -7765,6 +7765,80 @@ body.dark-theme .submission-item-card.extra-deliverable {
   border-left: 3px solid #CEF3E4 !important;
 }
 
+/* Optional Task Deadline Badges */
+.badge-deadline {
+  background: rgba(0, 139, 165, 0.12);
+  color: #008BA5;
+  border: 1px solid rgba(0, 139, 165, 0.25);
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.badge-deadline i {
+  width: 11px;
+  height: 11px;
+}
+.badge-deadline.overdue {
+  background: rgba(225, 29, 72, 0.12);
+  color: #E11D48;
+  border-color: rgba(225, 29, 72, 0.3);
+}
+.badge-deadline.today {
+  background: rgba(245, 158, 11, 0.14);
+  color: #D97706;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+.badge-deadline.soon {
+  background: rgba(245, 158, 11, 0.1);
+  color: #D97706;
+  border-color: rgba(245, 158, 11, 0.25);
+}
+.badge-deadline.completed {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  border-color: rgba(16, 185, 129, 0.25);
+  opacity: 0.85;
+}
+
+body.dark-theme .badge-deadline {
+  background: rgba(0, 139, 165, 0.18);
+  color: #45B2C3;
+  border-color: rgba(69, 178, 195, 0.35);
+}
+body.dark-theme .badge-deadline.overdue {
+  background: rgba(225, 29, 72, 0.18);
+  color: #FDA4AF;
+  border-color: rgba(225, 29, 72, 0.4);
+}
+body.dark-theme .badge-deadline.today {
+  background: rgba(245, 158, 11, 0.2);
+  color: #FDE68A;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+body.dark-theme .badge-deadline.soon {
+  background: rgba(245, 158, 11, 0.15);
+  color: #FCD34D;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+body.dark-theme .badge-deadline.completed {
+  background: rgba(16, 185, 129, 0.15);
+  color: #CEF3E4;
+  border-color: rgba(206, 243, 228, 0.3);
+  opacity: 0.85;
+}
+
+input[type="date"] {
+  color-scheme: light;
+}
+body.dark-theme input[type="date"] {
+  color-scheme: dark;
+}
+
 @keyframes pulse-glow {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.85; transform: scale(1.02); }
