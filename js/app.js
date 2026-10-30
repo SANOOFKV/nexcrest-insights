@@ -142,6 +142,13 @@ document.addEventListener('DOMContentLoaded', () => {
     filterCategorySelect: document.getElementById('filter-category-select'),
     filterBrandSelect: document.getElementById('filter-brand-select'),
     filterStatusSelect: document.getElementById('filter-status-select'),
+    adminTargetsStatusBar: document.getElementById('admin-targets-status-bar'),
+    adminStatusBtnAll: document.getElementById('admin-status-btn-all'),
+    adminStatusBtnPending: document.getElementById('admin-status-btn-pending'),
+    adminStatusBtnDelivered: document.getElementById('admin-status-btn-delivered'),
+    adminCountStatusAll: document.getElementById('admin-count-status-all'),
+    adminCountStatusPending: document.getElementById('admin-count-status-pending'),
+    adminCountStatusDelivered: document.getElementById('admin-count-status-delivered'),
 
     // Member View Elements
     memberKpiTarget: document.getElementById('member-kpi-target'),
@@ -1277,7 +1284,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (state.filters.status && state.filters.status !== 'all') {
       targets = targets.filter(t => {
         const prog = window.dataStore.getTargetProgress(t.id);
-        if (state.filters.status === 'completed') return prog.completed >= prog.target;
+        if (state.filters.status === 'completed' || state.filters.status === 'delivered') return prog.completed >= prog.target;
+        if (state.filters.status === 'pending') return prog.completed < prog.target;
         if (state.filters.status === 'in-progress') return prog.completed > 0 && prog.completed < prog.target;
         if (state.filters.status === 'not-started') return prog.completed === 0;
         return true;
@@ -1412,6 +1420,54 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     elements.tableRowCount.textContent = `${targets.length} items`;
+
+    // Calculate live telemetry counts for Admin Status Filter Bar
+    let baseTargets = window.dataStore.getTargets({
+      assignee: state.filters.role,
+      category: state.filters.category,
+      brand: state.filters.brand
+    });
+    if (state.filters.search) {
+      const q = state.filters.search.toLowerCase();
+      baseTargets = baseTargets.filter(t => 
+        (t.program && t.program.toLowerCase().includes(q)) ||
+        (t.format && t.format.toLowerCase().includes(q)) ||
+        (t.notes && t.notes.toLowerCase().includes(q)) ||
+        (t.brand && t.brand.toLowerCase().includes(q)) ||
+        (t.category && t.category.toLowerCase().includes(q))
+      );
+    }
+
+    let allCount = baseTargets.length;
+    let pendingCount = 0;
+    let deliveredCount = 0;
+
+    baseTargets.forEach(t => {
+      const prog = window.dataStore.getTargetProgress(t.id);
+      if (prog.completed >= prog.target) {
+        deliveredCount++;
+      } else {
+        pendingCount++;
+      }
+    });
+
+    const elCountAll = elements.adminCountStatusAll || document.getElementById('admin-count-status-all');
+    const elCountPending = elements.adminCountStatusPending || document.getElementById('admin-count-status-pending');
+    const elCountDelivered = elements.adminCountStatusDelivered || document.getElementById('admin-count-status-delivered');
+    if (elCountAll) elCountAll.textContent = allCount;
+    if (elCountPending) elCountPending.textContent = pendingCount;
+    if (elCountDelivered) elCountDelivered.textContent = deliveredCount;
+
+    // Sync active state on segmented status buttons
+    const curStatus = state.filters.status || 'all';
+    document.querySelectorAll('.admin-status-btn').forEach(btn => {
+      const btnStatus = btn.dataset.adminStatus;
+      const isActive = (btnStatus === curStatus) ||
+                       (btnStatus === 'delivered' && curStatus === 'completed') ||
+                       (btnStatus === 'all' && (curStatus === 'all' || !['pending', 'delivered', 'completed', 'in-progress', 'not-started'].includes(curStatus)));
+      btn.classList.toggle('active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
 
     if (targets.length === 0) {
       const allActiveTargets = window.dataStore.getTargets();
@@ -2548,6 +2604,29 @@ document.addEventListener('DOMContentLoaded', () => {
       state.filters.status = e.target.value;
       renderManagerTargetsTable();
       refreshIcons();
+    });
+  }
+
+  // Admin Targets Segmented Status Filter Bar Click Handler
+  const adminTargetsStatusBar = document.getElementById('admin-targets-status-bar');
+  if (adminTargetsStatusBar) {
+    adminTargetsStatusBar.addEventListener('click', (e) => {
+      const btn = e.target.closest('.admin-status-btn');
+      if (btn && btn.dataset.adminStatus) {
+        const newStatus = btn.dataset.adminStatus;
+        state.filters.status = newStatus;
+        if (elements.filterStatusSelect) {
+          if (elements.filterStatusSelect.querySelector(`option[value="${newStatus}"]`)) {
+            elements.filterStatusSelect.value = newStatus;
+          } else if (newStatus === 'delivered' && elements.filterStatusSelect.querySelector('option[value="completed"]')) {
+            elements.filterStatusSelect.value = 'completed';
+          } else if (newStatus === 'all') {
+            elements.filterStatusSelect.value = 'all';
+          }
+        }
+        renderManagerTargetsTable();
+        refreshIcons();
+      }
     });
   }
 

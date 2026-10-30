@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=67">
+  <link rel="stylesheet" href="css/styles.css?v=68">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -436,6 +436,25 @@
 
       <!-- TAB 1: Target Deliverables Table -->
       <div id="tab-all-targets" class="tab-pane hidden">
+        <!-- Admin Targets Delivery Status Filter Bar -->
+        <div class="admin-targets-status-bar" id="admin-targets-status-bar" role="tablist" aria-label="Target Delivery Status Filter">
+          <button type="button" class="admin-status-btn active" data-admin-status="all" id="admin-status-btn-all" aria-selected="true">
+            <i data-lucide="layers"></i>
+            <span>All Assigned</span>
+            <span class="admin-status-count" id="admin-count-status-all">0</span>
+          </button>
+          <button type="button" class="admin-status-btn" data-admin-status="pending" id="admin-status-btn-pending" aria-selected="false">
+            <i data-lucide="clock"></i>
+            <span>⏳ Pending</span>
+            <span class="admin-status-count admin-status-count-pending" id="admin-count-status-pending">0</span>
+          </button>
+          <button type="button" class="admin-status-btn" data-admin-status="delivered" id="admin-status-btn-delivered" aria-selected="false">
+            <i data-lucide="check-circle-2"></i>
+            <span>✅ Delivered</span>
+            <span class="admin-status-count admin-status-count-delivered" id="admin-count-status-delivered">0</span>
+          </button>
+        </div>
+
         <!-- Filter Controls (Visible on Table Tab) -->
         <div class="filter-controls" id="manager-table-filters" style="margin-bottom: 16px;">
           <div class="search-box">
@@ -478,7 +497,8 @@
             <label><i data-lucide="activity"></i> Status:</label>
             <select id="filter-status-select">
               <option value="all">All Statuses</option>
-              <option value="completed">Completed / Quota Met</option>
+              <option value="pending">⏳ Pending</option>
+              <option value="delivered">✅ Delivered / Met</option>
               <option value="in-progress">In Progress</option>
               <option value="not-started">Not Started</option>
             </select>
@@ -1626,10 +1646,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=67"></script>
-  <script src="js/data.js?v=67"></script>
-  <script src="js/auth.js?v=67"></script>
-  <script src="js/app.js?v=67"></script>
+  <script src="js/firebase-config.js?v=68"></script>
+  <script src="js/data.js?v=68"></script>
+  <script src="js/auth.js?v=68"></script>
+  <script src="js/app.js?v=68"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
