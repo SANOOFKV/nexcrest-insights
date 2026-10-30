@@ -639,6 +639,25 @@ button:active:not(:disabled),
   font-size: 14px;
 }
 
+.member-workspace-title,
+#member-view .section-header h2 {
+  color: var(--text-main) !important;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+body.light-theme .member-workspace-title,
+body.light-theme #member-view .section-header h2 {
+  color: #0F172A !important;
+}
+
+body.dark-theme .member-workspace-title,
+body.dark-theme #member-view .section-header h2 {
+  color: #FFFFFF !important;
+}
+
 .header-action-buttons {
   display: flex;
   align-items: center;
