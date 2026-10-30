@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=65">
+  <link rel="stylesheet" href="css/styles.css?v=66">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -130,15 +130,6 @@
   <main class="app-main">
     <!-- VIEW 1: MARKETING MANAGER COMMAND CENTER -->
     <section id="manager-view" class="view-section hidden">
-      <!-- Manager Pending Review Banner -->
-      <div id="review-alert-banner" class="alert-banner hidden">
-        <div class="alert-content">
-          <i data-lucide="bell-ring" class="alert-icon"></i>
-          <span id="alert-text">You have 3 submissions awaiting review.</span>
-        </div>
-        <button id="view-reviews-btn" class="btn btn-sm btn-light">Review Submissions</button>
-      </div>
-
       <!-- Tab Navigation & Action Controls for Manager (Unified Single Row) -->
       <div class="tabs-control-bar manager-unified-bar">
         <div class="tab-pills">
@@ -764,10 +755,6 @@
             <i data-lucide="layers"></i> All Tasks (<span id="count-status-all">0</span>)
           </button>
         </div>
-        <div class="status-summary-hint" id="status-summary-hint">
-          <i data-lucide="info"></i>
-          <span id="status-hint-text">Showing tasks to deliver for this month</span>
-        </div>
       </div>
 
       <!-- Member Deliverables Sections Container -->
@@ -1021,10 +1008,6 @@
 
       <div style="padding: 16px 0; font-size: 14px; line-height: 1.6; color: var(--text-main);">
         <p>Are you sure you want to remove <strong id="delete-emp-name-display" style="color: var(--teal-primary);">Employee</strong> from the team roster?</p>
-        <div class="delete-warning-callout">
-          <i data-lucide="alert-triangle"></i>
-          <span>Login access and assigned deliverables will be revoked.</span>
-        </div>
       </div>
 
       <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
@@ -1063,10 +1046,6 @@
             <span id="delete-target-assignee-display">Assigned to: <strong>User</strong></span>
           </div>
         </div>
-        <div class="delete-warning-callout">
-          <i data-lucide="alert-triangle"></i>
-          <span>This deliverable task and its progress will be permanently removed.</span>
-        </div>
       </div>
 
       <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
@@ -1095,10 +1074,6 @@
 
       <div style="padding: 16px 0; font-size: 14px; line-height: 1.6; color: var(--text-main);">
         <p>Are you sure you want to delete <strong id="delete-batch-count-display" style="color: var(--rose-danger); font-size: 16px;">0</strong> assigned tasks?</p>
-        <div class="delete-warning-callout">
-          <i data-lucide="alert-triangle"></i>
-          <span>All selected deliverable tasks, quota progress, and related submissions will be permanently removed across all devices.</span>
-        </div>
       </div>
 
       <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
@@ -1120,7 +1095,6 @@
           </div>
           <div>
             <h3 style="margin: 0; font-family: var(--font-heading); font-size: 18px; color: var(--text-main);" id="user-tasks-modal-title">Assigned Tasks</h3>
-            <p style="margin: 0; font-size: 12px; color: var(--text-muted);" id="user-tasks-modal-subtitle">Manage deliverables for team member</p>
           </div>
         </div>
         <button class="modal-close-btn" data-close-modal="user-tasks-modal">&times;</button>
@@ -1293,11 +1267,6 @@
 
         <!-- Mode 2: Add Task / Extra Work Fields -->
         <div id="log-extra-fields" class="submit-mode-section hidden">
-          <div class="extra-notice-box">
-            <i data-lucide="info"></i>
-            <span>Logging an extra deliverable beyond your assigned monthly quota. This task will be sent directly to Admin (Marketing Manager) for review. Once approved, it will be counted towards your monthly completion & bonus!</span>
-          </div>
-
           <div class="form-row">
             <div class="form-group">
               <label for="log-extra-brand"><i data-lucide="building"></i> Brand *</label>
@@ -1656,10 +1625,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=65"></script>
-  <script src="js/data.js?v=65"></script>
-  <script src="js/auth.js?v=65"></script>
-  <script src="js/app.js?v=65"></script>
+  <script src="js/firebase-config.js?v=66"></script>
+  <script src="js/data.js?v=66"></script>
+  <script src="js/auth.js?v=66"></script>
+  <script src="js/app.js?v=66"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

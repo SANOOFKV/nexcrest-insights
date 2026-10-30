@@ -797,11 +797,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const pendingCount = pendingSubs.length;
     elements.reviewQueueCount.textContent = pendingCount;
 
-    if (pendingCount > 0) {
-      elements.reviewAlertBanner.classList.remove('hidden');
-      elements.alertText.textContent = `You have ${pendingCount} deliverable submission${pendingCount > 1 ? 's' : ''} awaiting your review and approval.`;
-    } else {
-      elements.reviewAlertBanner.classList.add('hidden');
+    if (elements.reviewAlertBanner) {
+      if (pendingCount > 0) {
+        elements.reviewAlertBanner.classList.remove('hidden');
+        if (elements.alertText) elements.alertText.textContent = `You have ${pendingCount} deliverable submission${pendingCount > 1 ? 's' : ''} awaiting your review and approval.`;
+      } else {
+        elements.reviewAlertBanner.classList.add('hidden');
+      }
     }
 
     renderManagerActiveTab();
@@ -2521,14 +2523,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Alert Banner View Reviews button
-  elements.viewReviewsBtn.addEventListener('click', () => {
-    elements.managerTabBtns.forEach(b => {
-      if (b.dataset.managerTab === 'review-queue') b.classList.add('active');
-      else b.classList.remove('active');
+  if (elements.viewReviewsBtn) {
+    elements.viewReviewsBtn.addEventListener('click', () => {
+      elements.managerTabBtns.forEach(b => {
+        if (b.dataset.managerTab === 'review-queue') b.classList.add('active');
+        else b.classList.remove('active');
+      });
+      state.activeManagerTab = 'review-queue';
+      renderManagerActiveTab();
     });
-    state.activeManagerTab = 'review-queue';
-    renderManagerActiveTab();
-  });
+  }
 
   // Filter Listeners
   if (elements.filterSearchInput) {
@@ -3637,27 +3641,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (displayedTargets.length === 0) {
-      const emptyMsg = (modalFilter === 'pending')
-        ? `
-          <div style="text-align: center; padding: 32px 16px; color: var(--text-muted);">
-            <div style="font-size: 28px; margin-bottom: 6px;">🎉</div>
-            <p style="margin: 0; font-weight: 600; color: var(--text-main);">All assigned tasks have been delivered by ${escapeHtml(userObj.name)}!</p>
-            <p style="margin: 4px 0 0; font-size: 12px;">Switch to the 'Delivered' tab to view completed deliverables.</p>
-          </div>`
-        : (modalFilter === 'delivered')
-          ? `
-          <div style="text-align: center; padding: 32px 16px; color: var(--text-muted);">
-            <div style="font-size: 28px; margin-bottom: 6px;">⏳</div>
-            <p style="margin: 0; font-weight: 600; color: var(--text-main);">No delivered tasks yet for ${escapeHtml(userObj.name)}.</p>
-            <p style="margin: 4px 0 0; font-size: 12px;">Switch to 'Pending' to view active deliverables in progress.</p>
-          </div>`
-          : `
-          <div style="text-align: center; padding: 32px 16px; color: var(--text-muted);">
-            <i data-lucide="check-circle" style="width: 36px; height: 36px; color: var(--teal-primary); margin-bottom: 8px;"></i>
-            <p style="margin: 0; font-weight: 600; color: var(--text-main);">No tasks currently assigned to ${escapeHtml(userObj.name)}.</p>
-            <p style="margin: 4px 0 0; font-size: 12px;">Click 'Assign New Target' below to add a deliverable for this team member.</p>
-          </div>`;
-      elements.userTasksModalList.innerHTML = emptyMsg;
+      elements.userTasksModalList.innerHTML = `
+        <div style="text-align: center; padding: 24px 16px; color: var(--text-dim); font-size: 13px;">
+          No ${modalFilter === 'pending' ? 'pending' : modalFilter === 'delivered' ? 'delivered' : ''} tasks.
+        </div>
+      `;
     } else {
       elements.userTasksModalList.innerHTML = displayedTargets.map(t => {
         const prog = window.dataStore.getTargetProgress(t.id);
