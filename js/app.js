@@ -3170,7 +3170,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (elements.logExtraTitle) elements.logExtraTitle.setAttribute('required', 'required');
       if (elements.logWorkModalHeading) elements.logWorkModalHeading.textContent = 'Log Extra Work / Task';
       if (elements.btnSubmitDeliverable) {
-        elements.btnSubmitDeliverable.innerHTML = `<i data-lucide="send"></i> Submit Task for Admin Review`;
+        elements.btnSubmitDeliverable.innerHTML = `<i data-lucide="send"></i> Submit Extra Work`;
       }
     } else {
       if (elements.btnModeAssigned) elements.btnModeAssigned.classList.add('active');
