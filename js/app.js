@@ -2829,7 +2829,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (elements.logTargetSelect) elements.logTargetSelect.removeAttribute('required');
       if (elements.logWorkTitle) elements.logWorkTitle.removeAttribute('required');
       if (elements.logExtraTitle) elements.logExtraTitle.setAttribute('required', 'required');
-      if (elements.logWorkModalHeading) elements.logWorkModalHeading.textContent = 'Add Task & Submit for Admin Review';
+      if (elements.logWorkModalHeading) elements.logWorkModalHeading.textContent = 'Log Extra Work / Task';
       if (elements.btnSubmitDeliverable) {
         elements.btnSubmitDeliverable.innerHTML = `<i data-lucide="send"></i> Submit Task for Admin Review`;
       }
@@ -2857,7 +2857,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Open Log Work Modal (Global Button or Card Button)
-  function openLogWorkModal(preselectedTargetId = null, initialMode = 'extra') {
+  function openLogWorkModal(preselectedTargetId = null, initialMode = null) {
     let availableTargets = [];
     if (state.user && state.user.role === 'manager') {
       availableTargets = window.dataStore.getTargets();
@@ -2875,7 +2875,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </option>
         `).join('');
       } else {
-        elements.logTargetSelect.innerHTML = `<option value="">No assigned targets (use Add Task mode)</option>`;
+        elements.logTargetSelect.innerHTML = `<option value="">No assigned targets (use Log Extra Work tab)</option>`;
       }
     }
 
@@ -2884,8 +2884,8 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.logTargetSelect.value = preselectedTargetId;
     }
 
-    // Default to 'assigned' if a specific assigned target was preselected, otherwise 'extra' (Add Task)
-    const mode = preselectedTargetId ? 'assigned' : (initialMode || 'extra');
+    // Default to 'assigned' if assigned targets exist, or 'extra' if no assigned targets exist
+    const mode = initialMode || (preselectedTargetId ? 'assigned' : (availableTargets.length > 0 ? 'assigned' : 'extra'));
     setLogWorkMode(mode);
 
     elements.logWorkModal.classList.remove('hidden');
