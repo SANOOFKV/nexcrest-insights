@@ -382,7 +382,10 @@ document.addEventListener('DOMContentLoaded', () => {
   function safeUrl(url) {
     if (!url) return '#';
     try {
-      const trimmed = url.toString().trim();
+      let trimmed = url.toString().trim();
+      if (!/^https?:\/\//i.test(trimmed)) {
+        trimmed = 'https://' + trimmed;
+      }
       const parsed = new URL(trimmed);
       if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
         return parsed.href;
@@ -1423,7 +1426,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="sub-details">
             <h4 class="sub-title">${escapeHtml(sub.title)}</h4>
             <div class="sub-meta">
-              <span><strong>${escapeHtml(roleNameMap[sub.assignee] || sub.authorName || sub.assignee)}</strong></span>
+              <span><strong>${escapeHtml(sub.authorName || roleNameMap[sub.assignee] || sub.assignee)}</strong></span>
               <span>•</span>
               <span class="badge-brand ${escapeHtml(sub.brand)}">${formatBrandName(sub.brand)}</span>
               <span>•</span>
@@ -2797,14 +2800,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const submissionData = {
       targetId: target.id,
       assignee: target.assignee,
-      assigneeName: target.assigneeName,
+      assigneeName: target.assigneeName || (state.user ? state.user.name : ''),
+      authorName: state.user ? state.user.name : (target.assigneeName || target.assignee),
+      authorEmail: state.user ? state.user.email : '',
       brand: target.brand,
       category: target.category,
       program: target.program,
       format: target.format,
       title: elements.logWorkTitle.value.trim(),
       url: elements.logWorkUrl.value.trim(),
-      notes: elements.logWorkNotes.value.trim()
+      notes: elements.logWorkNotes.value.trim(),
+      month: target.month || window.dataStore.getActiveMonth()
     };
 
     window.dataStore.addSubmission(submissionData);
@@ -3574,6 +3580,13 @@ document.addEventListener('DOMContentLoaded', () => {
     state.user = user;
     renderApp();
   });
+
+  // Reactive DataStore Sync (Cloud Firestore real-time submissions & target updates)
+  if (window.dataStore && typeof window.dataStore.onChange === 'function') {
+    window.dataStore.onChange(() => {
+      renderApp();
+    });
+  }
 
   // Initial Boot
   try {

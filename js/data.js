@@ -315,10 +315,25 @@ const SEED_SUBMISSIONS = [];
 
 class DataStore {
   constructor() {
+    this.listeners = [];
     this.targets = this.loadTargets();
     this.submissions = this.loadSubmissions();
     this.activeMonth = localStorage.getItem(STORAGE_KEYS.SELECTED_MONTH) || '2026-10';
     this.initCloudSync();
+  }
+
+  onChange(callback) {
+    if (typeof callback === 'function') {
+      this.listeners.push(callback);
+    }
+  }
+
+  notify() {
+    if (Array.isArray(this.listeners)) {
+      this.listeners.forEach(cb => {
+        try { cb(); } catch (e) { console.error('DataStore listener notice:', e); }
+      });
+    }
   }
 
   initCloudSync() {
@@ -326,29 +341,28 @@ class DataStore {
       window.firebaseSync.seedTargetsIfEmpty(SEED_TARGETS);
       window.firebaseSync.seedSubmissionsIfEmpty(SEED_SUBMISSIONS);
 
-      // Permanently remove all old demo & recent October submissions from Cloud Firestore
-      const staleDemoSubIds = ['sub-1', 'sub-2', 'sub-3', 'sub-4', 'sub-5', 'sub-6', 'sub-7'];
-      window.firebaseSync.deleteMultipleSubmissions(staleDemoSubIds);
+      // Permanently remove legacy mock demo seed submissions from Cloud Firestore
+      const legacyDemoSubIds = ['sub-1', 'sub-2', 'sub-3', 'sub-4', 'sub-5', 'sub-6', 'sub-7'];
+      window.firebaseSync.deleteMultipleSubmissions(legacyDemoSubIds);
 
       window.firebaseSync.subscribeTargets((cloudTargets) => {
         if (Array.isArray(cloudTargets) && cloudTargets.length > 0) {
           this.targets = cloudTargets;
           try { localStorage.setItem(STORAGE_KEYS.TARGETS, JSON.stringify(this.targets)); } catch (e) {}
-          if (typeof this.notify === 'function') this.notify();
+          this.notify();
         }
       });
       window.firebaseSync.subscribeSubmissions((cloudSubs) => {
         if (Array.isArray(cloudSubs)) {
-          // Filter out stale demo submissions and recent October items
+          // Only filter out legacy mock demo seed submissions; preserve all user submissions
+          const demoSet = new Set(legacyDemoSubIds);
           this.submissions = cloudSubs.filter(s => {
             if (!s || !s.id) return false;
-            if (staleDemoSubIds.includes(String(s.id))) return false;
-            if (String(s.id).startsWith('sub-')) return false;
-            if (s.submittedAt && s.submittedAt.startsWith('2026-10')) return false;
+            if (demoSet.has(String(s.id))) return false;
             return true;
           });
           try { localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(this.submissions)); } catch (e) {}
-          if (typeof this.notify === 'function') this.notify();
+          this.notify();
         }
       });
     }
@@ -394,6 +408,7 @@ class DataStore {
     if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
       this.targets.forEach(t => window.firebaseSync.saveTarget(t));
     }
+    this.notify();
   }
 
   loadSubmissions() {
@@ -406,12 +421,12 @@ class DataStore {
       let parsed = JSON.parse(raw);
       let migrated = false;
 
-      // Automatically purge all old demo and recent October submissions (sub-1 .. sub-7 & recent sub-*)
+      // Only purge legacy mock demo seed submissions (sub-1 .. sub-7)
+      const legacyDemoSubIds = new Set(['sub-1', 'sub-2', 'sub-3', 'sub-4', 'sub-5', 'sub-6', 'sub-7']);
       const initialCount = parsed.length;
       parsed = parsed.filter(s => {
         if (!s || !s.id) return false;
-        if (String(s.id).startsWith('sub-')) return false;
-        if (s.submittedAt && s.submittedAt.startsWith('2026-10')) return false;
+        if (legacyDemoSubIds.has(String(s.id))) return false;
         return true;
       });
       if (parsed.length !== initialCount) {
@@ -449,6 +464,7 @@ class DataStore {
     if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
       this.submissions.forEach(s => window.firebaseSync.saveSubmission(s));
     }
+    this.notify();
   }
 
   setActiveMonth(month) {
@@ -619,23 +635,37 @@ class DataStore {
   // Submission Methods
   getSubmissions(filters = {}) {
     return this.submissions.filter(s => {
+      if (!s) return false;
       if (filters.targetId && s.targetId !== filters.targetId) return false;
-      if (filters.assignee && filters.assignee !== 'all' && s.assignee !== filters.assignee) return false;
       if (filters.status && filters.status !== 'all' && s.status !== filters.status) return false;
-      
+
+      if (filters.assignee && filters.assignee !== 'all') {
+        const normFilter = String(filters.assignee).toLowerCase();
+        const sAssignee = (s.assignee || '').toLowerCase();
+        const sAuthorEmail = (s.authorEmail || '').toLowerCase();
+        const sAuthorName = (s.authorName || '').toLowerCase();
+        if (sAssignee !== normFilter && sAuthorEmail !== normFilter && sAuthorName !== normFilter) {
+          return false;
+        }
+      }
+
       // Filter by active month
       const target = this.getTargetById(s.targetId);
-      if (target && target.month && target.month !== this.activeMonth) return false;
-      
+      const subMonth = (target && target.month) || s.month || (s.submittedAt ? s.submittedAt.slice(0, 7) : null);
+      if (subMonth && subMonth !== this.activeMonth) return false;
+
       return true;
     }).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
   }
 
   addSubmission(subData) {
+    if (!Array.isArray(this.submissions)) this.submissions = [];
+    const target = this.getTargetById(subData.targetId);
     const newSubmission = {
       ...subData,
-      id: 'sub-' + Date.now(),
+      id: 'sub-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
       submittedAt: new Date().toISOString(),
+      month: (target && target.month) || this.activeMonth,
       status: 'pending',
       feedback: ''
     };
@@ -665,7 +695,7 @@ class DataStore {
       if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
         window.firebaseSync.deleteSubmission(id);
       }
-      if (typeof this.notify === 'function') this.notify();
+      this.notify();
       return true;
     }
     return false;
@@ -678,8 +708,8 @@ class DataStore {
       if (!s) return false;
       const target = this.getTargetById(s.targetId);
       const isTargetMonth = (target && target.month === targetMonth) ||
-                            (s.submittedAt && s.submittedAt.startsWith(targetMonth)) ||
-                            (s.id && String(s.id).startsWith('sub-'));
+                            (s.month === targetMonth) ||
+                            (s.submittedAt && s.submittedAt.startsWith(targetMonth));
       if (isTargetMonth) {
         if (s.id) toRemove.push(String(s.id));
         return false;
@@ -695,7 +725,7 @@ class DataStore {
       window.firebaseSync.deleteMultipleSubmissions(toRemove);
     }
 
-    if (typeof this.notify === 'function') this.notify();
+    this.notify();
     return toRemove.length;
   }
 
