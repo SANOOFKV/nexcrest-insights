@@ -3059,39 +3059,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Copy Mobile Sync Link Button Handler
-  const btnCopySyncLink = document.getElementById('btn-copy-sync-link');
-  if (btnCopySyncLink) {
-    btnCopySyncLink.addEventListener('click', () => {
-      const user = state.user;
-      if (!user) {
-        showToast('Please sign in first.', 'error');
-        return;
-      }
-      try {
-        const payload = {
-          email: user.email,
-          pass: user.password,
-          t: Date.now()
-        };
-        const token = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-        const syncUrl = `${window.location.origin}${window.location.pathname}?sync=${encodeURIComponent(token)}`;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(syncUrl).then(() => {
-            showToast('📋 Mobile sync link copied! Open on your phone to sync instantly.', 'success');
-          }).catch(() => {
-            prompt('Copy this sync link and open on mobile:', syncUrl);
-          });
-        } else {
-          prompt('Copy this sync link and open on mobile:', syncUrl);
-        }
-      } catch (err) {
-        console.error('Failed to create sync URL', err);
-        showToast('Failed to generate sync link.', 'error');
-      }
-    });
-  }
-
   // Password visibility eye toggle handler (delegated)
   document.addEventListener('click', (e) => {
     const toggleBtn = e.target.closest('.btn-toggle-pass-visibility');
