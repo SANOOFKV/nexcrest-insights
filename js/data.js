@@ -480,6 +480,16 @@ class DataStore {
     return this.activeMonth;
   }
 
+  normalizeCategory(cat) {
+    if (!cat) return 'Branding';
+    const c = String(cat).toLowerCase().trim();
+    if (c.includes('campus') || c.includes('event') || c.includes('happening')) return 'Campus Events';
+    if (c.includes('market') && !c.includes('moment')) return 'Marketing';
+    if (c.includes('moment')) return 'Moment Marketing';
+    if (c.includes('brand')) return 'Branding';
+    return 'Branding';
+  }
+
   // Target Methods
   getTargets(filters = {}) {
     return this.targets.filter(t => {
@@ -491,7 +501,11 @@ class DataStore {
                                 (t.assigneeRole && t.assigneeRole.toLowerCase() === a);
         if (!matchesAssignee) return false;
       }
-      if (filters.category && filters.category !== 'all' && t.category !== filters.category) return false;
+      if (filters.category && filters.category !== 'all') {
+        const normFilterCat = this.normalizeCategory(filters.category);
+        const normTargetCat = this.normalizeCategory(t.category);
+        if (normFilterCat !== normTargetCat) return false;
+      }
       if (filters.brand && filters.brand !== 'all') {
         if (filters.brand === 'Both') {
           if (t.brand !== 'Both') return false;
@@ -843,17 +857,21 @@ class DataStore {
 
     const catBuckets = {
       'Branding': { name: 'Branding', total: 0, published: 0, reelsTarget: 0, reelsPublished: 0, postersTarget: 0, postersPublished: 0 },
-      'Campus Happenings': { name: 'Campus Happenings', total: 0, published: 0, reelsTarget: 0, reelsPublished: 0, postersTarget: 0, postersPublished: 0 },
-      'Marketing Creatives': { name: 'Marketing Creatives', total: 0, published: 0, reelsTarget: 0, reelsPublished: 0, postersTarget: 0, postersPublished: 0 },
+      'Campus Events': { name: 'Campus Events', total: 0, published: 0, reelsTarget: 0, reelsPublished: 0, postersTarget: 0, postersPublished: 0 },
+      'Marketing': { name: 'Marketing', total: 0, published: 0, reelsTarget: 0, reelsPublished: 0, postersTarget: 0, postersPublished: 0 },
       'Moment Marketing': { name: 'Moment Marketing', total: 0, published: 0, reelsTarget: 0, reelsPublished: 0, postersTarget: 0, postersPublished: 0 }
     };
+    // Backward compatibility aliases
+    catBuckets['Campus Happenings'] = catBuckets['Campus Events'];
+    catBuckets['Marketing Creatives'] = catBuckets['Marketing'];
 
     function normalizeCat(cat) {
       if (!cat) return 'Branding';
       const c = cat.toLowerCase().trim();
-      if (c.includes('campus') || c.includes('event') || c.includes('happening')) return 'Campus Happenings';
-      if (c.includes('market') && !c.includes('moment')) return 'Marketing Creatives';
+      if (c.includes('campus') || c.includes('event') || c.includes('happening')) return 'Campus Events';
+      if (c.includes('market') && !c.includes('moment')) return 'Marketing';
       if (c.includes('moment')) return 'Moment Marketing';
+      if (c.includes('brand')) return 'Branding';
       return 'Branding';
     }
 

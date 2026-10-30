@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=66">
+  <link rel="stylesheet" href="css/styles.css?v=67">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -457,9 +457,9 @@
             <label><i data-lucide="tag"></i> Category:</label>
             <select id="filter-category-select">
               <option value="all">All Categories</option>
-              <option value="Campus Happenings">Campus Happenings</option>
               <option value="Branding">Branding</option>
-              <option value="Marketing Creatives">Marketing Creatives</option>
+              <option value="Campus Events">Campus Events</option>
+              <option value="Marketing">Marketing</option>
               <option value="Moment Marketing">Moment Marketing</option>
             </select>
           </div>
@@ -838,9 +838,10 @@
             <div class="input-with-icon">
               <i data-lucide="tag"></i>
               <select id="target-category" required>
+                <option value="Branding" selected>Branding</option>
                 <option value="Campus Events">Campus Events</option>
-                <option value="Branding">Branding</option>
                 <option value="Marketing">Marketing</option>
+                <option value="Moment Marketing">Moment Marketing</option>
               </select>
             </div>
           </div>
@@ -1625,10 +1626,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=66"></script>
-  <script src="js/data.js?v=66"></script>
-  <script src="js/auth.js?v=66"></script>
-  <script src="js/app.js?v=66"></script>
+  <script src="js/firebase-config.js?v=67"></script>
+  <script src="js/data.js?v=67"></script>
+  <script src="js/auth.js?v=67"></script>
+  <script src="js/app.js?v=67"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

@@ -933,7 +933,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (elements.catBrandingBar) elements.catBrandingBar.style.width = `${bPct}%`;
     }
 
-    const campus = ov.categories['Campus Happenings'];
+    const campus = ov.categories['Campus Events'] || ov.categories['Campus Happenings'];
     if (campus) {
       animateCounter(elements.catCampusPosts, campus.total, 750, ' Posts');
       animateCounter(elements.catCampusReels, campus.reelsTarget);
@@ -942,7 +942,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (elements.catCampusBar) elements.catCampusBar.style.width = `${cPct}%`;
     }
 
-    const marketing = ov.categories['Marketing Creatives'];
+    const marketing = ov.categories['Marketing'] || ov.categories['Marketing Creatives'];
     if (marketing) {
       animateCounter(elements.catMarketingPosts, marketing.total, 750, ' Posts');
       animateCounter(elements.catMarketingReels, marketing.reelsTarget);
@@ -984,8 +984,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const catLabels = isMobile
         ? ['Branding', 'Campus', 'Marketing', 'Moment']
-        : ['Branding', 'Campus Happenings', 'Marketing Creatives', 'Moment Marketing'];
-      const catKeys = ['Branding', 'Campus Happenings', 'Marketing Creatives', 'Moment Marketing'];
+        : ['Branding', 'Campus Events', 'Marketing', 'Moment Marketing'];
+      const catKeys = ['Branding', 'Campus Events', 'Marketing', 'Moment Marketing'];
       const catTargets = catKeys.map(k => ov.categories[k] ? ov.categories[k].total : 0);
       const catAchieved = catKeys.map(k => ov.categories[k] ? ov.categories[k].published : 0);
 
