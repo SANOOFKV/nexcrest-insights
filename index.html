@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=64">
+  <link rel="stylesheet" href="css/styles.css?v=65">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -774,17 +774,6 @@
       <div id="member-deliverables-container">
         <!-- Section 1: Pending Deliverables -->
         <div id="section-pending-deliverables" class="deliverables-task-section">
-          <div class="deliverables-section-header">
-            <div class="section-header-title-group">
-              <div class="section-header-icon pending">
-                <i data-lucide="clock"></i>
-              </div>
-              <div>
-                <h3 class="section-title">Pending Deliverables <span class="badge-status-counter pending" id="badge-pending-count">0 To Deliver</span></h3>
-                <p class="section-subtitle">Deliverable tasks requiring work submission or currently under review</p>
-              </div>
-            </div>
-          </div>
           <div class="deliverables-cards-grid" id="grid-pending-deliverables">
             <!-- Rendered dynamically -->
           </div>
@@ -792,17 +781,6 @@
 
         <!-- Section 2: Delivered Deliverables -->
         <div id="section-delivered-deliverables" class="deliverables-task-section hidden">
-          <div class="deliverables-section-header">
-            <div class="section-header-title-group">
-              <div class="section-header-icon delivered">
-                <i data-lucide="check-circle-2"></i>
-              </div>
-              <div>
-                <h3 class="section-title">Delivered Deliverables <span class="badge-status-counter delivered" id="badge-delivered-count">0 Quota Met</span></h3>
-                <p class="section-subtitle">Deliverable tasks where monthly quota has been successfully met & approved</p>
-              </div>
-            </div>
-          </div>
           <div class="deliverables-cards-grid" id="grid-delivered-deliverables">
             <!-- Rendered dynamically -->
           </div>
@@ -1678,10 +1656,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=64"></script>
-  <script src="js/data.js?v=64"></script>
-  <script src="js/auth.js?v=64"></script>
-  <script src="js/app.js?v=64"></script>
+  <script src="js/firebase-config.js?v=65"></script>
+  <script src="js/data.js?v=65"></script>
+  <script src="js/auth.js?v=65"></script>
+  <script src="js/app.js?v=65"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
