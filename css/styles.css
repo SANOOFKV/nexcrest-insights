@@ -4333,10 +4333,10 @@ html, body {
   #add-employee-modal .form-group select,
   #edit-employee-modal .form-group input,
   #edit-employee-modal .form-group select {
-    height: 36px !important;
-    min-height: 36px !important;
-    font-size: 11px !important;
-    padding: 0 6px 0 28px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    font-size: 16px !important; /* Prevents mobile auto-zoom on keyboard focus */
+    padding: 0 8px 0 28px !important;
     border-radius: 8px !important;
   }
   #assign-target-modal .input-with-icon svg,
@@ -6188,8 +6188,8 @@ input.input-error,
 
   #profile-management-modal .input-with-icon input,
   #profile-management-modal .input-with-icon-right input {
-    height: 36px !important;
-    font-size: 12.5px !important;
+    height: 38px !important;
+    font-size: 16px !important; /* Prevents mobile auto-zoom on keyboard focus */
   }
 
   #profile-management-modal .modal-footer {
@@ -8513,15 +8513,15 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
 
   #log-work-modal .form-group input,
   #log-work-modal .form-group select {
-    height: 36px !important;
-    min-height: 36px !important;
-    font-size: 11.5px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    font-size: 16px !important; /* Prevents mobile auto-zoom on keyboard focus */
   }
 
   #log-work-modal textarea {
-    height: 48px !important;
-    min-height: 48px !important;
-    font-size: 11.5px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    font-size: 16px !important; /* Prevents mobile auto-zoom on keyboard focus */
   }
 
   #log-work-modal .modal-footer {
@@ -8535,6 +8535,32 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
     flex: 1 !important;
     height: 38px !important;
     font-size: 12px !important;
+  }
+}
+
+/* =========================================================================
+   PREVENT MOBILE VIEWPORT AUTO-ZOOM ON INPUT FOCUS (iOS Safari & Android)
+   iOS Safari automatically zooms the page when focused inputs have font-size < 16px.
+   Enforcing 16px on mobile viewports guarantees zero auto-zoom on focus.
+   ========================================================================= */
+@media screen and (max-width: 768px) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea,
+  .input-ctrl,
+  .form-group input,
+  .form-group select,
+  .form-group textarea,
+  .modal-form input,
+  .modal-form select,
+  .modal-form textarea,
+  .modal-card input,
+  .modal-card select,
+  .modal-card textarea,
+  #filter-search-input,
+  .search-box input,
+  .roster-toolbar input {
+    font-size: 16px !important; /* 16px threshold prevents iOS & Android auto-zoom */
   }
 }
 
