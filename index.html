@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=63">
+  <link rel="stylesheet" href="css/styles.css?v=64">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -751,9 +751,62 @@
       </div>
 
 
-      <!-- Member Deliverables Cards Grid -->
-      <div class="deliverables-cards-grid" id="member-deliverables-grid">
-        <!-- Rendered dynamically -->
+      <!-- Member Status Filter Bar (Option B: Default to Pending Only) -->
+      <div class="member-status-filter-bar" id="member-status-filter-bar">
+        <div class="status-btn-group">
+          <button type="button" class="member-status-btn active" data-status-filter="pending" id="status-btn-pending">
+            <i data-lucide="clock"></i> ⏳ Pending / To Deliver (<span id="count-status-pending">0</span>)
+          </button>
+          <button type="button" class="member-status-btn" data-status-filter="delivered" id="status-btn-delivered">
+            <i data-lucide="check-circle-2"></i> ✅ Delivered (<span id="count-status-delivered">0</span>)
+          </button>
+          <button type="button" class="member-status-btn" data-status-filter="all" id="status-btn-all">
+            <i data-lucide="layers"></i> All Tasks (<span id="count-status-all">0</span>)
+          </button>
+        </div>
+        <div class="status-summary-hint" id="status-summary-hint">
+          <i data-lucide="info"></i>
+          <span id="status-hint-text">Showing tasks to deliver for this month</span>
+        </div>
+      </div>
+
+      <!-- Member Deliverables Sections Container -->
+      <div id="member-deliverables-container">
+        <!-- Section 1: Pending Deliverables -->
+        <div id="section-pending-deliverables" class="deliverables-task-section">
+          <div class="deliverables-section-header">
+            <div class="section-header-title-group">
+              <div class="section-header-icon pending">
+                <i data-lucide="clock"></i>
+              </div>
+              <div>
+                <h3 class="section-title">Pending Deliverables <span class="badge-status-counter pending" id="badge-pending-count">0 To Deliver</span></h3>
+                <p class="section-subtitle">Deliverable tasks requiring work submission or currently under review</p>
+              </div>
+            </div>
+          </div>
+          <div class="deliverables-cards-grid" id="grid-pending-deliverables">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Section 2: Delivered Deliverables -->
+        <div id="section-delivered-deliverables" class="deliverables-task-section hidden">
+          <div class="deliverables-section-header">
+            <div class="section-header-title-group">
+              <div class="section-header-icon delivered">
+                <i data-lucide="check-circle-2"></i>
+              </div>
+              <div>
+                <h3 class="section-title">Delivered Deliverables <span class="badge-status-counter delivered" id="badge-delivered-count">0 Quota Met</span></h3>
+                <p class="section-subtitle">Deliverable tasks where monthly quota has been successfully met & approved</p>
+              </div>
+            </div>
+          </div>
+          <div class="deliverables-cards-grid" id="grid-delivered-deliverables">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
       </div>
 
       <!-- Member Recent Submissions -->
@@ -1103,6 +1156,19 @@
         </label>
         <button type="button" id="btn-user-tasks-batch-delete" class="btn btn-danger-sm" style="display: none; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; background: var(--rose-danger); border-color: var(--rose-danger); color: #fff; padding: 6px 12px; border-radius: var(--radius-sm); cursor: pointer;">
           <i data-lucide="trash-2" style="width: 13px; height: 13px;"></i> Delete Selected (<span id="user-tasks-selected-count">0</span>)
+        </button>
+      </div>
+
+      <!-- User Tasks Status Filter Tabs in Modal (Option B: Default to Pending) -->
+      <div class="user-tasks-modal-tabs" id="user-tasks-modal-tabs" style="display: flex; gap: 8px; margin-top: 10px;">
+        <button type="button" class="btn btn-outline-sm active user-tasks-tab-btn" data-modal-filter="pending" id="user-tasks-modal-tab-pending" style="font-size: 12px; padding: 5px 12px; cursor: pointer;">
+          ⏳ Pending (<span id="modal-count-pending">0</span>)
+        </button>
+        <button type="button" class="btn btn-outline-sm user-tasks-tab-btn" data-modal-filter="delivered" id="user-tasks-modal-tab-delivered" style="font-size: 12px; padding: 5px 12px; cursor: pointer;">
+          ✅ Delivered (<span id="modal-count-delivered">0</span>)
+        </button>
+        <button type="button" class="btn btn-outline-sm user-tasks-tab-btn" data-modal-filter="all" id="user-tasks-modal-tab-all" style="font-size: 12px; padding: 5px 12px; cursor: pointer;">
+          All (<span id="modal-count-all">0</span>)
         </button>
       </div>
 
@@ -1612,10 +1678,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=63"></script>
-  <script src="js/data.js?v=63"></script>
-  <script src="js/auth.js?v=63"></script>
-  <script src="js/app.js?v=63"></script>
+  <script src="js/firebase-config.js?v=64"></script>
+  <script src="js/data.js?v=64"></script>
+  <script src="js/auth.js?v=64"></script>
+  <script src="js/app.js?v=64"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

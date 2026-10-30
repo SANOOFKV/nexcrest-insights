@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     user: window.authService.getCurrentUser(),
     activeManagerTab: 'overview',
     memberCategory: 'all',
+    memberStatusFilter: 'pending', // Option B: 'pending' (default) | 'delivered' | 'all'
+    modalTasksFilter: 'pending',   // 'pending' (default) | 'delivered' | 'all'
     pacingMode: 'calendar', // 'calendar' | 'working'
     tableSort: {
       col: 'program',
@@ -155,7 +157,24 @@ document.addEventListener('DOMContentLoaded', () => {
     countBrandingTasks: document.getElementById('count-branding-tasks'),
     countMarketingTasks: document.getElementById('count-marketing-tasks'),
     countMomentTasks: document.getElementById('count-moment-tasks'),
-    memberDeliverablesGrid: document.getElementById('member-deliverables-grid'),
+    memberDeliverablesGrid: document.getElementById('grid-pending-deliverables') || document.getElementById('member-deliverables-grid'),
+    memberStatusFilterBar: document.getElementById('member-status-filter-bar'),
+    statusBtnPending: document.getElementById('status-btn-pending'),
+    statusBtnDelivered: document.getElementById('status-btn-delivered'),
+    statusBtnAll: document.getElementById('status-btn-all'),
+    countStatusAll: document.getElementById('count-status-all'),
+    countStatusPending: document.getElementById('count-status-pending'),
+    countStatusDelivered: document.getElementById('count-status-delivered'),
+    statusHintText: document.getElementById('status-hint-text'),
+    sectionPendingDeliverables: document.getElementById('section-pending-deliverables'),
+    sectionDeliveredDeliverables: document.getElementById('section-delivered-deliverables'),
+    gridPendingDeliverables: document.getElementById('grid-pending-deliverables'),
+    gridDeliveredDeliverables: document.getElementById('grid-delivered-deliverables'),
+    badgePendingCount: document.getElementById('badge-pending-count'),
+    badgeDeliveredCount: document.getElementById('badge-delivered-count'),
+    modalCountPending: document.getElementById('modal-count-pending'),
+    modalCountDelivered: document.getElementById('modal-count-delivered'),
+    modalCountAll: document.getElementById('modal-count-all'),
     memberSubmissionsTableBody: document.getElementById('member-submissions-table-body'),
 
     // Modals
@@ -1888,64 +1907,182 @@ document.addEventListener('DOMContentLoaded', () => {
       ? allUserTargets
       : allUserTargets.filter(t => normCat(t.category) === normCat(state.memberCategory));
 
-    // Render Cards Grid
-    if (filteredTargets.length === 0) {
-      elements.memberDeliverablesGrid.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-lg);">
-          <p>No deliverables assigned in this category for this month.</p>
-        </div>
-      `;
-    } else {
-      elements.memberDeliverablesGrid.innerHTML = filteredTargets.map(target => {
-        const prog = window.dataStore.getTargetProgress(target.id);
-        const isDone = prog.completed >= prog.target;
+    // Segregate targets into Pending / To Deliver vs Delivered & Completed
+    const pendingTargets = [];
+    const deliveredTargets = [];
 
-        const statusPill = (prog.extra > 0)
-          ? `<span class="status-pill completed" style="background: rgba(206, 243, 228, 0.15); color: #CEF3E4; border: 1px solid rgba(206, 243, 228, 0.3);"><i data-lucide="zap"></i> Quota Met (+${prog.extra} Extra!)</span>`
-          : isDone
-            ? `<span class="status-pill completed"><i data-lucide="check"></i> Quota Met</span>`
-            : prog.completed > 0
-              ? `<span class="status-pill in-progress"><i data-lucide="loader"></i> ${prog.completed}/${prog.target} Completed</span>`
-              : `<span class="status-pill not-started">Pending</span>`;
+    filteredTargets.forEach(target => {
+      const prog = window.dataStore.getTargetProgress(target.id);
+      const isDone = prog.completed >= (Number(target.targetQty) || 1);
+      if (isDone) {
+        deliveredTargets.push({ target, prog, isDone });
+      } else {
+        pendingTargets.push({ target, prog, isDone });
+      }
+    });
 
-        return `
-          <div class="deliverable-card spotlight-card tilt-card ${target.category === 'Campus Happenings' ? 'priority-hologram' : ''}">
-            <div>
-              <div class="del-card-header">
-                <div class="del-badges-row">
-                  <span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span>
-                  <span class="badge-category">${escapeHtml(target.category)}</span>
-                  <span class="badge-format">${escapeHtml(target.format)}</span>
-                  ${target.deadline ? formatDeadlineBadge(target.deadline, isDone) : ''}
-                  ${target.isExtra ? '<span class="badge-extra-work" style="font-size: 10px; padding: 1px 6px;">⭐ Extra</span>' : ''}
-                </div>
-                ${statusPill}
+    // Update Status Filter Counters & Section Badges
+    if (elements.countStatusPending) elements.countStatusPending.textContent = pendingTargets.length;
+    if (elements.countStatusDelivered) elements.countStatusDelivered.textContent = deliveredTargets.length;
+    if (elements.countStatusAll) elements.countStatusAll.textContent = filteredTargets.length;
+    if (elements.badgePendingCount) elements.badgePendingCount.textContent = `${pendingTargets.length} To Deliver`;
+    if (elements.badgeDeliveredCount) elements.badgeDeliveredCount.textContent = `${deliveredTargets.length} Quota Met`;
+
+    // Ensure status filter button active states match state.memberStatusFilter (Option B: default to 'pending')
+    const currentStatusFilter = state.memberStatusFilter || 'pending';
+    document.querySelectorAll('.member-status-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.statusFilter === currentStatusFilter);
+    });
+
+    // Toggle Section Visibility based on active Status Filter
+    if (elements.sectionPendingDeliverables && elements.sectionDeliveredDeliverables) {
+      if (currentStatusFilter === 'pending') {
+        elements.sectionPendingDeliverables.classList.remove('hidden');
+        elements.sectionDeliveredDeliverables.classList.add('hidden');
+        if (elements.statusHintText) elements.statusHintText.textContent = `Showing ${pendingTargets.length} pending deliverables to complete`;
+      } else if (currentStatusFilter === 'delivered') {
+        elements.sectionPendingDeliverables.classList.add('hidden');
+        elements.sectionDeliveredDeliverables.classList.remove('hidden');
+        if (elements.statusHintText) elements.statusHintText.textContent = `Showing ${deliveredTargets.length} delivered tasks completed`;
+      } else { // 'all'
+        elements.sectionPendingDeliverables.classList.remove('hidden');
+        elements.sectionDeliveredDeliverables.classList.remove('hidden');
+        if (elements.statusHintText) elements.statusHintText.textContent = `Showing all ${filteredTargets.length} tasks in ${state.memberCategory === 'all' ? 'all categories' : state.memberCategory}`;
+      }
+    }
+
+    // Helper: Render Deliverable Card
+    function renderDeliverableCard({ target, prog, isDone }) {
+      const isDelivered = isDone;
+      const statusPill = (prog.extra > 0)
+        ? `<span class="status-pill completed" style="background: rgba(206, 243, 228, 0.15); color: #CEF3E4; border: 1px solid rgba(206, 243, 228, 0.3);"><i data-lucide="zap"></i> Quota Met (+${prog.extra} Extra!)</span>`
+        : isDone
+          ? `<span class="status-pill completed"><i data-lucide="check"></i> Quota Met</span>`
+          : prog.completed > 0
+            ? `<span class="status-pill in-progress"><i data-lucide="loader"></i> ${prog.completed}/${prog.target} Completed</span>`
+            : `<span class="status-pill not-started">Pending</span>`;
+
+      const ctaBtn = isDelivered
+        ? `<button class="btn btn-outline-sm btn-block btn-open-log-modal" data-target-id="${target.id}" style="color: var(--mint-accent); border-color: rgba(206, 243, 228, 0.4); background: rgba(206, 243, 228, 0.08); font-size: 12px; padding: 7px 12px;">
+             <i data-lucide="plus-circle"></i> + Log Extra Work
+           </button>`
+        : `<button class="btn btn-primary btn-sm btn-block btn-open-log-modal" data-target-id="${target.id}">
+             <i data-lucide="upload-cloud"></i> + Submit Deliverable
+           </button>`;
+
+      return `
+        <div class="deliverable-card spotlight-card tilt-card ${isDelivered ? 'delivered-card' : ''} ${target.category === 'Campus Happenings' ? 'priority-hologram' : ''}">
+          <div>
+            <div class="del-card-header">
+              <div class="del-badges-row">
+                <span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span>
+                <span class="badge-category">${escapeHtml(target.category)}</span>
+                <span class="badge-format">${escapeHtml(target.format)}</span>
+                ${target.deadline ? formatDeadlineBadge(target.deadline, isDone) : ''}
+                ${target.isExtra ? '<span class="badge-extra-work" style="font-size: 10px; padding: 1px 6px;">⭐ Extra</span>' : ''}
               </div>
-
-              <h3 class="del-card-title">${escapeHtml(target.program)}</h3>
-              ${target.notes ? `<p class="del-card-desc">${escapeHtml(target.notes)}</p>` : ''}
-              ${target.deadline ? renderTaskDeadlineStrip(target.deadline, isDone) : ''}
+              ${statusPill}
             </div>
 
-            <div>
-              <div class="del-progress-metric">
-                <span>Target: <strong>${prog.target}</strong></span>
-                <span>Approved: <strong style="color: var(--mint-light);">${prog.completed}</strong> ${prog.extra > 0 ? `<span class="badge-exceeded" style="font-size: 10px; padding: 1px 5px;">+${prog.extra}</span>` : ''}</span>
-              </div>
-              <div class="progress-bar-container">
-                <div class="progress-bar-fill" style="width: ${Math.min(100, prog.pct)}%"></div>
-              </div>
-              ${prog.pending > 0 ? `<div style="font-size: 11px; color: var(--amber-light); margin-top: 4px;">⏳ ${prog.pending} in review</div>` : ''}
+            <h3 class="del-card-title">${escapeHtml(target.program)}</h3>
+            ${target.notes ? `<p class="del-card-desc">${escapeHtml(target.notes)}</p>` : ''}
+            ${target.deadline ? renderTaskDeadlineStrip(target.deadline, isDone) : ''}
+          </div>
 
-              <div class="del-card-actions">
-                <button class="btn btn-primary btn-sm btn-block btn-open-log-modal" data-target-id="${target.id}">
-                  <i data-lucide="upload-cloud"></i> + Submit Deliverable
-                </button>
-              </div>
+          <div>
+            <div class="del-progress-metric">
+              <span>Target: <strong>${prog.target}</strong></span>
+              <span>Approved: <strong style="color: ${isDelivered ? 'var(--mint-light)' : 'var(--teal-light)'};">${prog.completed}</strong> ${prog.extra > 0 ? `<span class="badge-exceeded" style="font-size: 10px; padding: 1px 5px;">+${prog.extra}</span>` : ''}</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill ${isDelivered ? 'teal' : ''}" style="width: ${Math.min(100, prog.pct)}%"></div>
+            </div>
+            ${prog.pending > 0 ? `<div style="font-size: 11px; color: var(--amber-light); margin-top: 4px;">⏳ ${prog.pending} in review</div>` : ''}
+
+            <div class="del-card-actions">
+              ${ctaBtn}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Render Pending Deliverables Grid
+    if (elements.gridPendingDeliverables) {
+      if (pendingTargets.length === 0) {
+        elements.gridPendingDeliverables.innerHTML = `
+          <div class="deliverables-section-empty celebration" style="grid-column: 1 / -1;">
+            <div style="font-size: 32px; margin-bottom: 6px;">🎉</div>
+            <h4>All Tasks in this Category Delivered!</h4>
+            <p>You have met all deliverable quotas for this category. Switch to the Delivered tab to review completed work or submit extra work.</p>
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px;">
+              <button type="button" class="btn btn-outline-sm btn-switch-to-delivered" style="color: var(--mint-accent); border-color: rgba(206, 243, 228, 0.4);">
+                <i data-lucide="check-circle-2"></i> View Delivered (${deliveredTargets.length})
+              </button>
+              <button type="button" class="btn btn-primary btn-sm btn-log-extra-now">
+                <i data-lucide="plus-circle"></i> + Log Extra Work
+              </button>
             </div>
           </div>
         `;
-      }).join('');
+      } else {
+        elements.gridPendingDeliverables.innerHTML = pendingTargets.map(renderDeliverableCard).join('');
+      }
+    }
+
+    // Render Delivered Deliverables Grid
+    if (elements.gridDeliveredDeliverables) {
+      if (deliveredTargets.length === 0) {
+        elements.gridDeliveredDeliverables.innerHTML = `
+          <div class="deliverables-section-empty" style="grid-column: 1 / -1;">
+            <div style="font-size: 28px; margin-bottom: 6px;">⏳</div>
+            <h4>No Delivered Tasks Yet</h4>
+            <p>You have not met the quota on any tasks in this category yet. Submit your deliverables in the Pending section above to complete your tasks!</p>
+            <button type="button" class="btn btn-primary btn-sm btn-switch-to-pending" style="margin-top: 10px;">
+              <i data-lucide="clock"></i> View Pending Tasks (${pendingTargets.length})
+            </button>
+          </div>
+        `;
+      } else {
+        elements.gridDeliveredDeliverables.innerHTML = deliveredTargets.map(renderDeliverableCard).join('');
+      }
+    }
+
+    // Wire Status Filter Switch & Quick Action Delegation
+    const deliverablesContainer = document.getElementById('member-deliverables-container');
+    if (deliverablesContainer && !deliverablesContainer.dataset.wired) {
+      deliverablesContainer.dataset.wired = 'true';
+      deliverablesContainer.addEventListener('click', (e) => {
+        const btnToDelivered = e.target.closest('.btn-switch-to-delivered');
+        if (btnToDelivered) {
+          state.memberStatusFilter = 'delivered';
+          renderMemberView();
+          return;
+        }
+        const btnToPending = e.target.closest('.btn-switch-to-pending');
+        if (btnToPending) {
+          state.memberStatusFilter = 'pending';
+          renderMemberView();
+          return;
+        }
+        const btnLogExtraNow = e.target.closest('.btn-log-extra-now');
+        if (btnLogExtraNow) {
+          openLogWorkModal(null, 'extra');
+          return;
+        }
+      });
+    }
+
+    const statusFilterBar = document.getElementById('member-status-filter-bar');
+    if (statusFilterBar && !statusFilterBar.dataset.wired) {
+      statusFilterBar.dataset.wired = 'true';
+      statusFilterBar.addEventListener('click', (e) => {
+        const btn = e.target.closest('.member-status-btn');
+        if (btn && btn.dataset.statusFilter) {
+          state.memberStatusFilter = btn.dataset.statusFilter;
+          renderMemberView();
+        }
+      });
     }
 
     // Render Member Submissions Table
@@ -3467,23 +3604,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const targets = window.dataStore.getTargetsForUser(userObj);
 
+    // Segregate targets for user tasks modal
+    const pendingTargets = targets.filter(t => {
+      const prog = window.dataStore.getTargetProgress(t.id);
+      return prog.completed < (Number(t.targetQty) || 1);
+    });
+    const deliveredTargets = targets.filter(t => {
+      const prog = window.dataStore.getTargetProgress(t.id);
+      return prog.completed >= (Number(t.targetQty) || 1);
+    });
+
+    if (elements.modalCountPending) elements.modalCountPending.textContent = pendingTargets.length;
+    if (elements.modalCountDelivered) elements.modalCountDelivered.textContent = deliveredTargets.length;
+    if (elements.modalCountAll) elements.modalCountAll.textContent = targets.length;
+
+    const modalFilter = state.modalTasksFilter || 'pending';
+    document.querySelectorAll('.user-tasks-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.modalFilter === modalFilter);
+    });
+
+    const displayedTargets = (modalFilter === 'pending')
+      ? pendingTargets
+      : (modalFilter === 'delivered')
+        ? deliveredTargets
+        : targets;
+
     if (elements.userTasksModalTitle) {
       elements.userTasksModalTitle.textContent = `Assigned Tasks – ${userObj.name}`;
     }
     if (elements.userTasksModalSubtitle) {
-      elements.userTasksModalSubtitle.textContent = `${targets.length} deliverable task${targets.length === 1 ? '' : 's'} assigned for ${window.dataStore.getActiveMonth()}`;
+      elements.userTasksModalSubtitle.textContent = `${targets.length} deliverable task${targets.length === 1 ? '' : 's'} assigned (${pendingTargets.length} pending, ${deliveredTargets.length} delivered)`;
     }
 
-    if (targets.length === 0) {
-      elements.userTasksModalList.innerHTML = `
-        <div style="text-align: center; padding: 32px 16px; color: var(--text-muted);">
-          <i data-lucide="check-circle" style="width: 36px; height: 36px; color: var(--teal-primary); margin-bottom: 8px;"></i>
-          <p style="margin: 0; font-weight: 600; color: var(--text-main);">No tasks currently assigned to ${escapeHtml(userObj.name)}.</p>
-          <p style="margin: 4px 0 0; font-size: 12px;">Click 'Assign New Target' below to add a deliverable for this team member.</p>
-        </div>
-      `;
+    if (displayedTargets.length === 0) {
+      const emptyMsg = (modalFilter === 'pending')
+        ? `
+          <div style="text-align: center; padding: 32px 16px; color: var(--text-muted);">
+            <div style="font-size: 28px; margin-bottom: 6px;">🎉</div>
+            <p style="margin: 0; font-weight: 600; color: var(--text-main);">All assigned tasks have been delivered by ${escapeHtml(userObj.name)}!</p>
+            <p style="margin: 4px 0 0; font-size: 12px;">Switch to the 'Delivered' tab to view completed deliverables.</p>
+          </div>`
+        : (modalFilter === 'delivered')
+          ? `
+          <div style="text-align: center; padding: 32px 16px; color: var(--text-muted);">
+            <div style="font-size: 28px; margin-bottom: 6px;">⏳</div>
+            <p style="margin: 0; font-weight: 600; color: var(--text-main);">No delivered tasks yet for ${escapeHtml(userObj.name)}.</p>
+            <p style="margin: 4px 0 0; font-size: 12px;">Switch to 'Pending' to view active deliverables in progress.</p>
+          </div>`
+          : `
+          <div style="text-align: center; padding: 32px 16px; color: var(--text-muted);">
+            <i data-lucide="check-circle" style="width: 36px; height: 36px; color: var(--teal-primary); margin-bottom: 8px;"></i>
+            <p style="margin: 0; font-weight: 600; color: var(--text-main);">No tasks currently assigned to ${escapeHtml(userObj.name)}.</p>
+            <p style="margin: 4px 0 0; font-size: 12px;">Click 'Assign New Target' below to add a deliverable for this team member.</p>
+          </div>`;
+      elements.userTasksModalList.innerHTML = emptyMsg;
     } else {
-      elements.userTasksModalList.innerHTML = targets.map(t => {
+      elements.userTasksModalList.innerHTML = displayedTargets.map(t => {
         const prog = window.dataStore.getTargetProgress(t.id);
         const isChecked = state.selectedUserModalTargetIds.has(String(t.id));
         return `
@@ -3511,7 +3687,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }).join('');
     }
 
-    updateUserTasksBatchBar(targets);
+    // Wire Modal Tab Buttons
+    const modalTabs = document.getElementById('user-tasks-modal-tabs');
+    if (modalTabs && !modalTabs.dataset.wired) {
+      modalTabs.dataset.wired = 'true';
+      modalTabs.addEventListener('click', (e) => {
+        const btn = e.target.closest('.user-tasks-tab-btn');
+        if (btn && btn.dataset.modalFilter) {
+          state.modalTasksFilter = btn.dataset.modalFilter;
+          renderUserTasksModal(userEmail, userName, userRole);
+        }
+      });
+    }
+
+    updateUserTasksBatchBar(displayedTargets);
     refreshIcons();
   }
 
