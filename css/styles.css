@@ -7839,6 +7839,133 @@ body.dark-theme input[type="date"] {
   color-scheme: dark;
 }
 
+/* Prominent Task Deadline Strip in Deliverable Cards */
+.task-deadline-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  font-size: 12px;
+  background: rgba(0, 139, 165, 0.08);
+  border: 1px solid rgba(0, 139, 165, 0.2);
+  color: var(--teal-primary, #008BA5);
+  transition: all 0.2s ease;
+}
+
+body.dark-theme .task-deadline-strip {
+  background: rgba(0, 139, 165, 0.14);
+  border-color: rgba(69, 178, 195, 0.25);
+  color: #45B2C3;
+}
+
+.task-deadline-strip .deadline-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.task-deadline-strip .deadline-content i {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.task-deadline-strip .deadline-content strong {
+  color: #0F172A;
+  font-weight: 700;
+}
+
+body.dark-theme .task-deadline-strip .deadline-content strong {
+  color: #FFFFFF;
+}
+
+.task-deadline-strip .deadline-tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* Status variants */
+.task-deadline-strip.upcoming {
+  background: rgba(0, 139, 165, 0.1);
+  border-color: rgba(0, 139, 165, 0.25);
+}
+.task-deadline-strip.upcoming .deadline-tag {
+  background: rgba(0, 139, 165, 0.15);
+  color: #008BA5;
+}
+body.dark-theme .task-deadline-strip.upcoming .deadline-tag {
+  background: rgba(69, 178, 195, 0.2);
+  color: #45B2C3;
+}
+
+.task-deadline-strip.overdue {
+  background: rgba(225, 29, 72, 0.1);
+  border-color: rgba(225, 29, 72, 0.3);
+  color: #E11D48;
+}
+body.dark-theme .task-deadline-strip.overdue {
+  background: rgba(225, 29, 72, 0.18);
+  border-color: rgba(225, 29, 72, 0.4);
+  color: #FDA4AF;
+}
+.task-deadline-strip.overdue .deadline-tag {
+  background: rgba(225, 29, 72, 0.2);
+  color: #E11D48;
+}
+body.dark-theme .task-deadline-strip.overdue .deadline-tag {
+  background: rgba(225, 29, 72, 0.3);
+  color: #FDA4AF;
+}
+
+.task-deadline-strip.today,
+.task-deadline-strip.soon {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: #D97706;
+}
+body.dark-theme .task-deadline-strip.today,
+body.dark-theme .task-deadline-strip.soon {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #FCD34D;
+}
+.task-deadline-strip.today .deadline-tag,
+.task-deadline-strip.soon .deadline-tag {
+  background: rgba(245, 158, 11, 0.2);
+  color: #D97706;
+}
+body.dark-theme .task-deadline-strip.today .deadline-tag,
+body.dark-theme .task-deadline-strip.soon .deadline-tag {
+  background: rgba(245, 158, 11, 0.3);
+  color: #FDE68A;
+}
+
+.task-deadline-strip.completed {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #059669;
+}
+body.dark-theme .task-deadline-strip.completed {
+  background: rgba(206, 243, 228, 0.12);
+  border-color: rgba(206, 243, 228, 0.25);
+  color: #CEF3E4;
+}
+.task-deadline-strip.completed .deadline-tag {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+body.dark-theme .task-deadline-strip.completed .deadline-tag {
+  background: rgba(206, 243, 228, 0.2);
+  color: #CEF3E4;
+}
+
 @keyframes pulse-glow {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.85; transform: scale(1.02); }

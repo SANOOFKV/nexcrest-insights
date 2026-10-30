@@ -559,14 +559,18 @@ class DataStore {
   }
 
   saveOrUpdateTarget(targetData) {
-    if (targetData.id) {
-      const idx = this.targets.findIndex(t => t.id === targetData.id);
+    const cleanTarget = { ...targetData };
+    if (cleanTarget.deadline !== undefined) {
+      cleanTarget.deadline = cleanTarget.deadline ? String(cleanTarget.deadline).trim() : '';
+    }
+    if (cleanTarget.id) {
+      const idx = this.targets.findIndex(t => t.id === cleanTarget.id);
       if (idx !== -1) {
-        this.targets[idx] = { ...this.targets[idx], ...targetData };
+        this.targets[idx] = { ...this.targets[idx], ...cleanTarget };
       }
     } else {
       const newTarget = {
-        ...targetData,
+        ...cleanTarget,
         id: 'target-' + Date.now(),
         month: this.activeMonth
       };

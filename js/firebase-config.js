@@ -164,12 +164,25 @@ class FirebaseSyncService {
     }
   }
 
+  // Sanitize object so Firestore never receives `undefined` values (which causes Firestore errors)
+  _cleanFirestoreData(data) {
+    if (!data || typeof data !== 'object') return data;
+    const clean = {};
+    Object.keys(data).forEach(key => {
+      if (data[key] !== undefined) {
+        clean[key] = data[key];
+      }
+    });
+    return clean;
+  }
+
   // Save target to cloud
   async saveTarget(target) {
     if (!this.isActive() || !target || !target.id) return false;
     try {
       this.deletedTargetIds.delete(String(target.id));
-      await this.db.collection('targets').doc(String(target.id)).set(target, { merge: true });
+      const cleanData = this._cleanFirestoreData(target);
+      await this.db.collection('targets').doc(String(target.id)).set(cleanData, { merge: true });
       return true;
     } catch (err) {
       console.error('Failed to save target to Firestore:', err);
@@ -258,7 +271,8 @@ class FirebaseSyncService {
     if (!this.isActive() || !sub || !sub.id) return false;
     try {
       this.deletedSubmissionIds.delete(String(sub.id));
-      await this.db.collection('submissions').doc(String(sub.id)).set(sub, { merge: true });
+      const cleanData = this._cleanFirestoreData(sub);
+      await this.db.collection('submissions').doc(String(sub.id)).set(cleanData, { merge: true });
       return true;
     } catch (err) {
       console.error('Failed to save submission to Firestore:', err);

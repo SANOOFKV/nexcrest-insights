@@ -218,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Log Work / Add Task Form
     logWorkForm: document.getElementById('log-work-form'),
     logTargetSelect: document.getElementById('log-target-select'),
+    logTargetDeadlineBadge: document.getElementById('log-target-deadline-badge'),
     logWorkTitle: document.getElementById('log-work-title'),
     logWorkUrl: document.getElementById('log-work-url'),
     logWorkNotes: document.getElementById('log-work-notes'),
@@ -418,6 +419,72 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } catch (e) {
       return `<span class="badge-deadline"><i data-lucide="calendar"></i> Due ${escapeHtml(deadlineStr)}</span>`;
+    }
+  }
+
+  function renderTaskDeadlineStrip(deadlineStr, isCompleted = false) {
+    if (!deadlineStr) return '';
+    try {
+      const parts = deadlineStr.split('-');
+      if (parts.length < 3) {
+        return `
+          <div class="task-deadline-strip upcoming">
+            <span class="deadline-content"><i data-lucide="calendar"></i> Due: <strong>${escapeHtml(deadlineStr)}</strong></span>
+            <span class="deadline-tag">Scheduled</span>
+          </div>`;
+      }
+      const dueYear = parseInt(parts[0], 10);
+      const dueMonth = parseInt(parts[1], 10) - 1;
+      const dueDay = parseInt(parts[2], 10);
+      const dueDate = new Date(dueYear, dueMonth, dueDay, 23, 59, 59);
+
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const dueStart = new Date(dueYear, dueMonth, dueDay);
+      const diffMs = dueStart - todayStart;
+      const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+      const formattedDate = dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+      if (isCompleted) {
+        return `
+          <div class="task-deadline-strip completed" title="Task Completed">
+            <span class="deadline-content"><i data-lucide="calendar-check"></i> Due: <strong>${formattedDate}</strong></span>
+            <span class="deadline-tag">Completed</span>
+          </div>`;
+      }
+
+      if (diffDays < 0) {
+        const absDays = Math.abs(diffDays);
+        return `
+          <div class="task-deadline-strip overdue" title="Overdue by ${absDays} day(s)">
+            <span class="deadline-content"><i data-lucide="alert-circle"></i> Due: <strong>${formattedDate}</strong></span>
+            <span class="deadline-tag">⚠️ ${absDays}d Overdue</span>
+          </div>`;
+      } else if (diffDays === 0) {
+        return `
+          <div class="task-deadline-strip today" title="Due Today!">
+            <span class="deadline-content"><i data-lucide="clock"></i> Due: <strong>${formattedDate}</strong></span>
+            <span class="deadline-tag">⏰ Due Today</span>
+          </div>`;
+      } else if (diffDays === 1) {
+        return `
+          <div class="task-deadline-strip soon" title="Due Tomorrow">
+            <span class="deadline-content"><i data-lucide="calendar"></i> Due: <strong>${formattedDate}</strong></span>
+            <span class="deadline-tag">Due Tomorrow</span>
+          </div>`;
+      } else {
+        return `
+          <div class="task-deadline-strip upcoming" title="Due in ${diffDays} days">
+            <span class="deadline-content"><i data-lucide="calendar"></i> Due: <strong>${formattedDate}</strong></span>
+            <span class="deadline-tag">${diffDays} days left</span>
+          </div>`;
+      }
+    } catch (e) {
+      return `
+        <div class="task-deadline-strip upcoming">
+          <span class="deadline-content"><i data-lucide="calendar"></i> Due: <strong>${escapeHtml(deadlineStr)}</strong></span>
+        </div>`;
     }
   }
 
@@ -1857,6 +1924,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
               <h3 class="del-card-title">${escapeHtml(target.program)}</h3>
               ${target.notes ? `<p class="del-card-desc">${escapeHtml(target.notes)}</p>` : ''}
+              ${target.deadline ? renderTaskDeadlineStrip(target.deadline, isDone) : ''}
             </div>
 
             <div>
@@ -1913,13 +1981,19 @@ document.addEventListener('DOMContentLoaded', () => {
             ? `<span class="status-pill pending"><i data-lucide="clock"></i> Under Review</span>`
             : `<span class="status-pill behind"><i data-lucide="rotate-ccw"></i> Rework Needed</span>`;
 
+        const linkedTarget = sub.targetId ? (window.dataStore.getTargets() || []).find(t => String(t.id) === String(sub.targetId)) : null;
+        const subDeadlineBadge = linkedTarget && linkedTarget.deadline ? formatDeadlineBadge(linkedTarget.deadline, sub.status === 'approved') : '';
+
         return `
           <tr>
             <td>${formatDate(sub.submittedAt)}</td>
             <td>
-              <strong>${escapeHtml(sub.program)}</strong>
-              ${sub.isExtra ? `<span class="badge-extra-work" style="font-size: 10px; padding: 1px 6px; margin-left: 4px;">⭐ Extra</span>` : ''}
-              <div style="font-size: 11px; color: var(--text-dim);">${escapeHtml(sub.title)}</div>
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <strong>${escapeHtml(sub.program)}</strong>
+                ${sub.isExtra ? `<span class="badge-extra-work" style="font-size: 10px; padding: 1px 6px;">⭐ Extra</span>` : ''}
+                ${subDeadlineBadge}
+              </div>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">${escapeHtml(sub.title)}</div>
             </td>
             <td><span class="badge-format">${escapeHtml(sub.format)}</span></td>
             <td>${renderProofChip(sub.url)}</td>
@@ -2839,19 +2913,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const userMatch = window.authService.getUserByEmail(assigneeVal) || window.authService.getAllUsers().find(u => u.role === assigneeVal);
 
     const targetData = {
-      id: elements.editTargetId.value || undefined,
       assignee: assigneeVal,
       assigneeName: userMatch ? userMatch.name : (assigneeVal.charAt(0).toUpperCase() + assigneeVal.slice(1)),
       assigneeRole: userMatch ? userMatch.role : assigneeVal,
-      assigneeEmail: userMatch ? userMatch.email : undefined,
+      assigneeEmail: userMatch ? userMatch.email : '',
       brand: elements.targetBrand.value,
       category: elements.targetCategory.value,
       format: (elements.targetFormat && elements.targetFormat.value.trim()) || elements.targetBrand.value || 'Deliverable',
       program: elements.targetProgram.value.trim(),
       targetQty: parseInt(elements.targetQty.value, 10) || 1,
-      deadline: (elements.targetDeadline && elements.targetDeadline.value) ? elements.targetDeadline.value : undefined,
+      deadline: (elements.targetDeadline && elements.targetDeadline.value) ? elements.targetDeadline.value.trim() : '',
       notes: elements.targetNotes.value.trim()
     };
+    if (elements.editTargetId.value) {
+      targetData.id = elements.editTargetId.value;
+    }
 
     window.dataStore.saveOrUpdateTarget(targetData);
     elements.assignTargetModal.classList.add('hidden');
@@ -2929,6 +3005,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (preselectedTargetId && elements.logTargetSelect) {
       elements.logTargetSelect.value = preselectedTargetId;
     }
+    updateLogTargetDeadlineDisplay();
 
     // Default to 'assigned' if assigned targets exist, or 'extra' if no assigned targets exist
     const mode = initialMode || (preselectedTargetId ? 'assigned' : (availableTargets.length > 0 ? 'assigned' : 'extra'));
@@ -2936,6 +3013,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     elements.logWorkModal.classList.remove('hidden');
     refreshIcons();
+  }
+
+  function updateLogTargetDeadlineDisplay() {
+    if (!elements.logTargetDeadlineBadge || !elements.logTargetSelect) return;
+    const selTargetId = elements.logTargetSelect.value;
+    if (!selTargetId) {
+      elements.logTargetDeadlineBadge.style.display = 'none';
+      elements.logTargetDeadlineBadge.innerHTML = '';
+      return;
+    }
+    const target = (window.dataStore.getTargets() || []).find(t => String(t.id) === String(selTargetId));
+    if (target && target.deadline) {
+      const prog = window.dataStore.getTargetProgress(target.id);
+      const isDone = prog.completed >= (Number(target.targetQty) || 1);
+      elements.logTargetDeadlineBadge.innerHTML = renderTaskDeadlineStrip(target.deadline, isDone);
+      elements.logTargetDeadlineBadge.style.display = 'block';
+      refreshIcons();
+    } else {
+      elements.logTargetDeadlineBadge.style.display = 'none';
+      elements.logTargetDeadlineBadge.innerHTML = '';
+    }
+  }
+
+  if (elements.logTargetSelect) {
+    elements.logTargetSelect.addEventListener('change', updateLogTargetDeadlineDisplay);
   }
 
   if (elements.btnMemberAddTask) {
