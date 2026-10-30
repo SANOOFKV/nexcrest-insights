@@ -845,9 +845,11 @@ class DataStore {
     };
 
     function normalizeCat(cat) {
-      if (cat === 'Campus Events' || cat === 'Campus Happenings') return 'Campus Happenings';
-      if (cat === 'Marketing' || cat === 'Marketing Creatives') return 'Marketing Creatives';
-      if (cat === 'Moment Marketing') return 'Moment Marketing';
+      if (!cat) return 'Branding';
+      const c = cat.toLowerCase().trim();
+      if (c.includes('campus') || c.includes('event') || c.includes('happening')) return 'Campus Happenings';
+      if (c.includes('market') && !c.includes('moment')) return 'Marketing Creatives';
+      if (c.includes('moment')) return 'Moment Marketing';
       return 'Branding';
     }
 

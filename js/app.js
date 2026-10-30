@@ -214,12 +214,13 @@ document.addEventListener('DOMContentLoaded', () => {
     btnUserTasksBatchDelete: document.getElementById('btn-user-tasks-batch-delete'),
     userTasksSelectedCount: document.getElementById('user-tasks-selected-count'),
 
-    // Log Work Form
+    // Log Work / Add Task Form
     logWorkForm: document.getElementById('log-work-form'),
     logTargetSelect: document.getElementById('log-target-select'),
     logWorkTitle: document.getElementById('log-work-title'),
     logWorkUrl: document.getElementById('log-work-url'),
     logWorkNotes: document.getElementById('log-work-notes'),
+    btnMemberAddTask: document.getElementById('btn-member-add-task'),
     btnMemberLogExtraWork: document.getElementById('btn-member-log-extra-work'),
     btnModeAssigned: document.getElementById('btn-mode-assigned'),
     btnModeExtra: document.getElementById('btn-mode-extra'),
@@ -228,8 +229,11 @@ document.addEventListener('DOMContentLoaded', () => {
     logExtraFields: document.getElementById('log-extra-fields'),
     logExtraBrand: document.getElementById('log-extra-brand'),
     logExtraCategory: document.getElementById('log-extra-category'),
+    logExtraTitle: document.getElementById('log-extra-title'),
     logExtraProgram: document.getElementById('log-extra-program'),
     logExtraFormat: document.getElementById('log-extra-format'),
+    logWorkModalHeading: document.getElementById('log-work-modal-heading'),
+    btnSubmitDeliverable: document.getElementById('btn-submit-deliverable'),
 
     // Review Modal Form & Fields
     reviewDecisionForm: document.getElementById('review-decision-form'),
@@ -1749,12 +1753,22 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    // Robust category normalizer for member category counts & filtering
+    function normCat(cat) {
+      if (!cat) return 'Branding';
+      const c = cat.toLowerCase().trim();
+      if (c.includes('campus') || c.includes('event') || c.includes('happening')) return 'Campus Events';
+      if (c.includes('market') && !c.includes('moment')) return 'Marketing';
+      if (c.includes('moment')) return 'Moment Marketing';
+      return 'Branding';
+    }
+
     // Category Task Counts
     const allUserTargets = window.dataStore.getTargetsForUser(user);
-    const campusTargets = allUserTargets.filter(t => t.category === 'Campus Happenings');
-    const brandingTargets = allUserTargets.filter(t => t.category === 'Branding');
-    const marketingTargets = allUserTargets.filter(t => t.category === 'Marketing Creatives');
-    const momentTargets = allUserTargets.filter(t => t.category === 'Moment Marketing');
+    const campusTargets = allUserTargets.filter(t => normCat(t.category) === 'Campus Events');
+    const brandingTargets = allUserTargets.filter(t => normCat(t.category) === 'Branding');
+    const marketingTargets = allUserTargets.filter(t => normCat(t.category) === 'Marketing');
+    const momentTargets = allUserTargets.filter(t => normCat(t.category) === 'Moment Marketing');
 
     if (elements.countAllTasks) elements.countAllTasks.textContent = allUserTargets.length;
     if (elements.countCampusTasks) elements.countCampusTasks.textContent = campusTargets.length;
@@ -1763,9 +1777,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (elements.countMomentTasks) elements.countMomentTasks.textContent = momentTargets.length;
 
     // Filter targets by selected member category
-    const filteredTargets = state.memberCategory === 'all'
+    const filteredTargets = (!state.memberCategory || state.memberCategory === 'all')
       ? allUserTargets
-      : allUserTargets.filter(t => t.category === state.memberCategory);
+      : allUserTargets.filter(t => normCat(t.category) === normCat(state.memberCategory));
 
     // Render Cards Grid
     if (filteredTargets.length === 0) {
@@ -2802,7 +2816,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderApp();
   });
 
-  // Set Log Work Modal Mode (Assigned Target vs Extra Work)
+  // Set Log Work Modal Mode (Add Task / Extra Work vs Assigned Quota)
   function setLogWorkMode(mode) {
     if (!elements.logWorkMode) return;
     elements.logWorkMode.value = mode;
@@ -2813,14 +2827,24 @@ document.addEventListener('DOMContentLoaded', () => {
       if (elements.logAssignedFields) elements.logAssignedFields.classList.add('hidden');
       if (elements.logExtraFields) elements.logExtraFields.classList.remove('hidden');
       if (elements.logTargetSelect) elements.logTargetSelect.removeAttribute('required');
-      if (elements.logExtraProgram) elements.logExtraProgram.setAttribute('required', 'required');
+      if (elements.logWorkTitle) elements.logWorkTitle.removeAttribute('required');
+      if (elements.logExtraTitle) elements.logExtraTitle.setAttribute('required', 'required');
+      if (elements.logWorkModalHeading) elements.logWorkModalHeading.textContent = 'Add Task & Submit for Admin Review';
+      if (elements.btnSubmitDeliverable) {
+        elements.btnSubmitDeliverable.innerHTML = `<i data-lucide="send"></i> Submit Task for Admin Review`;
+      }
     } else {
       if (elements.btnModeAssigned) elements.btnModeAssigned.classList.add('active');
       if (elements.btnModeExtra) elements.btnModeExtra.classList.remove('active');
       if (elements.logAssignedFields) elements.logAssignedFields.classList.remove('hidden');
       if (elements.logExtraFields) elements.logExtraFields.classList.add('hidden');
       if (elements.logTargetSelect) elements.logTargetSelect.setAttribute('required', 'required');
-      if (elements.logExtraProgram) elements.logExtraProgram.removeAttribute('required');
+      if (elements.logWorkTitle) elements.logWorkTitle.setAttribute('required', 'required');
+      if (elements.logExtraTitle) elements.logExtraTitle.removeAttribute('required');
+      if (elements.logWorkModalHeading) elements.logWorkModalHeading.textContent = 'Submit Assigned Deliverable';
+      if (elements.btnSubmitDeliverable) {
+        elements.btnSubmitDeliverable.innerHTML = `<i data-lucide="send"></i> Submit Deliverable`;
+      }
     }
     refreshIcons();
   }
@@ -2833,7 +2857,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Open Log Work Modal (Global Button or Card Button)
-  function openLogWorkModal(preselectedTargetId = null, initialMode = 'assigned') {
+  function openLogWorkModal(preselectedTargetId = null, initialMode = 'extra') {
     let availableTargets = [];
     if (state.user && state.user.role === 'manager') {
       availableTargets = window.dataStore.getTargets();
@@ -2851,7 +2875,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </option>
         `).join('');
       } else {
-        elements.logTargetSelect.innerHTML = `<option value="">No assigned targets (switch to Extra Work)</option>`;
+        elements.logTargetSelect.innerHTML = `<option value="">No assigned targets (use Add Task mode)</option>`;
       }
     }
 
@@ -2860,14 +2884,17 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.logTargetSelect.value = preselectedTargetId;
     }
 
-    // Default to 'extra' if user requested extra mode or if no assigned targets exist
-    const mode = (initialMode === 'extra' || availableTargets.length === 0) ? 'extra' : 'assigned';
+    // Default to 'assigned' if a specific assigned target was preselected, otherwise 'extra' (Add Task)
+    const mode = preselectedTargetId ? 'assigned' : (initialMode || 'extra');
     setLogWorkMode(mode);
 
     elements.logWorkModal.classList.remove('hidden');
     refreshIcons();
   }
 
+  if (elements.btnMemberAddTask) {
+    elements.btnMemberAddTask.addEventListener('click', () => openLogWorkModal(null, 'extra'));
+  }
   if (elements.btnMemberLogWork) {
     elements.btnMemberLogWork.addEventListener('click', () => openLogWorkModal(null, 'assigned'));
   }
@@ -2875,22 +2902,31 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.btnMemberLogExtraWork.addEventListener('click', () => openLogWorkModal(null, 'extra'));
   }
 
-  // Submit Completed Work Form (Handles both Assigned Targets and Extra Work Tasks)
+  // Submit Completed Work Form (Handles both Add Task / Extra Work and Assigned Targets)
   elements.logWorkForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const mode = elements.logWorkMode ? elements.logWorkMode.value : 'assigned';
+    const mode = elements.logWorkMode ? elements.logWorkMode.value : 'extra';
 
     let submissionData = null;
 
     if (mode === 'extra') {
       const brand = elements.logExtraBrand ? elements.logExtraBrand.value : 'Both';
       const category = elements.logExtraCategory ? elements.logExtraCategory.value : 'Branding';
-      const program = elements.logExtraProgram ? elements.logExtraProgram.value.trim() : 'Self-Initiated Task';
+      const title = (elements.logExtraTitle ? elements.logExtraTitle.value.trim() : '') ||
+                    (elements.logWorkTitle ? elements.logWorkTitle.value.trim() : '');
       const format = elements.logExtraFormat ? elements.logExtraFormat.value : 'Poster';
+      const url = elements.logWorkUrl ? elements.logWorkUrl.value.trim() : '';
+      const notes = elements.logWorkNotes ? elements.logWorkNotes.value.trim() : '';
 
-      if (!program) {
-        showToast('Please enter a program or task name.', 'warning');
-        if (elements.logExtraProgram) elements.logExtraProgram.focus();
+      if (!title) {
+        showToast('Please enter a task title.', 'warning');
+        if (elements.logExtraTitle) elements.logExtraTitle.focus();
+        return;
+      }
+
+      if (!url) {
+        showToast('Please provide a deliverable proof link.', 'warning');
+        if (elements.logWorkUrl) elements.logWorkUrl.focus();
         return;
       }
 
@@ -2902,18 +2938,18 @@ document.addEventListener('DOMContentLoaded', () => {
         authorEmail: state.user ? state.user.email : '',
         brand,
         category,
-        program,
+        program: title,
+        title,
         format,
-        title: elements.logWorkTitle.value.trim(),
-        url: elements.logWorkUrl.value.trim(),
-        notes: elements.logWorkNotes.value.trim(),
+        url,
+        notes,
         month: window.dataStore.getActiveMonth()
       };
     } else {
       const targetId = elements.logTargetSelect ? elements.logTargetSelect.value : null;
       const target = window.dataStore.getTargetById(targetId);
       if (!target) {
-        showToast('Please select a deliverable task or switch to Extra Work.', 'warning');
+        showToast('Please select a deliverable task or switch to Add Task.', 'warning');
         return;
       }
 
@@ -2938,8 +2974,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.dataStore.addSubmission(submissionData);
     elements.logWorkModal.classList.add('hidden');
     const toastMsg = mode === 'extra'
-      ? '⭐ Extra deliverable submitted! Sent to Marketing Manager for review and bonus achievement credit.'
-      : 'Deliverable submitted successfully! Sent to Marketing Manager for review.';
+      ? '⭐ Task submitted! Sent to Admin for review. Once approved, it will be counted.'
+      : 'Deliverable submitted successfully! Sent to Admin for review.';
     showToast(toastMsg, 'success');
     renderApp();
   });
