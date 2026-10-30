@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=71">
+  <link rel="stylesheet" href="css/styles.css?v=72">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -1496,7 +1496,7 @@
             </div>
 
             <div class="form-group">
-              <label for="profile-edit-title">Job Title</label>
+              <label for="profile-edit-title">Job Title <span id="profile-title-lock-tag" class="profile-lock-tag" style="margin-left: 6px; display: none;"><i data-lucide="lock"></i> Managed by Admin</span></label>
               <div class="input-with-icon">
                 <i data-lucide="briefcase"></i>
                 <input type="text" id="profile-edit-title" placeholder="e.g. Senior Graphic Designer">
@@ -1504,7 +1504,7 @@
             </div>
 
             <div class="form-group">
-              <label>Brand</label>
+              <label>Brand <span class="profile-lock-tag" style="margin-left: 6px;"><i data-lucide="lock"></i> Fixed</span></label>
               <div class="input-with-icon">
                 <i data-lucide="tag"></i>
                 <input type="text" id="profile-edit-brand-readonly" readonly disabled>
@@ -1631,10 +1631,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=71"></script>
-  <script src="js/data.js?v=71"></script>
-  <script src="js/auth.js?v=71"></script>
-  <script src="js/app.js?v=71"></script>
+  <script src="js/firebase-config.js?v=72"></script>
+  <script src="js/data.js?v=72"></script>
+  <script src="js/auth.js?v=72"></script>
+  <script src="js/app.js?v=72"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

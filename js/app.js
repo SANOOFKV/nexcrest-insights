@@ -292,6 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
     profileDetailsForm: document.getElementById('profile-details-form'),
     profileEditName: document.getElementById('profile-edit-name'),
     profileEditTitle: document.getElementById('profile-edit-title'),
+    profileTitleLockTag: document.getElementById('profile-title-lock-tag'),
     profileEditBrandReadonly: document.getElementById('profile-edit-brand-readonly'),
     profilePasswordForm: document.getElementById('profile-password-form'),
     profileCurrentPass: document.getElementById('profile-current-pass'),
@@ -2874,8 +2875,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (elements.profileEditName) {
       elements.profileEditName.value = user.name || '';
     }
+    const isManager = user.role === 'manager';
     if (elements.profileEditTitle) {
       elements.profileEditTitle.value = user.title || '';
+      if (isManager) {
+        elements.profileEditTitle.removeAttribute('readonly');
+        elements.profileEditTitle.removeAttribute('disabled');
+        elements.profileEditTitle.style.cursor = 'text';
+        elements.profileEditTitle.style.opacity = '1';
+        if (elements.profileTitleLockTag) elements.profileTitleLockTag.style.display = 'none';
+      } else {
+        elements.profileEditTitle.setAttribute('readonly', 'true');
+        elements.profileEditTitle.setAttribute('disabled', 'true');
+        elements.profileEditTitle.style.cursor = 'not-allowed';
+        elements.profileEditTitle.style.opacity = '0.75';
+        if (elements.profileTitleLockTag) elements.profileTitleLockTag.style.display = 'inline-flex';
+      }
     }
     if (elements.profileEditBrandReadonly) {
       elements.profileEditBrandReadonly.value = formatBrandName(user.brand);
@@ -2976,8 +2991,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const user = state.user;
       if (!user) return;
 
+      const isManager = user.role === 'manager';
       const newName = elements.profileEditName.value.trim();
-      const newTitle = elements.profileEditTitle.value.trim();
+      // Team members cannot edit job title; only manager can
+      const newTitle = (isManager && elements.profileEditTitle) ? elements.profileEditTitle.value.trim() : user.title;
 
       if (!newName) {
         showToast('Please enter your full name.', 'error');
