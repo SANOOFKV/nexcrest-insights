@@ -12,116 +12,231 @@ const STORAGE_KEYS = {
 
 // Seed Targets based on exact user specification & chart + September 2026 Archive
 const SEED_TARGETS = [
-  // ================= GRAPHIC DESIGNER (Exact chart provided: 25 deliverables) =================
+  // ================= GRAPHIC DESIGNER (15 Deliverables assigned by Manager) =================
   {
-    id: 'gd-1',
+    id: 'target-1793365529125',
     assignee: 'designer',
-    brand: 'Techschool',
-    category: 'Campus Happenings',
-    program: 'NexTalk Series',
-    format: 'Carousel',
-    targetQty: 1,
-    month: '2026-10',
-    notes: 'Cover guest speaker highlights and key takeaways'
-  },
-  {
-    id: 'gd-2',
-    assignee: 'designer',
-    brand: 'Techschool',
-    category: 'Campus Happenings',
-    program: "Let's Talk Series",
-    format: 'Carousel',
-    targetQty: 1,
-    month: '2026-10',
-    notes: 'Q&A format with student community quotes'
-  },
-  {
-    id: 'gd-3',
-    assignee: 'designer',
-    brand: 'Techschool',
-    category: 'Campus Happenings',
-    program: 'LinkedIn Contest',
-    format: 'Carousel',
-    targetQty: 1,
-    month: '2026-10',
-    notes: 'Contest announcement, rules, and prize reveal slides'
-  },
-  {
-    id: 'gd-4',
-    assignee: 'designer',
-    brand: 'Techschool',
-    category: 'Campus Happenings',
-    program: 'Experts Talk',
-    format: 'Poster',
-    targetQty: 1,
-    month: '2026-10',
-    notes: 'Official high-contrast speaker announcement poster'
-  },
-  {
-    id: 'gd-5',
-    assignee: 'designer',
-    brand: 'Techschool',
-    category: 'Campus Happenings',
-    program: 'Experts Talk',
-    format: 'Carousel',
-    targetQty: 1,
-    month: '2026-10',
-    notes: 'Detailed session agenda, speaker bio, and key learning points'
-  },
-  {
-    id: 'gd-6',
-    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
     brand: 'Techschool',
     category: 'Branding',
-    program: 'Informative Contents',
+    program: 'Best AI Tools Carousal',
     format: 'Carousel',
-    targetQty: 5,
+    targetQty: 1,
     month: '2026-10',
-    notes: 'Industry trends, programming cheat sheets, tech career tips'
+    notes: '',
+    deadline: ''
   },
   {
-    id: 'gd-7',
+    id: 'target-1793365575079',
     assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
+    brand: 'Techschool',
+    category: 'Branding',
+    program: '5 Mistakes Carousal',
+    format: 'Carousel',
+    targetQty: 1,
+    month: '2026-10',
+    notes: '',
+    deadline: ''
+  },
+  {
+    id: 'target-1793365599040',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
+    brand: 'Techschool',
+    category: 'Branding',
+    program: 'AI Replace Developers Carousal',
+    format: 'Carousel',
+    targetQty: 1,
+    month: '2026-10',
+    notes: '',
+    deadline: ''
+  },
+  {
+    id: 'target-1793365625418',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
+    brand: 'Techschool',
+    category: 'Branding',
+    program: 'Jailer Frontend vs Backend Carousal',
+    format: 'Carousel',
+    targetQty: 1,
+    month: '2026-10',
+    notes: '',
+    deadline: ''
+  },
+  {
+    id: 'target-1793365658549',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
     brand: 'IT',
     category: 'Branding',
-    program: 'Informative Contents',
+    program: '2nd Anniversary',
+    format: 'Poster',
+    targetQty: 1,
+    month: '2026-10',
+    notes: '',
+    deadline: ''
+  },
+  {
+    id: 'target-1793365692193',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
+    brand: 'Techschool',
+    category: 'Campus Events',
+    program: 'Students Day Carousal',
     format: 'Carousel',
-    targetQty: 5,
+    targetQty: 1,
     month: '2026-10',
-    notes: 'Corporate tech updates, system architecture deep-dives'
+    notes: '',
+    deadline: ''
   },
   {
-    id: 'gd-8',
+    id: 'target-1793365706869',
     assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
     brand: 'Techschool',
-    category: 'Marketing Creatives',
-    program: 'Marketing Posters',
+    category: 'Campus Events',
+    program: 'Halloween Poster',
     format: 'Poster',
-    targetQty: 5,
+    targetQty: 1,
     month: '2026-10',
-    notes: 'Admission batch announcements, fast-track program banners'
+    notes: '',
+    deadline: ''
   },
   {
-    id: 'gd-9',
+    id: 'target-1793365734373',
     assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
+    brand: 'Techschool',
+    category: 'Marketing',
+    program: 'Advanced AI Engineering Poster',
+    format: 'Poster',
+    targetQty: 1,
+    month: '2026-10',
+    notes: '',
+    deadline: ''
+  },
+  {
+    id: 'target-1793365760539',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
+    brand: 'Techschool',
+    category: 'Marketing',
+    program: 'Master Advanced AI Engineering',
+    format: 'Poster',
+    targetQty: 1,
+    month: '2026-10',
+    notes: '',
+    deadline: ''
+  },
+  {
+    id: 'target-1793365785173',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
     brand: 'IT',
-    category: 'Marketing Creatives',
-    program: 'Marketing Posters',
+    category: 'Marketing',
+    program: 'Sales officer B2B Hiring Poster',
     format: 'Poster',
-    targetQty: 5,
+    targetQty: 1,
     month: '2026-10',
-    notes: 'Enterprise IT placement records, hiring partners showcase'
+    notes: '',
+    deadline: ''
   },
   {
-    id: 'gd-10',
+    id: 'target-1793365811566',
     assignee: 'designer',
-    brand: 'Techschool',
-    category: 'Moment Marketing',
-    program: 'Viral Tech Memes & Trending Topics',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
+    brand: 'IT',
+    category: 'Marketing',
+    program: 'One ERP Poster 1',
     format: 'Poster',
-    targetQty: 2,
+    targetQty: 1,
     month: '2026-10',
-    notes: 'Real-time trending tech news and viral developer culture'
+    notes: '',
+    deadline: ''
+  },
+  {
+    id: 'target-1793365830026',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
+    brand: 'IT',
+    category: 'Marketing',
+    program: 'BDE Hiring Poster',
+    format: 'Poster',
+    targetQty: 1,
+    month: '2026-10',
+    notes: '',
+    deadline: ''
+  },
+  {
+    id: 'target-1793365848429',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
+    brand: 'IT',
+    category: 'Marketing',
+    program: 'One ERP Poster 2',
+    format: 'Poster',
+    targetQty: 1,
+    month: '2026-10',
+    notes: '',
+    deadline: ''
+  },
+  {
+    id: 'target-1793365877870',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
+    brand: 'IT',
+    category: 'Marketing',
+    program: 'UAE Business ERP',
+    format: 'Poster',
+    targetQty: 1,
+    month: '2026-10',
+    notes: '',
+    deadline: ''
+  },
+  {
+    id: 'target-1793365899353',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
+    brand: 'Techschool',
+    category: 'Marketing',
+    program: 'BCA/MCA Poster',
+    format: 'Poster',
+    targetQty: 1,
+    month: '2026-10',
+    notes: '',
+    deadline: ''
   },
 
   // ================= VIDEOGRAPHER + EDITOR (18 video deliverables) =================
@@ -341,13 +456,17 @@ class DataStore {
       window.firebaseSync.seedTargetsIfEmpty(SEED_TARGETS);
       window.firebaseSync.seedSubmissionsIfEmpty(SEED_SUBMISSIONS);
 
-      // Permanently remove legacy mock demo seed submissions from Cloud Firestore
+      // Permanently remove legacy mock demo seed submissions and targets from Cloud Firestore
       const legacyDemoSubIds = ['sub-1', 'sub-2', 'sub-3', 'sub-4', 'sub-5', 'sub-6', 'sub-7'];
       window.firebaseSync.deleteMultipleSubmissions(legacyDemoSubIds);
 
+      const legacyDemoTargetIds = ['gd-1', 'gd-2', 'gd-3', 'gd-4', 'gd-5', 'gd-6', 'gd-7', 'gd-8', 'gd-9', 'gd-10'];
+      window.firebaseSync.deleteMultipleTargets(legacyDemoTargetIds);
+
       window.firebaseSync.subscribeTargets((cloudTargets) => {
         if (Array.isArray(cloudTargets) && cloudTargets.length > 0) {
-          this.targets = cloudTargets;
+          const legacyTargetSet = new Set(legacyDemoTargetIds);
+          this.targets = cloudTargets.filter(t => !legacyTargetSet.has(String(t.id)));
           try { localStorage.setItem(STORAGE_KEYS.TARGETS, JSON.stringify(this.targets)); } catch (e) {}
           this.notify();
         }
@@ -369,14 +488,24 @@ class DataStore {
   }
 
   loadTargets() {
+    const legacyDemoTargetIds = ['gd-1', 'gd-2', 'gd-3', 'gd-4', 'gd-5', 'gd-6', 'gd-7', 'gd-8', 'gd-9', 'gd-10'];
+    const legacyTargetSet = new Set(legacyDemoTargetIds);
     const raw = localStorage.getItem(STORAGE_KEYS.TARGETS);
     if (!raw) {
       this.saveTargets(SEED_TARGETS);
       return [...SEED_TARGETS];
     }
     try {
-      const parsed = JSON.parse(raw);
+      let parsed = JSON.parse(raw);
       let migrated = false;
+
+      // Purge old mock seed targets from local cache if present
+      const hadLegacy = parsed.some(t => legacyTargetSet.has(String(t.id)));
+      if (hadLegacy) {
+        parsed = parsed.filter(t => !legacyTargetSet.has(String(t.id)));
+        migrated = true;
+      }
+
       parsed.forEach(t => {
         if (t.brand === 'Insights' || t.brand === 'Nexcrest Insights' || t.brand === 'Nexcrest Techschool') {
           t.brand = 'Techschool';
