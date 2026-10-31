@@ -237,6 +237,21 @@ const SEED_TARGETS = [
     month: '2026-10',
     notes: '',
     deadline: ''
+  },
+  {
+    id: 'target-1793429167984',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    assigneeEmail: 'designer@nexcrest.com',
+    assigneeRole: 'designer',
+    brand: 'IT',
+    category: 'Branding',
+    program: '2 Anniversary Carousal',
+    format: 'IT',
+    targetQty: 1,
+    month: '2026-10',
+    notes: '',
+    deadline: ''
   }
 ];
 
@@ -312,7 +327,6 @@ class DataStore {
     const legacyTargetSet = new Set(LEGACY_DEMO_TARGET_IDS);
     const raw = localStorage.getItem(STORAGE_KEYS.TARGETS);
     if (!raw) {
-      this.saveTargets(SEED_TARGETS);
       return [...SEED_TARGETS];
     }
     try {
@@ -346,15 +360,15 @@ class DataStore {
     }
   }
 
-  saveTargets(data) {
+  saveTargets(data, syncAllToCloud = false) {
     this.targets = Array.isArray(data) ? data : [];
     try {
       localStorage.setItem(STORAGE_KEYS.TARGETS, JSON.stringify(this.targets));
     } catch (e) {
       console.error('Storage quota exceeded while saving targets', e);
     }
-    // Broadcast target changes to Cloud Firestore
-    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+    // Only broadcast all targets if explicitly requested (not on initial load or cache writes)
+    if (syncAllToCloud && typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
       this.targets.forEach(t => window.firebaseSync.saveTarget(t));
     }
     this.notify();
@@ -526,10 +540,12 @@ class DataStore {
     if (cleanTarget.deadline !== undefined) {
       cleanTarget.deadline = cleanTarget.deadline ? String(cleanTarget.deadline).trim() : '';
     }
+    let targetToSave = cleanTarget;
     if (cleanTarget.id) {
       const idx = this.targets.findIndex(t => t.id === cleanTarget.id);
       if (idx !== -1) {
         this.targets[idx] = { ...this.targets[idx], ...cleanTarget };
+        targetToSave = this.targets[idx];
       }
     } else {
       const newTarget = {
@@ -538,8 +554,14 @@ class DataStore {
         month: this.activeMonth
       };
       this.targets.push(newTarget);
+      targetToSave = newTarget;
     }
     this.saveTargets(this.targets);
+    // Explicitly sync this specific target to Cloud Firestore
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.saveTarget(targetToSave);
+    }
+    return targetToSave;
   }
 
   deleteTarget(id) {
