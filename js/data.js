@@ -237,196 +237,21 @@ const SEED_TARGETS = [
     month: '2026-10',
     notes: '',
     deadline: ''
-  },
-
-  // ================= VIDEOGRAPHER + EDITOR (18 video deliverables) =================
-  {
-    id: 've-1',
-    assignee: 'videographer',
-    brand: 'Techschool',
-    category: 'Campus Happenings',
-    program: 'NexTalk & Let\'s Talk Coverage',
-    format: '9:16 Reel / Highlight',
-    targetQty: 2,
-    month: '2026-10',
-    notes: 'Fast-paced event recap with trending audio and subtitles'
-  },
-  {
-    id: 've-2',
-    assignee: 'videographer',
-    brand: 'Techschool',
-    category: 'Campus Happenings',
-    program: 'Experts Talk Speaker Clips & Student Reactions',
-    format: 'Vertical Reels',
-    targetQty: 3,
-    month: '2026-10',
-    notes: 'Bite-sized knowledge nuggets from the guest speaker session'
-  },
-  {
-    id: 've-3',
-    assignee: 'videographer',
-    brand: 'Techschool',
-    category: 'Branding',
-    program: 'Nexcrest Life & Culture Series',
-    format: 'Cinematic 9:16 Reel',
-    targetQty: 4,
-    month: '2026-10',
-    notes: 'Day in the life of a tech student, lab tours, peer collabs'
-  },
-  {
-    id: 've-4',
-    assignee: 'videographer',
-    brand: 'IT',
-    category: 'Branding',
-    program: 'IT Program Explainers & Faculty Talks',
-    format: 'Short Video Clips',
-    targetQty: 4,
-    month: '2026-10',
-    notes: 'Mentors explaining modern DevOps, Cloud, and Fullstack roadmaps'
-  },
-  {
-    id: 've-5',
-    assignee: 'videographer',
-    brand: 'Techschool',
-    category: 'Marketing Creatives',
-    program: 'Course Admission Video Ads',
-    format: 'Paid Ad Creative (9:16 & 1:1)',
-    targetQty: 3,
-    month: '2026-10',
-    notes: 'High-conversion hooks targeting college grads & career switchers'
-  },
-  {
-    id: 've-6',
-    assignee: 'videographer',
-    brand: 'IT',
-    category: 'Marketing Creatives',
-    program: 'Student Career Transformation Testimonials',
-    format: 'Long-form Video (16:9)',
-    targetQty: 2,
-    month: '2026-10',
-    notes: 'In-depth interview documenting salary hike and tech hiring story'
-  },
-  {
-    id: 've-7',
-    assignee: 'videographer',
-    brand: 'Techschool',
-    category: 'Moment Marketing',
-    program: 'Trending Audio Tech Skits',
-    format: '9:16 Reel / Highlight',
-    targetQty: 1,
-    month: '2026-10',
-    notes: 'Short viral trend recreation for campus students'
-  },
-
-  // ================= MARKETING EXECUTIVE (Campaigns & Outreach) =================
-  {
-    id: 'me-1',
-    assignee: 'marketing',
-    brand: 'Techschool',
-    category: 'Campus Happenings',
-    program: 'NexTalk & Let\'s Talk Audience Registrations',
-    format: 'Event Registration Drive',
-    targetQty: 2,
-    month: '2026-10',
-    notes: 'Target: 150 RSVP registrations and attendance coordination'
-  },
-  {
-    id: 'me-2',
-    assignee: 'marketing',
-    brand: 'Techschool',
-    category: 'Campus Happenings',
-    program: 'LinkedIn Contest & Student Engagement Campaign',
-    format: 'Organic Engagement Sprints',
-    targetQty: 3,
-    month: '2026-10',
-    notes: 'Drive 50+ user generated submissions across colleges'
-  },
-  {
-    id: 'me-3',
-    assignee: 'marketing',
-    brand: 'Techschool',
-    category: 'Branding',
-    program: 'Multi-Platform Content Distribution & Growth',
-    format: 'Daily Social Publishing',
-    targetQty: 12,
-    month: '2026-10',
-    notes: 'Cross-posting on LinkedIn, Instagram, and Tech Community groups'
-  },
-  {
-    id: 'me-4',
-    assignee: 'marketing',
-    brand: 'IT',
-    category: 'Branding',
-    program: 'IT Career Community & Newsletter Broadcasts',
-    format: 'Bi-Weekly Tech Newsletter',
-    targetQty: 2,
-    month: '2026-10',
-    notes: 'Tech hiring trends newsletter sent to subscriber database'
-  },
-  {
-    id: 'me-5',
-    assignee: 'marketing',
-    brand: 'Techschool',
-    category: 'Marketing Creatives',
-    program: 'Meta & Google Lead Acquisition Ads',
-    format: 'Paid Lead Funnel (Target: 300 Leads)',
-    targetQty: 4,
-    month: '2026-10',
-    notes: 'Optimize CPL under ₹120 for upcoming batch intake'
-  },
-  {
-    id: 'me-6',
-    assignee: 'marketing',
-    brand: 'IT',
-    category: 'Marketing Creatives',
-    program: 'IT Upskilling Conversion Campaign',
-    format: 'Conversion Funnel (Target: 120 Inquiries)',
-    targetQty: 2,
-    month: '2026-10',
-    notes: 'Direct outreach & webinar signups for working professionals'
-  },
-
-  // ================= SEPTEMBER 2026 (EXACT MATCH TO USER PHOTO: 40 TARGETS) =================
-  // Branding (20 Posts: 13 Reels & Videos, 7 Posters & Carousels)
-  { id: 'sep-1', assignee: 'videographer', brand: 'Techschool', category: 'Branding', program: 'Campus Story Reels', format: 'Reel (9:16)', targetQty: 13, month: '2026-09' },
-  { id: 'sep-2', assignee: 'designer', brand: 'Techschool', category: 'Branding', program: 'Brand Identity Carousels', format: 'Carousel', targetQty: 7, month: '2026-09' },
-  // Campus Happenings (9 Posts: 5 Reels & Videos, 4 Posters & Carousels)
-  { id: 'sep-3', assignee: 'videographer', brand: 'Techschool', category: 'Campus Happenings', program: 'Event Recap Highlights', format: 'Reel (9:16)', targetQty: 5, month: '2026-09' },
-  { id: 'sep-4', assignee: 'designer', brand: 'Techschool', category: 'Campus Happenings', program: 'Campus Activity Posters', format: 'Poster', targetQty: 4, month: '2026-09' },
-  // Marketing Creatives (8 Posts: 2 Reels & Videos, 6 Posters & Carousels)
-  { id: 'sep-5', assignee: 'videographer', brand: 'Techschool', category: 'Marketing Creatives', program: 'Ad Promo Videos', format: 'Video Ad', targetQty: 2, month: '2026-09' },
-  { id: 'sep-6', assignee: 'designer', brand: 'Techschool', category: 'Marketing Creatives', program: 'Enrollment Ad Creatives', format: 'Poster', targetQty: 6, month: '2026-09' },
-  // Moment Marketing (3 Posts: 2 Posters, 1 Reel)
-  { id: 'sep-7', assignee: 'designer', brand: 'Techschool', category: 'Moment Marketing', program: 'Trending Topic Memes', format: 'Poster', targetQty: 2, month: '2026-09' },
-  { id: 'sep-8', assignee: 'videographer', brand: 'Techschool', category: 'Moment Marketing', program: 'Viral Sound Clip', format: 'Reel (9:16)', targetQty: 1, month: '2026-09' }
+  }
 ];
 
-// Seed Submissions for realistic demo (October starts pristine with 0 submissions)
-const SEED_SUBMISSIONS = [];
+// Legacy demo targets & submissions to permanently purge from all clients and cloud
+const LEGACY_DEMO_TARGET_IDS = [
+  'gd-1', 'gd-2', 'gd-3', 'gd-4', 'gd-5', 'gd-6', 'gd-7', 'gd-8', 'gd-9', 'gd-10',
+  've-1', 've-2', 've-3', 've-4', 've-5', 've-6', 've-7',
+  'me-1', 'me-2', 'me-3', 'me-4', 'me-5', 'me-6',
+  'sep-1', 'sep-2', 'sep-3', 'sep-4', 'sep-5', 'sep-6', 'sep-7', 'sep-8'
+];
 
-// Generate 40 approved submissions for September 2026 so September displays 100% complete
-(function generateSeptemberApproved() {
-  const sepTargets = SEED_TARGETS.filter(t => t.month === '2026-09');
-  sepTargets.forEach(target => {
-    for (let i = 1; i <= target.targetQty; i++) {
-      SEED_SUBMISSIONS.push({
-        id: `sep-sub-${target.id}-${i}`,
-        targetId: target.id,
-        assignee: target.assignee,
-        brand: target.brand,
-        category: target.category,
-        program: target.program,
-        format: target.format,
-        title: `${target.program} - Deliverable #${i}`,
-        url: 'https://drive.google.com/drive/folders/september-archive',
-        notes: `September verified release #${i}`,
-        submittedAt: '2026-09-28T16:00:00Z',
-        status: 'approved',
-        feedback: 'Published and live'
-      });
-    }
-  });
-})();
+const LEGACY_DEMO_SUB_PREFIXES = ['sep-sub-', 'sub-'];
+
+// Submissions start clean with 0 demo records
+const SEED_SUBMISSIONS = [];
 
 class DataStore {
   constructor() {
@@ -456,28 +281,24 @@ class DataStore {
       window.firebaseSync.seedTargetsIfEmpty(SEED_TARGETS);
       window.firebaseSync.seedSubmissionsIfEmpty(SEED_SUBMISSIONS);
 
-      // Permanently remove legacy mock demo seed submissions and targets from Cloud Firestore
-      const legacyDemoSubIds = ['sub-1', 'sub-2', 'sub-3', 'sub-4', 'sub-5', 'sub-6', 'sub-7'];
-      window.firebaseSync.deleteMultipleSubmissions(legacyDemoSubIds);
+      // Permanently remove all legacy mock demo seed targets and submissions from Cloud Firestore
+      window.firebaseSync.deleteMultipleTargets(LEGACY_DEMO_TARGET_IDS);
 
-      const legacyDemoTargetIds = ['gd-1', 'gd-2', 'gd-3', 'gd-4', 'gd-5', 'gd-6', 'gd-7', 'gd-8', 'gd-9', 'gd-10'];
-      window.firebaseSync.deleteMultipleTargets(legacyDemoTargetIds);
+      const legacyTargetSet = new Set(LEGACY_DEMO_TARGET_IDS);
 
       window.firebaseSync.subscribeTargets((cloudTargets) => {
-        if (Array.isArray(cloudTargets) && cloudTargets.length > 0) {
-          const legacyTargetSet = new Set(legacyDemoTargetIds);
-          this.targets = cloudTargets.filter(t => !legacyTargetSet.has(String(t.id)));
+        if (Array.isArray(cloudTargets)) {
+          this.targets = cloudTargets.filter(t => t && t.id && !legacyTargetSet.has(String(t.id)));
           try { localStorage.setItem(STORAGE_KEYS.TARGETS, JSON.stringify(this.targets)); } catch (e) {}
           this.notify();
         }
       });
       window.firebaseSync.subscribeSubmissions((cloudSubs) => {
         if (Array.isArray(cloudSubs)) {
-          // Only filter out legacy mock demo seed submissions; preserve all user submissions
-          const demoSet = new Set(legacyDemoSubIds);
           this.submissions = cloudSubs.filter(s => {
             if (!s || !s.id) return false;
-            if (demoSet.has(String(s.id))) return false;
+            const sid = String(s.id);
+            if (LEGACY_DEMO_SUB_PREFIXES.some(prefix => sid.startsWith(prefix))) return false;
             return true;
           });
           try { localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(this.submissions)); } catch (e) {}
@@ -488,8 +309,7 @@ class DataStore {
   }
 
   loadTargets() {
-    const legacyDemoTargetIds = ['gd-1', 'gd-2', 'gd-3', 'gd-4', 'gd-5', 'gd-6', 'gd-7', 'gd-8', 'gd-9', 'gd-10'];
-    const legacyTargetSet = new Set(legacyDemoTargetIds);
+    const legacyTargetSet = new Set(LEGACY_DEMO_TARGET_IDS);
     const raw = localStorage.getItem(STORAGE_KEYS.TARGETS);
     if (!raw) {
       this.saveTargets(SEED_TARGETS);
@@ -499,7 +319,7 @@ class DataStore {
       let parsed = JSON.parse(raw);
       let migrated = false;
 
-      // Purge old mock seed targets from local cache if present
+      // Purge all old mock seed targets from local cache if present
       const hadLegacy = parsed.some(t => legacyTargetSet.has(String(t.id)));
       if (hadLegacy) {
         parsed = parsed.filter(t => !legacyTargetSet.has(String(t.id)));
@@ -550,12 +370,12 @@ class DataStore {
       let parsed = JSON.parse(raw);
       let migrated = false;
 
-      // Only purge legacy mock demo seed submissions (sub-1 .. sub-7)
-      const legacyDemoSubIds = new Set(['sub-1', 'sub-2', 'sub-3', 'sub-4', 'sub-5', 'sub-6', 'sub-7']);
+      // Purge legacy mock demo submissions
       const initialCount = parsed.length;
       parsed = parsed.filter(s => {
         if (!s || !s.id) return false;
-        if (legacyDemoSubIds.has(String(s.id))) return false;
+        const sid = String(s.id);
+        if (LEGACY_DEMO_SUB_PREFIXES.some(prefix => sid.startsWith(prefix))) return false;
         return true;
       });
       if (parsed.length !== initialCount) {

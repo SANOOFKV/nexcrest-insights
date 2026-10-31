@@ -13,12 +13,19 @@ window.FIREBASE_CONFIG = {
   measurementId: "G-30XDBKR84M"
 };
 
+const LEGACY_PURGED_TARGET_IDS = [
+  'gd-1', 'gd-2', 'gd-3', 'gd-4', 'gd-5', 'gd-6', 'gd-7', 'gd-8', 'gd-9', 'gd-10',
+  've-1', 've-2', 've-3', 've-4', 've-5', 've-6', 've-7',
+  'me-1', 'me-2', 'me-3', 'me-4', 'me-5', 'me-6',
+  'sep-1', 'sep-2', 'sep-3', 'sep-4', 'sep-5', 'sep-6', 'sep-7', 'sep-8'
+];
+
 class FirebaseSyncService {
   constructor() {
     this.db = null;
     this.isReady = false;
     this.listeners = [];
-    this.deletedTargetIds = new Set();
+    this.deletedTargetIds = new Set(LEGACY_PURGED_TARGET_IDS);
     this.deletedSubmissionIds = new Set();
     this.init();
   }
