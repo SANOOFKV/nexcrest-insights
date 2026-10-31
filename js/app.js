@@ -201,6 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
     targetProgram: document.getElementById('target-program'),
     targetQty: document.getElementById('target-qty'),
     targetDeadline: document.getElementById('target-deadline'),
+    targetDeadlinePresets: document.getElementById('target-deadline-presets'),
+    targetDeadlineQuickPreview: document.getElementById('target-deadline-quick-preview'),
     targetNotes: document.getElementById('target-notes'),
     btnModalDeleteTarget: document.getElementById('btn-modal-delete-target'),
     btnSubmitTargetModal: document.getElementById('btn-submit-target-modal'),
@@ -260,8 +262,23 @@ document.addEventListener('DOMContentLoaded', () => {
     logExtraTitle: document.getElementById('log-extra-title'),
     logExtraProgram: document.getElementById('log-extra-program'),
     logExtraFormat: document.getElementById('log-extra-format'),
+    logExtraDeadline: document.getElementById('log-extra-deadline'),
+    logExtraDeadlinePresets: document.getElementById('log-extra-deadline-presets'),
+    logExtraDeadlinePreview: document.getElementById('log-extra-deadline-preview'),
     logWorkModalHeading: document.getElementById('log-work-modal-heading'),
     btnSubmitDeliverable: document.getElementById('btn-submit-deliverable'),
+
+    // Marketing Executive Workspace & Modals
+    memberCreativeWorkspace: document.getElementById('member-creative-workspace'),
+    memberMarketingWorkspace: document.getElementById('member-marketing-workspace'),
+    routineNoteModal: document.getElementById('routine-note-modal'),
+    routineNoteForm: document.getElementById('routine-note-form'),
+    routineModalTitle: document.getElementById('routine-modal-title'),
+    routineModalTaskId: document.getElementById('routine-modal-task-id'),
+    routineModalType: document.getElementById('routine-modal-type'),
+    routineModalTaskName: document.getElementById('routine-modal-task-name'),
+    routineModalProofUrl: document.getElementById('routine-modal-proof-url'),
+    routineModalNoteText: document.getElementById('routine-modal-note-text'),
 
     // Review Modal Form & Fields
     reviewDecisionForm: document.getElementById('review-decision-form'),
@@ -511,6 +528,61 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="task-deadline-strip upcoming">
           <span class="deadline-content"><i data-lucide="calendar"></i> Due: <strong>${escapeHtml(deadlineStr)}</strong></span>
         </div>`;
+    }
+  }
+
+  // Calculate Date String for Quick Preset Buttons
+  function calculateDatePreset(preset) {
+    const d = new Date();
+    if (preset === 'today') {
+      return (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr(d) : d.toISOString().split('T')[0];
+    }
+    if (preset === 'tomorrow') {
+      d.setDate(d.getDate() + 1);
+      return (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr(d) : d.toISOString().split('T')[0];
+    }
+    if (preset === 'in3days') {
+      d.setDate(d.getDate() + 3);
+      return (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr(d) : d.toISOString().split('T')[0];
+    }
+    if (preset === 'weekend') {
+      const day = d.getDay(); // 0 is Sunday
+      const diff = (7 - day) % 7 || 7;
+      d.setDate(d.getDate() + diff);
+      return (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr(d) : d.toISOString().split('T')[0];
+    }
+    if (preset === 'nextweek') {
+      const day = d.getDay();
+      const diff = (8 - day) % 7 || 7;
+      d.setDate(d.getDate() + diff);
+      return (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr(d) : d.toISOString().split('T')[0];
+    }
+    return (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr(d) : d.toISOString().split('T')[0];
+  }
+
+  function updateDeadlineQuickPreview(inputEl, previewEl) {
+    if (!previewEl) return;
+    const val = inputEl ? inputEl.value : '';
+    if (!val) {
+      previewEl.innerHTML = '';
+      return;
+    }
+    const today = new Date();
+    const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr(today) : today.toISOString().split('T')[0];
+
+    if (val === todayStr) {
+      previewEl.innerHTML = `<span style="color: #FDE68A;">⏰ Due Today!</span>`;
+    } else if (val < todayStr) {
+      previewEl.innerHTML = `<span style="color: #FDA4AF;">⚠️ Past Date</span>`;
+    } else {
+      const targetD = new Date(val);
+      const diffTime = targetD.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24));
+      if (diffDays === 1) {
+        previewEl.innerHTML = `<span style="color: #FEF08A;">⚡ Due Tomorrow</span>`;
+      } else {
+        previewEl.innerHTML = `<span style="color: var(--teal-light);">📅 In ${diffDays} days</span>`;
+      }
     }
   }
 
@@ -1823,6 +1895,74 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.teamRosterGrid.innerHTML = filtered.map(emp => {
       const stats = window.dataStore.getEmployeeStats(emp);
       const isAhead = stats.pct >= 50;
+      const isMarketing = emp.role === 'marketing';
+      const mktTodayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
+      const mktWeekStr = (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W44';
+      const mktDailyStats = isMarketing ? window.dataStore.getMarketingDailyStats(mktTodayStr) : null;
+      const mktWeeklyStats = isMarketing ? window.dataStore.getMarketingWeeklyStats(mktWeekStr) : null;
+      const mktStreak = isMarketing ? window.dataStore.getMarketingDailyStreak() : 0;
+
+      const statsStripHtml = isMarketing ? `
+        <!-- Marketing Routines Strip -->
+        <div class="employee-stats-strip">
+          <div class="emp-stat-item completed">
+            <span class="emp-stat-val">${mktDailyStats.completed}/${mktDailyStats.total}</span>
+            <span class="emp-stat-lbl">Today</span>
+          </div>
+          <div class="emp-stat-item" style="color: #38BDF8;">
+            <span class="emp-stat-val" style="color: #38BDF8;">${mktWeeklyStats.completed}/${mktWeeklyStats.total}</span>
+            <span class="emp-stat-lbl">Weekly</span>
+          </div>
+          <div class="emp-stat-item" style="color: #FBBF24;">
+            <span class="emp-stat-val" style="color: #FBBF24;">${mktStreak}d 🔥</span>
+            <span class="emp-stat-lbl">Streak</span>
+          </div>
+          <div class="emp-stat-item">
+            <span class="emp-stat-val" style="color: var(--teal-light);">${stats.targetsCount}</span>
+            <span class="emp-stat-lbl">Instant</span>
+          </div>
+        </div>
+
+        <div class="employee-pacing-section">
+          <div class="emp-pacing-header">
+            <span>Today's Execution (${mktDailyStats.completed}/${mktDailyStats.total} Routines)</span>
+            <span>${mktDailyStats.pct}%</span>
+          </div>
+          <div class="progress-bar-container" style="margin: 0;">
+            <div class="progress-bar-fill teal" style="width: ${mktDailyStats.pct}%;"></div>
+          </div>
+        </div>
+      ` : `
+        <!-- Pacing & Deliverable Stats -->
+        <div class="employee-stats-strip">
+          <div class="emp-stat-item">
+            <span class="emp-stat-val">${stats.totalTarget}</span>
+            <span class="emp-stat-lbl">Target</span>
+          </div>
+          <div class="emp-stat-item completed">
+            <span class="emp-stat-val">${stats.totalCompleted}</span>
+            <span class="emp-stat-lbl">Done</span>
+          </div>
+          <div class="emp-stat-item pending">
+            <span class="emp-stat-val">${stats.totalPending}</span>
+            <span class="emp-stat-lbl">Review</span>
+          </div>
+          <div class="emp-stat-item">
+            <span class="emp-stat-val" style="color: ${stats.extraCompleted > 0 ? 'var(--mint-accent, #10B981)' : isAhead ? 'var(--mint-success)' : 'var(--teal-primary)'};">${stats.pct}%</span>
+            <span class="emp-stat-lbl">Pace</span>
+          </div>
+        </div>
+
+        <div class="employee-pacing-section">
+          <div class="emp-pacing-header">
+            <span>Completion ${stats.extraCompleted > 0 ? `<span class="badge-exceeded" style="font-size: 10px; padding: 1px 6px;">+${stats.extraCompleted} Extra!</span>` : ''}</span>
+            <span>${stats.totalCompleted} / ${stats.totalTarget}</span>
+          </div>
+          <div class="progress-bar-container" style="margin: 0;">
+            <div class="progress-bar-fill ${stats.extraCompleted > 0 ? 'mint' : isAhead ? 'mint' : 'teal'}" style="width: ${Math.min(100, stats.pct)}%;"></div>
+          </div>
+        </div>
+      `;
 
       return `
         <div class="employee-card spotlight-card">
@@ -1845,35 +1985,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <span>${escapeHtml(emp.email)}</span>
           </div>
 
-          <!-- Pacing & Deliverable Stats -->
-          <div class="employee-stats-strip">
-            <div class="emp-stat-item">
-              <span class="emp-stat-val">${stats.totalTarget}</span>
-              <span class="emp-stat-lbl">Target</span>
-            </div>
-            <div class="emp-stat-item completed">
-              <span class="emp-stat-val">${stats.totalCompleted}</span>
-              <span class="emp-stat-lbl">Done</span>
-            </div>
-            <div class="emp-stat-item pending">
-              <span class="emp-stat-val">${stats.totalPending}</span>
-              <span class="emp-stat-lbl">Review</span>
-            </div>
-            <div class="emp-stat-item">
-              <span class="emp-stat-val" style="color: ${stats.extraCompleted > 0 ? 'var(--mint-accent, #10B981)' : isAhead ? 'var(--mint-success)' : 'var(--teal-primary)'};">${stats.pct}%</span>
-              <span class="emp-stat-lbl">Pace</span>
-            </div>
-          </div>
-
-          <div class="employee-pacing-section">
-            <div class="emp-pacing-header">
-              <span>Completion ${stats.extraCompleted > 0 ? `<span class="badge-exceeded" style="font-size: 10px; padding: 1px 6px;">+${stats.extraCompleted} Extra!</span>` : ''}</span>
-              <span>${stats.totalCompleted} / ${stats.totalTarget}</span>
-            </div>
-            <div class="progress-bar-container" style="margin: 0;">
-              <div class="progress-bar-fill ${stats.extraCompleted > 0 ? 'mint' : isAhead ? 'mint' : 'teal'}" style="width: ${Math.min(100, stats.pct)}%;"></div>
-            </div>
-          </div>
+          ${statsStripHtml}
 
           <!-- Card Actions Footer -->
           <div class="employee-card-footer">
@@ -1908,6 +2020,19 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderMemberView() {
     const user = state.user;
     if (!user) return;
+
+    // Marketing Executive Dedicated Workspace (Daily & Weekly Routines + Instant Tasks with Deadlines)
+    if (user.role === 'marketing') {
+      if (elements.memberCreativeWorkspace) elements.memberCreativeWorkspace.classList.add('hidden');
+      if (elements.memberMarketingWorkspace) elements.memberMarketingWorkspace.classList.remove('hidden');
+      renderMarketingWorkspace(user);
+      renderMemberSubmissionsTable();
+      return;
+    }
+
+    // Creative Roles (Graphic Designer / Videographer) - 100% Isolated Deliverables Grid
+    if (elements.memberCreativeWorkspace) elements.memberCreativeWorkspace.classList.remove('hidden');
+    if (elements.memberMarketingWorkspace) elements.memberMarketingWorkspace.classList.add('hidden');
 
     // Load Stats for this user (Kinetic Number Rollers)
     const stats = window.dataStore.getEmployeeStats(user);
@@ -2144,6 +2269,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Render Member Submissions Table
+    renderMemberSubmissionsTable();
+    refreshFuturisticEffects();
+  }
+
+  // =========================================================================
+  // SUBMISSIONS TABLE RENDERER
+  // =========================================================================
+  function renderMemberSubmissionsTable() {
+    const user = state.user;
+    if (!user || !elements.memberSubmissionsTableBody) return;
     const userSubs = window.dataStore.getSubmissions({ assignee: user.role });
     const btnClearSubs = document.getElementById('btn-clear-recent-subs');
     if (btnClearSubs) {
@@ -2216,8 +2351,256 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       });
     }
+  }
 
-    refreshFuturisticEffects();
+  // =========================================================================
+  // MARKETING EXECUTIVE: DEDICATED WORKSPACE CONTROLLER
+  // =========================================================================
+  function renderMarketingWorkspace(user) {
+    if (!elements.memberMarketingWorkspace) return;
+
+    state.mktActiveTab = state.mktActiveTab || 'daily';
+
+    const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
+    const weekStr = (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W44';
+
+    const dailyTasks = window.dataStore.getMarketingDailyTasks(todayStr);
+    const dailyStats = window.dataStore.getMarketingDailyStats(todayStr);
+    const dailyStreak = window.dataStore.getMarketingDailyStreak();
+
+    const weeklyTasks = window.dataStore.getMarketingWeeklyTasks(weekStr);
+    const weeklyStats = window.dataStore.getMarketingWeeklyStats(weekStr);
+
+    const instantTasks = window.dataStore.getMarketingInstantTasks(user);
+
+    // Update Radar Cards
+    const dailyRadarText = document.getElementById('mkt-radar-daily-text');
+    const dailyRadarBar = document.getElementById('mkt-radar-daily-bar');
+    if (dailyRadarText) dailyRadarText.textContent = `${dailyStats.completed} / ${dailyStats.total} Done`;
+    if (dailyRadarBar) dailyRadarBar.style.width = `${dailyStats.pct}%`;
+
+    const streakRadarText = document.getElementById('mkt-radar-streak-text');
+    if (streakRadarText) streakRadarText.textContent = `${dailyStreak} Day${dailyStreak === 1 ? '' : 's'}`;
+
+    const weeklyRadarText = document.getElementById('mkt-radar-weekly-text');
+    if (weeklyRadarText) weeklyRadarText.textContent = `${weeklyStats.completed} / ${weeklyStats.total} Delivered`;
+
+    const instantRadarText = document.getElementById('mkt-radar-instant-text');
+    if (instantRadarText) instantRadarText.textContent = `${instantTasks.length} Active`;
+
+    // Badges in Tabs
+    const badgeDaily = document.getElementById('mkt-badge-daily');
+    const badgeWeekly = document.getElementById('mkt-badge-weekly');
+    const badgeInstant = document.getElementById('mkt-badge-instant');
+    if (badgeDaily) badgeDaily.textContent = dailyTasks.length;
+    if (badgeWeekly) badgeWeekly.textContent = weeklyTasks.length;
+    if (badgeInstant) badgeInstant.textContent = instantTasks.length;
+
+    // Active Tab Switching State
+    const tabBtns = elements.memberMarketingWorkspace.querySelectorAll('.mkt-cadence-btn');
+    tabBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mktTab === state.mktActiveTab);
+    });
+
+    const tabDaily = document.getElementById('mkt-tab-content-daily');
+    const tabWeekly = document.getElementById('mkt-tab-content-weekly');
+    const tabInstant = document.getElementById('mkt-tab-content-instant');
+    if (tabDaily) tabDaily.classList.toggle('hidden', state.mktActiveTab !== 'daily');
+    if (tabWeekly) tabWeekly.classList.toggle('hidden', state.mktActiveTab !== 'weekly');
+    if (tabInstant) tabInstant.classList.toggle('hidden', state.mktActiveTab !== 'instant');
+
+    // Date / Cadence Labels
+    const dailyDateLabel = document.getElementById('mkt-daily-date-label');
+    if (dailyDateLabel) {
+      const todayFormatted = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date());
+      dailyDateLabel.innerHTML = `Today: <strong>${todayFormatted}</strong>`;
+    }
+
+    const weeklyCadenceLabel = document.getElementById('mkt-weekly-cadence-label');
+    if (weeklyCadenceLabel) {
+      weeklyCadenceLabel.innerHTML = `Active Cadence: <strong>${weekStr}</strong>`;
+    }
+
+    // Render TAB 1: DAILY TASKS
+    const dailyListEl = document.getElementById('mkt-daily-tasks-list');
+    if (dailyListEl) {
+      dailyListEl.innerHTML = dailyTasks.map(task => {
+        const isDone = task.completed;
+        const timeStr = task.completedAt ? new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }).format(new Date(task.completedAt)) : '';
+        const hasNote = Boolean(task.note || task.proofUrl);
+
+        return `
+          <div class="mkt-task-item ${isDone ? 'completed' : ''}" data-task-id="${task.id}">
+            <div class="mkt-task-left">
+              <div class="mkt-checkbox-wrap ${isDone ? 'checked' : ''}" data-action="toggle-daily" data-task-id="${task.id}" title="${isDone ? 'Click to uncheck' : 'Click to complete for today'}">
+                <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+              </div>
+              <div class="mkt-task-details">
+                <div class="mkt-task-title">${escapeHtml(task.title)}</div>
+                <div class="mkt-task-meta">
+                  <span class="badge-category" style="font-size: 10px; padding: 1px 6px;">${escapeHtml(task.category)}</span>
+                  <span class="badge-brand ${escapeHtml(task.brand)}">${formatBrandName(task.brand)}</span>
+                  ${isDone ? `<span style="color: var(--mint-accent); font-weight: 500;">• Completed at ${timeStr}</span>` : '<span style="color: var(--amber-light);">⏳ Pending Today</span>'}
+                  ${hasNote ? '<span style="color: var(--teal-light); display: inline-flex; align-items: center; gap: 3px;"><i data-lucide="file-text" style="width: 11px; height: 11px;"></i> Has Note/Link</span>' : ''}
+                </div>
+              </div>
+            </div>
+            <div class="mkt-task-right">
+              <button type="button" class="btn btn-outline-sm btn-open-routine-note" data-task-id="${task.id}" data-task-type="daily" data-task-title="${escapeHtml(task.title)}" style="font-size: 11.5px; padding: 5px 10px; gap: 5px;">
+                <i data-lucide="${hasNote ? 'file-text' : 'plus'}"></i> ${hasNote ? 'View Note' : '+ Note'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render TAB 2: WEEKLY TASKS
+    const weeklyListEl = document.getElementById('mkt-weekly-tasks-list');
+    if (weeklyListEl) {
+      weeklyListEl.innerHTML = weeklyTasks.map(task => {
+        const isDone = task.completed;
+        const hasNote = Boolean(task.note || task.proofUrl);
+
+        return `
+          <div class="mkt-task-item ${isDone ? 'completed' : ''}" data-task-id="${task.id}">
+            <div class="mkt-task-left">
+              <div class="mkt-checkbox-wrap ${isDone ? 'checked' : ''}" data-action="toggle-weekly" data-task-id="${task.id}" title="${isDone ? 'Click to uncheck' : 'Click to mark delivered for this week'}">
+                <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+              </div>
+              <div class="mkt-task-details">
+                <div class="mkt-task-title">${escapeHtml(task.title)}</div>
+                <div class="mkt-task-meta">
+                  <span class="badge-category" style="font-size: 10px; padding: 1px 6px;">${escapeHtml(task.category)}</span>
+                  <span class="badge-format" style="font-size: 10px; padding: 1px 6px; color: #A78BFA; border-color: rgba(167, 139, 250, 0.3); background: rgba(167, 139, 250, 0.1);">${escapeHtml(task.dueDay || 'Weekly')}</span>
+                  ${isDone ? '<span style="color: var(--mint-accent); font-weight: 500;">• Delivered for this week</span>' : '<span style="color: var(--amber-light);">⏳ In Progress</span>'}
+                  ${hasNote ? '<span style="color: var(--teal-light); display: inline-flex; align-items: center; gap: 3px;"><i data-lucide="link" style="width: 11px; height: 11px;"></i> Link Attached</span>' : ''}
+                </div>
+              </div>
+            </div>
+            <div class="mkt-task-right">
+              <button type="button" class="btn btn-outline-sm btn-open-routine-note" data-task-id="${task.id}" data-task-type="weekly" data-task-title="${escapeHtml(task.title)}" style="font-size: 11.5px; padding: 5px 10px; gap: 5px;">
+                <i data-lucide="${hasNote ? 'link' : 'upload-cloud'}"></i> ${hasNote ? 'View Proof' : '+ Add Proof'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render TAB 3: INSTANT TASKS (WITH DEADLINE OPTION)
+    const instantGridEl = document.getElementById('mkt-instant-tasks-grid');
+    if (instantGridEl) {
+      if (instantTasks.length === 0) {
+        instantGridEl.innerHTML = `
+          <div class="deliverables-section-empty" style="grid-column: 1 / -1; padding: 32px 20px; text-align: center;">
+            <i data-lucide="zap-off" style="width: 32px; height: 32px; color: var(--text-dim); opacity: 0.6; margin-bottom: 8px;"></i>
+            <h4 style="font-family: var(--font-heading); margin-bottom: 4px;">No Instant Tasks Assigned</h4>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">The manager has not assigned any ad-hoc instant tasks for marketing yet.</p>
+            <button type="button" class="btn btn-primary btn-sm btn-open-log-modal" data-mode="extra">
+              <i data-lucide="plus-circle"></i> + Log Instant Work
+            </button>
+          </div>
+        `;
+      } else {
+        instantGridEl.innerHTML = instantTasks.map(target => {
+          const prog = window.dataStore.getTargetProgress(target.id);
+          const isDone = prog.completed >= (Number(target.targetQty) || 1);
+
+          let deadlineBanner = '';
+          if (target.deadline) {
+            const today = new Date();
+            const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : today.toISOString().split('T')[0];
+            if (isDone) {
+              deadlineBanner = `<div class="mkt-instant-deadline-banner completed"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="check-circle" style="width:13px;height:13px;"></i> Completed</span><span>Delivered</span></div>`;
+            } else if (target.deadline === todayStr) {
+              deadlineBanner = `<div class="mkt-instant-deadline-banner due-today"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="clock" style="width:13px;height:13px;"></i> ⏰ Due Today (by 6:00 PM)</span><span>Urgent</span></div>`;
+            } else if (target.deadline < todayStr) {
+              deadlineBanner = `<div class="mkt-instant-deadline-banner overdue"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="alert-circle" style="width:13px;height:13px;"></i> ⚠️ Overdue (${target.deadline})</span><span>Action Required</span></div>`;
+            } else {
+              const targetD = new Date(target.deadline);
+              const diffTime = targetD.getTime() - today.getTime();
+              const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24));
+              if (diffDays === 1) {
+                deadlineBanner = `<div class="mkt-instant-deadline-banner due-tomorrow"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="calendar" style="width:13px;height:13px;"></i> ⚡ Due Tomorrow</span><span>Priority</span></div>`;
+              } else {
+                deadlineBanner = `<div class="mkt-instant-deadline-banner upcoming"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="calendar" style="width:13px;height:13px;"></i> 📅 ${diffDays} days left (${target.deadline})</span><span>Scheduled</span></div>`;
+              }
+            }
+          }
+
+          return `
+            <div class="deliverable-card spotlight-card ${isDone ? 'delivered-card' : ''}">
+              <div>
+                <div class="del-card-header">
+                  <div class="del-badges-row">
+                    <span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span>
+                    <span class="badge-category">${escapeHtml(target.category)}</span>
+                    <span class="badge-format">${escapeHtml(target.format)}</span>
+                  </div>
+                  <span class="status-pill ${isDone ? 'completed' : 'in-progress'}">${isDone ? 'Completed' : 'Pending'}</span>
+                </div>
+                <h3 class="del-card-title">${escapeHtml(target.program)}</h3>
+                ${target.notes ? `<p class="del-card-desc">${escapeHtml(target.notes)}</p>` : ''}
+                ${deadlineBanner}
+              </div>
+
+              <div style="margin-top: 12px;">
+                <div class="del-card-actions">
+                  ${isDone
+                    ? `<button type="button" class="btn btn-outline-sm btn-block" style="color: var(--mint-accent); border-color: rgba(206, 243, 228, 0.4);"><i data-lucide="check"></i> Deliverable Approved</button>`
+                    : `<button type="button" class="btn btn-primary btn-sm btn-block btn-open-log-modal" data-target-id="${target.id}"><i data-lucide="upload-cloud"></i> + Submit Deliverable Proof</button>`
+                  }
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    refreshIcons();
+  }
+
+  // Open Routine Note Modal
+  function openRoutineNoteModal(taskId, taskType, taskTitle) {
+    if (!elements.routineNoteModal) return;
+    elements.routineNoteForm.reset();
+    if (elements.routineModalTaskId) elements.routineModalTaskId.value = taskId;
+    if (elements.routineModalType) elements.routineModalType.value = taskType;
+    if (elements.routineModalTaskName) elements.routineModalTaskName.value = taskTitle;
+
+    let existingNote = '';
+    let existingProof = '';
+    if (taskType === 'daily') {
+      const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
+      const tasks = window.dataStore.getMarketingDailyTasks(todayStr);
+      const task = tasks.find(t => t.id === taskId);
+      if (task) {
+        existingNote = task.note || '';
+        existingProof = task.proofUrl || '';
+      }
+      if (elements.routineModalTitle) {
+        elements.routineModalTitle.innerHTML = `<i data-lucide="file-text"></i> Today's Daily Note & Proof`;
+      }
+    } else {
+      const weekStr = (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W44';
+      const tasks = window.dataStore.getMarketingWeeklyTasks(weekStr);
+      const task = tasks.find(t => t.id === taskId);
+      if (task) {
+        existingNote = task.note || '';
+        existingProof = task.proofUrl || '';
+      }
+      if (elements.routineModalTitle) {
+        elements.routineModalTitle.innerHTML = `<i data-lucide="upload-cloud"></i> Weekly Report / Proof Link`;
+      }
+    }
+
+    if (elements.routineModalNoteText) elements.routineModalNoteText.value = existingNote;
+    if (elements.routineModalProofUrl) elements.routineModalProofUrl.value = existingProof;
+
+    elements.routineNoteModal.classList.remove('hidden');
+    refreshIcons();
   }
 
   function populateLoginProfileTabs(activeEmail = null) {
@@ -2691,6 +3074,10 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.assignTargetForm.reset();
     elements.editTargetId.value = '';
     if (elements.targetDeadline) elements.targetDeadline.value = '';
+    if (elements.targetDeadlineQuickPreview) elements.targetDeadlineQuickPreview.innerHTML = '';
+    if (elements.targetDeadlinePresets) {
+      elements.targetDeadlinePresets.querySelectorAll('.btn-preset-pill').forEach(b => b.classList.remove('active'));
+    }
     populateTargetAssigneeOptions(preselectedAssignee);
     elements.assignTargetModal.querySelector('h3').textContent = 'Assign Target Deliverable';
     if (elements.btnSubmitTargetText) elements.btnSubmitTargetText.textContent = 'Assign Target';
@@ -3203,6 +3590,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     elements.logWorkForm.reset();
+    if (elements.logExtraDeadline) elements.logExtraDeadline.value = '';
+    if (elements.logExtraDeadlinePreview) elements.logExtraDeadlinePreview.innerHTML = '';
+    if (elements.logExtraDeadlinePresets) {
+      elements.logExtraDeadlinePresets.querySelectorAll('.btn-preset-pill').forEach(b => b.classList.remove('active'));
+    }
     if (preselectedTargetId && elements.logTargetSelect) {
       elements.logTargetSelect.value = preselectedTargetId;
     }
@@ -3279,6 +3671,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      const extraDeadline = (elements.logExtraDeadline && elements.logExtraDeadline.value) ? elements.logExtraDeadline.value.trim() : '';
+
       submissionData = {
         isExtra: true,
         assignee: state.user ? state.user.role : 'designer',
@@ -3292,6 +3686,7 @@ document.addEventListener('DOMContentLoaded', () => {
         format,
         url,
         notes,
+        deadline: extraDeadline,
         month: window.dataStore.getActiveMonth()
       };
     } else {
@@ -3492,7 +3887,130 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       return;
     }
+
+    // =========================================================================
+    // MARKETING EXECUTIVE WORKSPACE & DEADLINE PRESET DELEGATION
+    // =========================================================================
+
+    // Marketing Cadence Navigation Tabs
+    const mktTabBtn = e.target.closest('.mkt-cadence-btn');
+    if (mktTabBtn && mktTabBtn.dataset.mktTab) {
+      state.mktActiveTab = mktTabBtn.dataset.mktTab;
+      renderMarketingWorkspace(state.user);
+      return;
+    }
+
+    // Marketing Daily Checkbox Toggle
+    const dailyCheck = e.target.closest('.mkt-checkbox-wrap[data-action="toggle-daily"]');
+    if (dailyCheck && dailyCheck.dataset.taskId) {
+      const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
+      const updated = window.dataStore.toggleMarketingDailyTask(dailyCheck.dataset.taskId, todayStr);
+      if (updated && updated.history && updated.history[todayStr] && updated.history[todayStr].completed) {
+        showToast(`✅ Completed "${updated.title}" for today!`, 'success');
+      } else {
+        showToast(`Marked "${updated ? updated.title : 'Task'}" pending for today.`, 'info');
+      }
+      renderMarketingWorkspace(state.user);
+      return;
+    }
+
+    // Marketing Weekly Checkbox Toggle
+    const weeklyCheck = e.target.closest('.mkt-checkbox-wrap[data-action="toggle-weekly"]');
+    if (weeklyCheck && weeklyCheck.dataset.taskId) {
+      const weekStr = (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W44';
+      const updated = window.dataStore.toggleMarketingWeeklyTask(weeklyCheck.dataset.taskId, weekStr);
+      if (updated && updated.history && updated.history[weekStr] && updated.history[weekStr].completed) {
+        showToast(`✅ Delivered "${updated.title}" for ${weekStr}!`, 'success');
+      } else {
+        showToast(`Marked "${updated ? updated.title : 'Task'}" in progress for ${weekStr}.`, 'info');
+      }
+      renderMarketingWorkspace(state.user);
+      return;
+    }
+
+    // Routine Note Modal Open
+    const openNoteBtn = e.target.closest('.btn-open-routine-note');
+    if (openNoteBtn) {
+      const taskId = openNoteBtn.dataset.taskId;
+      const taskType = openNoteBtn.dataset.taskType || 'daily';
+      const taskTitle = openNoteBtn.dataset.taskTitle || '';
+      openRoutineNoteModal(taskId, taskType, taskTitle);
+      return;
+    }
+
+    // Assign Target Deadline Presets
+    const targetPresetBtn = e.target.closest('#target-deadline-presets .btn-preset-pill');
+    if (targetPresetBtn && targetPresetBtn.dataset.preset) {
+      const preset = targetPresetBtn.dataset.preset;
+      const calcDate = calculateDatePreset(preset);
+      if (elements.targetDeadline) {
+        elements.targetDeadline.value = calcDate;
+        updateDeadlineQuickPreview(elements.targetDeadline, elements.targetDeadlineQuickPreview);
+      }
+      document.querySelectorAll('#target-deadline-presets .btn-preset-pill').forEach(b => b.classList.remove('active'));
+      targetPresetBtn.classList.add('active');
+      return;
+    }
+
+    // Log Extra Work Deadline Presets
+    const extraPresetBtn = e.target.closest('#log-extra-deadline-presets .btn-preset-pill');
+    if (extraPresetBtn && extraPresetBtn.dataset.extraPreset) {
+      const preset = extraPresetBtn.dataset.extraPreset;
+      const calcDate = calculateDatePreset(preset);
+      if (elements.logExtraDeadline) {
+        elements.logExtraDeadline.value = calcDate;
+        updateDeadlineQuickPreview(elements.logExtraDeadline, elements.logExtraDeadlinePreview);
+      }
+      document.querySelectorAll('#log-extra-deadline-presets .btn-preset-pill').forEach(b => b.classList.remove('active'));
+      extraPresetBtn.classList.add('active');
+      return;
+    }
   });
+
+  // Real-Time Input Handlers for Deadline Inputs
+  if (elements.targetDeadline) {
+    elements.targetDeadline.addEventListener('input', () => {
+      updateDeadlineQuickPreview(elements.targetDeadline, elements.targetDeadlineQuickPreview);
+      if (elements.targetDeadlinePresets) {
+        elements.targetDeadlinePresets.querySelectorAll('.btn-preset-pill').forEach(b => b.classList.remove('active'));
+      }
+    });
+  }
+
+  if (elements.logExtraDeadline) {
+    elements.logExtraDeadline.addEventListener('input', () => {
+      updateDeadlineQuickPreview(elements.logExtraDeadline, elements.logExtraDeadlinePreview);
+      if (elements.logExtraDeadlinePresets) {
+        elements.logExtraDeadlinePresets.querySelectorAll('.btn-preset-pill').forEach(b => b.classList.remove('active'));
+      }
+    });
+  }
+
+  // Routine Note Form Submission Handler
+  if (elements.routineNoteForm) {
+    elements.routineNoteForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const taskId = elements.routineModalTaskId ? elements.routineModalTaskId.value : '';
+      const taskType = elements.routineModalType ? elements.routineModalType.value : 'daily';
+      const proofUrl = elements.routineModalProofUrl ? elements.routineModalProofUrl.value.trim() : '';
+      const noteText = elements.routineModalNoteText ? elements.routineModalNoteText.value.trim() : '';
+
+      if (taskType === 'daily') {
+        const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
+        window.dataStore.updateMarketingDailyTaskNote(taskId, todayStr, noteText, proofUrl);
+        showToast('Saved note & link for today’s routine.', 'success');
+      } else {
+        const weekStr = (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W44';
+        window.dataStore.toggleMarketingWeeklyTask(taskId, weekStr, noteText, proofUrl);
+        showToast(`Saved weekly report & proof for ${weekStr}.`, 'success');
+      }
+
+      if (elements.routineNoteModal) {
+        elements.routineNoteModal.classList.add('hidden');
+      }
+      renderMarketingWorkspace(state.user);
+    });
+  }
 
   // Review Actions: Approve or Request Rework
   elements.btnApproveWork.addEventListener('click', () => {

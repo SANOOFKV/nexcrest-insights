@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=78">
+  <link rel="stylesheet" href="css/styles.css?v=79">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -710,86 +710,205 @@
         </div>
       </div>
 
-      <!-- Member Personal KPI Banner with Laser Border Glow -->
-      <div class="member-kpi-banner laser-border-glow spotlight-card">
-        <div class="kpi-banner-metric">
-          <span class="kpi-banner-label">Target</span>
-          <span class="kpi-banner-val" id="member-kpi-target">25</span>
-        </div>
-        <div class="kpi-banner-divider"></div>
-        <div class="kpi-banner-metric">
-          <span class="kpi-banner-label">Completed</span>
-          <span class="kpi-banner-val success" id="member-kpi-completed">0</span>
-        </div>
-        <div class="kpi-banner-divider"></div>
-        <div class="kpi-banner-metric">
-          <span class="kpi-banner-label">In Review</span>
-          <span class="kpi-banner-val warning" id="member-kpi-review">0</span>
-        </div>
-        <div class="kpi-banner-divider"></div>
-        <div class="kpi-banner-metric">
-          <span class="kpi-banner-label">Remaining</span>
-          <span class="kpi-banner-val accent" id="member-kpi-remaining">25</span>
-        </div>
-        <div class="kpi-banner-progress">
-          <div class="kpi-banner-progress-text">
-            <span>Progress</span>
-            <span id="member-kpi-pct">0%</span>
+      <!-- Member Creative Deliverables Workspace (Graphic Designer / Videographer) -->
+      <div id="member-creative-workspace">
+        <!-- Member Personal KPI Banner with Laser Border Glow -->
+        <div class="member-kpi-banner laser-border-glow spotlight-card">
+          <div class="kpi-banner-metric">
+            <span class="kpi-banner-label">Target</span>
+            <span class="kpi-banner-val" id="member-kpi-target">25</span>
           </div>
-          <div class="progress-bar-container large">
-            <div class="progress-bar-fill teal" id="member-kpi-progress-bar" style="width: 0%"></div>
+          <div class="kpi-banner-divider"></div>
+          <div class="kpi-banner-metric">
+            <span class="kpi-banner-label">Completed</span>
+            <span class="kpi-banner-val success" id="member-kpi-completed">0</span>
+          </div>
+          <div class="kpi-banner-divider"></div>
+          <div class="kpi-banner-metric">
+            <span class="kpi-banner-label">In Review</span>
+            <span class="kpi-banner-val warning" id="member-kpi-review">0</span>
+          </div>
+          <div class="kpi-banner-divider"></div>
+          <div class="kpi-banner-metric">
+            <span class="kpi-banner-label">Remaining</span>
+            <span class="kpi-banner-val accent" id="member-kpi-remaining">25</span>
+          </div>
+          <div class="kpi-banner-progress">
+            <div class="kpi-banner-progress-text">
+              <span>Progress</span>
+              <span id="member-kpi-pct">0%</span>
+            </div>
+            <div class="progress-bar-container large">
+              <div class="progress-bar-fill teal" id="member-kpi-progress-bar" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categories Filter for Member -->
+        <div class="member-category-tabs">
+          <button class="member-cat-btn active" data-category="all">
+            <i data-lucide="grid"></i> All Tasks (<span id="count-all-tasks">0</span>)
+          </button>
+          <button class="member-cat-btn" data-category="Branding">
+            <i data-lucide="award"></i> Branding (<span id="count-branding-tasks">0</span>)
+          </button>
+          <button class="member-cat-btn" data-category="Campus Events">
+            <i data-lucide="sparkles"></i> Campus Events (<span id="count-campus-tasks">0</span>)
+          </button>
+          <button class="member-cat-btn" data-category="Marketing">
+            <i data-lucide="megaphone"></i> Marketing (<span id="count-marketing-tasks">0</span>)
+          </button>
+          <button class="member-cat-btn" data-category="Moment Marketing">
+            <i data-lucide="zap"></i> Moment Marketing (<span id="count-moment-tasks">0</span>)
+          </button>
+        </div>
+
+
+        <!-- Member Status Filter Bar (Option B: Default to Pending Only) -->
+        <div class="member-status-filter-bar" id="member-status-filter-bar">
+          <div class="status-btn-group">
+            <button type="button" class="member-status-btn active" data-status-filter="pending" id="status-btn-pending">
+              <i data-lucide="clock"></i> ⏳ Pending / To Deliver (<span id="count-status-pending">0</span>)
+            </button>
+            <button type="button" class="member-status-btn" data-status-filter="delivered" id="status-btn-delivered">
+              <i data-lucide="check-circle-2"></i> ✅ Delivered (<span id="count-status-delivered">0</span>)
+            </button>
+            <button type="button" class="member-status-btn" data-status-filter="all" id="status-btn-all">
+              <i data-lucide="layers"></i> All Tasks (<span id="count-status-all">0</span>)
+            </button>
+          </div>
+        </div>
+
+        <!-- Member Deliverables Sections Container -->
+        <div id="member-deliverables-container">
+          <!-- Section 1: Pending Deliverables -->
+          <div id="section-pending-deliverables" class="deliverables-task-section">
+            <div class="deliverables-cards-grid" id="grid-pending-deliverables">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Section 2: Delivered Deliverables -->
+          <div id="section-delivered-deliverables" class="deliverables-task-section hidden">
+            <div class="deliverables-cards-grid" id="grid-delivered-deliverables">
+              <!-- Rendered dynamically -->
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Categories Filter for Member -->
-      <div class="member-category-tabs">
-        <button class="member-cat-btn active" data-category="all">
-          <i data-lucide="grid"></i> All Tasks (<span id="count-all-tasks">0</span>)
-        </button>
-        <button class="member-cat-btn" data-category="Branding">
-          <i data-lucide="award"></i> Branding (<span id="count-branding-tasks">0</span>)
-        </button>
-        <button class="member-cat-btn" data-category="Campus Events">
-          <i data-lucide="sparkles"></i> Campus Events (<span id="count-campus-tasks">0</span>)
-        </button>
-        <button class="member-cat-btn" data-category="Marketing">
-          <i data-lucide="megaphone"></i> Marketing (<span id="count-marketing-tasks">0</span>)
-        </button>
-        <button class="member-cat-btn" data-category="Moment Marketing">
-          <i data-lucide="zap"></i> Moment Marketing (<span id="count-moment-tasks">0</span>)
-        </button>
-      </div>
+      <!-- MARKETING EXECUTIVE DEDICATED WORKSPACE -->
+      <div id="member-marketing-workspace" class="hidden">
+        <!-- Marketing Health Radar Strip -->
+        <div class="mkt-radar-strip">
+          <div class="mkt-radar-card">
+            <div class="mkt-radar-icon" style="background: rgba(0, 139, 165, 0.15); border-color: rgba(0, 139, 165, 0.3); color: var(--teal-light);">
+              <i data-lucide="check-circle-2"></i>
+            </div>
+            <div class="mkt-radar-info">
+              <div class="mkt-radar-val" id="mkt-radar-daily-text">0 / 4 Done</div>
+              <div class="mkt-radar-lbl">Today's Daily Routines</div>
+              <div class="progress-bar-container" style="height: 5px; margin-top: 6px;">
+                <div class="progress-bar-fill teal" id="mkt-radar-daily-bar" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
 
+          <div class="mkt-radar-card">
+            <div class="mkt-radar-icon" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.3); color: #FBBF24;">
+              <i data-lucide="flame"></i>
+            </div>
+            <div class="mkt-radar-info">
+              <div class="mkt-radar-val" id="mkt-radar-streak-text">0 Days</div>
+              <div class="mkt-radar-lbl">Execution Habit Streak 🔥</div>
+            </div>
+          </div>
 
-      <!-- Member Status Filter Bar (Option B: Default to Pending Only) -->
-      <div class="member-status-filter-bar" id="member-status-filter-bar">
-        <div class="status-btn-group">
-          <button type="button" class="member-status-btn active" data-status-filter="pending" id="status-btn-pending">
-            <i data-lucide="clock"></i> ⏳ Pending / To Deliver (<span id="count-status-pending">0</span>)
-          </button>
-          <button type="button" class="member-status-btn" data-status-filter="delivered" id="status-btn-delivered">
-            <i data-lucide="check-circle-2"></i> ✅ Delivered (<span id="count-status-delivered">0</span>)
-          </button>
-          <button type="button" class="member-status-btn" data-status-filter="all" id="status-btn-all">
-            <i data-lucide="layers"></i> All Tasks (<span id="count-status-all">0</span>)
-          </button>
-        </div>
-      </div>
+          <div class="mkt-radar-card">
+            <div class="mkt-radar-icon" style="background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.3); color: #38BDF8;">
+              <i data-lucide="calendar"></i>
+            </div>
+            <div class="mkt-radar-info">
+              <div class="mkt-radar-val" id="mkt-radar-weekly-text">0 / 3 Delivered</div>
+              <div class="mkt-radar-lbl">This Week's Deliverables</div>
+            </div>
+          </div>
 
-      <!-- Member Deliverables Sections Container -->
-      <div id="member-deliverables-container">
-        <!-- Section 1: Pending Deliverables -->
-        <div id="section-pending-deliverables" class="deliverables-task-section">
-          <div class="deliverables-cards-grid" id="grid-pending-deliverables">
-            <!-- Rendered dynamically -->
+          <div class="mkt-radar-card">
+            <div class="mkt-radar-icon" style="background: rgba(167, 139, 250, 0.15); border-color: rgba(167, 139, 250, 0.3); color: #A78BFA;">
+              <i data-lucide="zap"></i>
+            </div>
+            <div class="mkt-radar-info">
+              <div class="mkt-radar-val" id="mkt-radar-instant-text">0 Active</div>
+              <div class="mkt-radar-lbl">Instant Tasks with Deadlines</div>
+            </div>
           </div>
         </div>
 
-        <!-- Section 2: Delivered Deliverables -->
-        <div id="section-delivered-deliverables" class="deliverables-task-section hidden">
-          <div class="deliverables-cards-grid" id="grid-delivered-deliverables">
-            <!-- Rendered dynamically -->
+        <!-- Cadence Navigation Tabs -->
+        <div class="mkt-cadence-tabs">
+          <button type="button" class="mkt-cadence-btn active" data-mkt-tab="daily" id="btn-mkt-tab-daily">
+            <i data-lucide="clock"></i>
+            <span>Daily Tasks (Today)</span>
+            <span class="mkt-cadence-badge" id="mkt-badge-daily">4</span>
+          </button>
+          <button type="button" class="mkt-cadence-btn" data-mkt-tab="weekly" id="btn-mkt-tab-weekly">
+            <i data-lucide="calendar-range"></i>
+            <span>Weekly Tasks</span>
+            <span class="mkt-cadence-badge" id="mkt-badge-weekly">3</span>
+          </button>
+          <button type="button" class="mkt-cadence-btn" data-mkt-tab="instant" id="btn-mkt-tab-instant">
+            <i data-lucide="zap"></i>
+            <span>Instant / Priority Tasks</span>
+            <span class="mkt-cadence-badge" id="mkt-badge-instant">0</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: DAILY ROUTINES -->
+        <div id="mkt-tab-content-daily" class="mkt-tab-content">
+          <div class="mkt-section-banner">
+            <div class="mkt-banner-left">
+              <i data-lucide="calendar-check" style="color: var(--teal-light);"></i>
+              <span id="mkt-daily-date-label">Today: <strong>...</strong></span>
+            </div>
+            <div class="mkt-reset-pill">
+              <i data-lucide="rotate-ccw"></i> Auto-Resets Every Midnight (00:00)
+            </div>
+          </div>
+          <div id="mkt-daily-tasks-list" class="mkt-tasks-list">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+
+        <!-- TAB 2: WEEKLY TASKS -->
+        <div id="mkt-tab-content-weekly" class="mkt-tab-content hidden">
+          <div class="mkt-section-banner">
+            <div class="mkt-banner-left">
+              <i data-lucide="calendar" style="color: #38BDF8;"></i>
+              <span id="mkt-weekly-cadence-label">Active Cadence: <strong>...</strong></span>
+            </div>
+            <div class="mkt-reset-pill" style="color: #BAE6FD; border-color: rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.12);">
+              <i data-lucide="rotate-ccw"></i> Auto-Resets Every Monday (00:00)
+            </div>
+          </div>
+          <div id="mkt-weekly-tasks-list" class="mkt-tasks-list">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+
+        <!-- TAB 3: INSTANT TASKS -->
+        <div id="mkt-tab-content-instant" class="mkt-tab-content hidden">
+          <div class="mkt-section-banner">
+            <div class="mkt-banner-left">
+              <i data-lucide="zap" style="color: #A78BFA;"></i>
+              <span>Direct Manager Assignments with <strong>Active Deadlines</strong></span>
+            </div>
+            <div class="mkt-reset-pill" style="color: #E9D5FF; border-color: rgba(167, 139, 250, 0.3); background: rgba(167, 139, 250, 0.12);">
+              <i data-lucide="shield-check"></i> Requires Review Approval
+            </div>
+          </div>
+          <div id="mkt-instant-tasks-grid" class="deliverables-cards-grid">
+            <!-- Injected via JavaScript -->
           </div>
         </div>
       </div>
@@ -897,10 +1016,20 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="target-deadline">Deadline (Optional)</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label for="target-deadline" style="margin-bottom: 0;">Deadline (Optional)</label>
+              <div id="target-deadline-quick-preview" style="font-size: 11px; color: var(--teal-light); font-weight: 600;"></div>
+            </div>
             <div class="input-with-icon">
               <i data-lucide="calendar"></i>
               <input type="date" id="target-deadline">
+            </div>
+            <div class="quick-deadline-presets" id="target-deadline-presets">
+              <button type="button" class="btn-preset-pill" data-preset="today">Today (6 PM)</button>
+              <button type="button" class="btn-preset-pill" data-preset="tomorrow">Tomorrow (EOD)</button>
+              <button type="button" class="btn-preset-pill" data-preset="in3days">In 3 Days</button>
+              <button type="button" class="btn-preset-pill" data-preset="weekend">This Sunday</button>
+              <button type="button" class="btn-preset-pill" data-preset="nextweek">Next Monday</button>
             </div>
           </div>
         </div>
@@ -1335,6 +1464,25 @@
               </select>
             </div>
           </div>
+
+          <div class="form-row">
+            <div class="form-group" style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <label for="log-extra-deadline" style="margin-bottom: 0;"><i data-lucide="calendar"></i> Deadline (Optional)</label>
+                <div id="log-extra-deadline-preview" style="font-size: 11px; color: var(--teal-light); font-weight: 600;"></div>
+              </div>
+              <div class="input-with-icon">
+                <i data-lucide="calendar"></i>
+                <input type="date" id="log-extra-deadline">
+              </div>
+              <div class="quick-deadline-presets" id="log-extra-deadline-presets">
+                <button type="button" class="btn-preset-pill" data-extra-preset="today">Today (6 PM)</button>
+                <button type="button" class="btn-preset-pill" data-extra-preset="tomorrow">Tomorrow (EOD)</button>
+                <button type="button" class="btn-preset-pill" data-extra-preset="in3days">In 3 Days</button>
+                <button type="button" class="btn-preset-pill" data-extra-preset="weekend">This Sunday</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -1624,6 +1772,41 @@
     </div>
   </div>
 
+  <!-- Routine Note / Proof Link Modal -->
+  <div id="routine-note-modal" class="modal-overlay hidden">
+    <div class="modal-card spotlight-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 id="routine-modal-title"><i data-lucide="file-text"></i> Task Note & Link</h3>
+        <button class="modal-close-btn" data-close-modal="routine-note-modal">&times;</button>
+      </div>
+      <form id="routine-note-form" class="modal-form">
+        <input type="hidden" id="routine-modal-task-id">
+        <input type="hidden" id="routine-modal-type" value="daily">
+        <div class="form-group">
+          <label for="routine-modal-task-name"><i data-lucide="target"></i> Task</label>
+          <input type="text" id="routine-modal-task-name" disabled style="opacity: 0.8; cursor: not-allowed;">
+        </div>
+        <div class="form-group">
+          <label for="routine-modal-proof-url"><i data-lucide="link"></i> Proof / Document Link (Optional)</label>
+          <div class="input-with-icon">
+            <i data-lucide="link"></i>
+            <input type="url" id="routine-modal-proof-url" placeholder="https://drive.google.com/... or https://loom.com/...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="routine-modal-note-text"><i data-lucide="message-square"></i> Execution Note (Optional)</label>
+          <textarea id="routine-modal-note-text" rows="3" placeholder="Provide any details about today's execution..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="routine-note-modal">Close</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-routine-note">
+            <i data-lucide="save"></i> Save Details
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
@@ -1631,10 +1814,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=78"></script>
-  <script src="js/data.js?v=78"></script>
-  <script src="js/auth.js?v=78"></script>
-  <script src="js/app.js?v=78"></script>
+  <script src="js/firebase-config.js?v=79"></script>
+  <script src="js/data.js?v=79"></script>
+  <script src="js/auth.js?v=79"></script>
+  <script src="js/app.js?v=79"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

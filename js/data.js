@@ -7,8 +7,101 @@
 const STORAGE_KEYS = {
   TARGETS: 'nexcrest_targets_v2',
   SUBMISSIONS: 'nexcrest_submissions_v2',
-  SELECTED_MONTH: 'nexcrest_active_month_v2'
+  SELECTED_MONTH: 'nexcrest_active_month_v2',
+  MARKETING_DAILY: 'nexcrest_marketing_daily_v1',
+  MARKETING_WEEKLY: 'nexcrest_marketing_weekly_v1'
 };
+
+// =========================================================================
+// MARKETING EXECUTIVE CADENCES: DAILY & WEEKLY ROUTINES SPECIFICATION
+// =========================================================================
+const DEFAULT_MARKETING_DAILY_ROUTINES = [
+  {
+    id: 'md-1',
+    title: 'Daily Report IT & Techschool',
+    category: 'Reporting',
+    brand: 'Both',
+    icon: 'file-text',
+    active: true,
+    history: {}
+  },
+  {
+    id: 'md-2',
+    title: 'Lead Assigning & Checking',
+    category: 'Lead Operations',
+    brand: 'Both',
+    icon: 'user-check',
+    active: true,
+    history: {}
+  },
+  {
+    id: 'md-3',
+    title: 'Google Review Handling',
+    category: 'Reputation',
+    brand: 'Both',
+    icon: 'star',
+    active: true,
+    history: {}
+  },
+  {
+    id: 'md-4',
+    title: 'Learnings 1 Video',
+    category: 'Learnings & Upskilling',
+    brand: 'Both',
+    icon: 'video',
+    active: true,
+    history: {}
+  }
+];
+
+const DEFAULT_MARKETING_WEEKLY_ROUTINES = [
+  {
+    id: 'mw-1',
+    title: 'Weekly Report IT & Techschool',
+    category: 'Reporting',
+    brand: 'Both',
+    dueDay: 'Every Friday',
+    icon: 'bar-chart-2',
+    active: true,
+    history: {}
+  },
+  {
+    id: 'mw-2',
+    title: 'Social Media Performance Report',
+    category: 'Analytics',
+    brand: 'Both',
+    dueDay: 'Every Friday',
+    icon: 'trending-up',
+    active: true,
+    history: {}
+  },
+  {
+    id: 'mw-3',
+    title: '1 Reel for Life at Nexcrest',
+    category: 'Content & Culture',
+    brand: 'Both',
+    dueDay: 'Every Saturday',
+    icon: 'film',
+    active: true,
+    history: {}
+  }
+];
+
+function getTodayDateStr(d = new Date()) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function getCurrentWeekStr(d = new Date()) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+  return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+}
 
 // Seed Targets based on exact user specification & chart + September 2026 Archive
 const SEED_TARGETS = [
@@ -281,6 +374,8 @@ class DataStore {
     this.listeners = [];
     this.targets = this.loadTargets();
     this.submissions = this.loadSubmissions();
+    this.marketingDaily = this.loadMarketingDaily();
+    this.marketingWeekly = this.loadMarketingWeekly();
     this.activeMonth = localStorage.getItem(STORAGE_KEYS.SELECTED_MONTH) || '2026-10';
     this.initCloudSync();
   }
@@ -323,6 +418,24 @@ class DataStore {
           this.notify();
         }
       });
+
+      if (typeof window.firebaseSync.subscribeMarketingDailyRoutines === 'function') {
+        window.firebaseSync.subscribeMarketingDailyRoutines((cloudDaily) => {
+          if (Array.isArray(cloudDaily) && cloudDaily.length > 0) {
+            this._mergeCloudDailyRoutines(cloudDaily);
+            this.notify();
+          }
+        });
+      }
+
+      if (typeof window.firebaseSync.subscribeMarketingWeeklyRoutines === 'function') {
+        window.firebaseSync.subscribeMarketingWeeklyRoutines((cloudWeekly) => {
+          if (Array.isArray(cloudWeekly) && cloudWeekly.length > 0) {
+            this._mergeCloudWeeklyRoutines(cloudWeekly);
+            this.notify();
+          }
+        });
+      }
     }
   }
 
@@ -951,6 +1064,291 @@ class DataStore {
         marketing: marketingStats
       }
     };
+  }
+
+  // =========================================================================
+  // MARKETING EXECUTIVE: DAILY REPETITIVE ROUTINES METHODS
+  // =========================================================================
+  loadMarketingDaily() {
+    const raw = localStorage.getItem(STORAGE_KEYS.MARKETING_DAILY);
+    if (!raw) {
+      const initial = JSON.parse(JSON.stringify(DEFAULT_MARKETING_DAILY_ROUTINES));
+      try { localStorage.setItem(STORAGE_KEYS.MARKETING_DAILY, JSON.stringify(initial)); } catch (e) {}
+      return initial;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Ensure all default routines are present
+        const idMap = new Map(parsed.map(r => [r.id, r]));
+        DEFAULT_MARKETING_DAILY_ROUTINES.forEach(def => {
+          if (!idMap.has(def.id)) {
+            parsed.push(JSON.parse(JSON.stringify(def)));
+          }
+        });
+        return parsed;
+      }
+    } catch (e) {
+      console.warn('Error parsing local marketing daily routines:', e);
+    }
+    return JSON.parse(JSON.stringify(DEFAULT_MARKETING_DAILY_ROUTINES));
+  }
+
+  saveMarketingDaily(routines) {
+    this.marketingDaily = routines;
+    try {
+      localStorage.setItem(STORAGE_KEYS.MARKETING_DAILY, JSON.stringify(routines));
+    } catch (e) {
+      console.error('Failed to save marketing daily routines locally:', e);
+    }
+  }
+
+  _mergeCloudDailyRoutines(cloudRoutines) {
+    if (!Array.isArray(cloudRoutines) || !cloudRoutines.length) return;
+    const current = this.marketingDaily || [];
+    const map = new Map(current.map(r => [r.id, r]));
+
+    cloudRoutines.forEach(c => {
+      if (map.has(c.id)) {
+        const local = map.get(c.id);
+        const mergedHistory = { ...(local.history || {}), ...(c.history || {}) };
+        map.set(c.id, { ...local, ...c, history: mergedHistory });
+      } else {
+        map.set(c.id, c);
+      }
+    });
+
+    this.marketingDaily = Array.from(map.values());
+    try { localStorage.setItem(STORAGE_KEYS.MARKETING_DAILY, JSON.stringify(this.marketingDaily)); } catch (e) {}
+  }
+
+  getMarketingDailyTasks(dateStr = getTodayDateStr()) {
+    if (!Array.isArray(this.marketingDaily)) {
+      this.marketingDaily = this.loadMarketingDaily();
+    }
+    return this.marketingDaily.map(task => {
+      const hist = (task.history && task.history[dateStr]) || null;
+      return {
+        ...task,
+        completed: Boolean(hist && hist.completed),
+        completedAt: hist ? hist.completedAt : null,
+        note: hist ? (hist.note || '') : '',
+        proofUrl: hist ? (hist.proofUrl || '') : ''
+      };
+    });
+  }
+
+  toggleMarketingDailyTask(taskId, dateStr = getTodayDateStr(), note = '', proofUrl = '') {
+    if (!Array.isArray(this.marketingDaily)) {
+      this.marketingDaily = this.loadMarketingDaily();
+    }
+    const task = this.marketingDaily.find(t => t.id === taskId);
+    if (!task) return null;
+
+    if (!task.history) task.history = {};
+    const current = task.history[dateStr] || { completed: false };
+    const willBeCompleted = !current.completed;
+
+    task.history[dateStr] = {
+      completed: willBeCompleted,
+      completedAt: willBeCompleted ? new Date().toISOString() : null,
+      note: note || (current.note || ''),
+      proofUrl: proofUrl || (current.proofUrl || '')
+    };
+
+    this.saveMarketingDaily(this.marketingDaily);
+
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.saveMarketingDailyRoutine(task);
+    }
+
+    this.notify();
+    return task;
+  }
+
+  updateMarketingDailyTaskNote(taskId, dateStr = getTodayDateStr(), note = '', proofUrl = '') {
+    if (!Array.isArray(this.marketingDaily)) {
+      this.marketingDaily = this.loadMarketingDaily();
+    }
+    const task = this.marketingDaily.find(t => t.id === taskId);
+    if (!task) return null;
+
+    if (!task.history) task.history = {};
+    const current = task.history[dateStr] || { completed: true, completedAt: new Date().toISOString() };
+    task.history[dateStr] = {
+      ...current,
+      note: note,
+      proofUrl: proofUrl
+    };
+
+    this.saveMarketingDaily(this.marketingDaily);
+
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.saveMarketingDailyRoutine(task);
+    }
+
+    this.notify();
+    return task;
+  }
+
+  getMarketingDailyStreak() {
+    const tasks = this.marketingDaily || [];
+    if (!tasks.length) return 0;
+    const activeTasks = tasks.filter(t => t.active !== false);
+    if (!activeTasks.length) return 0;
+
+    let streak = 0;
+    const today = new Date();
+    const todayStr = getTodayDateStr(today);
+
+    // Check if today is fully completed
+    const todayAllDone = activeTasks.every(t => t.history && t.history[todayStr] && t.history[todayStr].completed);
+    if (todayAllDone) {
+      streak = 1;
+    }
+
+    // Now count backwards from yesterday
+    let checkDate = new Date(today);
+    checkDate.setDate(checkDate.getDate() - 1);
+
+    for (let i = 0; i < 365; i++) {
+      const dateStr = getTodayDateStr(checkDate);
+      const dayDone = activeTasks.every(t => t.history && t.history[dateStr] && t.history[dateStr].completed);
+      if (dayDone) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  getMarketingDailyStats(dateStr = getTodayDateStr()) {
+    const tasks = this.getMarketingDailyTasks(dateStr).filter(t => t.active !== false);
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.completed).length;
+    const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { total, completed, pct, remaining: total - completed };
+  }
+
+  // =========================================================================
+  // MARKETING EXECUTIVE: WEEKLY RECURRING ROUTINES METHODS
+  // =========================================================================
+  loadMarketingWeekly() {
+    const raw = localStorage.getItem(STORAGE_KEYS.MARKETING_WEEKLY);
+    if (!raw) {
+      const initial = JSON.parse(JSON.stringify(DEFAULT_MARKETING_WEEKLY_ROUTINES));
+      try { localStorage.setItem(STORAGE_KEYS.MARKETING_WEEKLY, JSON.stringify(initial)); } catch (e) {}
+      return initial;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const idMap = new Map(parsed.map(r => [r.id, r]));
+        DEFAULT_MARKETING_WEEKLY_ROUTINES.forEach(def => {
+          if (!idMap.has(def.id)) {
+            parsed.push(JSON.parse(JSON.stringify(def)));
+          }
+        });
+        return parsed;
+      }
+    } catch (e) {
+      console.warn('Error parsing local marketing weekly routines:', e);
+    }
+    return JSON.parse(JSON.stringify(DEFAULT_MARKETING_WEEKLY_ROUTINES));
+  }
+
+  saveMarketingWeekly(routines) {
+    this.marketingWeekly = routines;
+    try {
+      localStorage.setItem(STORAGE_KEYS.MARKETING_WEEKLY, JSON.stringify(routines));
+    } catch (e) {
+      console.error('Failed to save marketing weekly routines locally:', e);
+    }
+  }
+
+  _mergeCloudWeeklyRoutines(cloudRoutines) {
+    if (!Array.isArray(cloudRoutines) || !cloudRoutines.length) return;
+    const current = this.marketingWeekly || [];
+    const map = new Map(current.map(r => [r.id, r]));
+
+    cloudRoutines.forEach(c => {
+      if (map.has(c.id)) {
+        const local = map.get(c.id);
+        const mergedHistory = { ...(local.history || {}), ...(c.history || {}) };
+        map.set(c.id, { ...local, ...c, history: mergedHistory });
+      } else {
+        map.set(c.id, c);
+      }
+    });
+
+    this.marketingWeekly = Array.from(map.values());
+    try { localStorage.setItem(STORAGE_KEYS.MARKETING_WEEKLY, JSON.stringify(this.marketingWeekly)); } catch (e) {}
+  }
+
+  getMarketingWeeklyTasks(weekStr = getCurrentWeekStr()) {
+    if (!Array.isArray(this.marketingWeekly)) {
+      this.marketingWeekly = this.loadMarketingWeekly();
+    }
+    return this.marketingWeekly.map(task => {
+      const hist = (task.history && task.history[weekStr]) || null;
+      return {
+        ...task,
+        completed: Boolean(hist && hist.completed),
+        completedAt: hist ? hist.completedAt : null,
+        note: hist ? (hist.note || '') : '',
+        proofUrl: hist ? (hist.proofUrl || '') : ''
+      };
+    });
+  }
+
+  toggleMarketingWeeklyTask(taskId, weekStr = getCurrentWeekStr(), note = '', proofUrl = '') {
+    if (!Array.isArray(this.marketingWeekly)) {
+      this.marketingWeekly = this.loadMarketingWeekly();
+    }
+    const task = this.marketingWeekly.find(t => t.id === taskId);
+    if (!task) return null;
+
+    if (!task.history) task.history = {};
+    const current = task.history[weekStr] || { completed: false };
+    const willBeCompleted = !current.completed;
+
+    task.history[weekStr] = {
+      completed: willBeCompleted,
+      completedAt: willBeCompleted ? new Date().toISOString() : null,
+      note: note || (current.note || ''),
+      proofUrl: proofUrl || (current.proofUrl || '')
+    };
+
+    this.saveMarketingWeekly(this.marketingWeekly);
+
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.saveMarketingWeeklyRoutine(task);
+    }
+
+    this.notify();
+    return task;
+  }
+
+  getMarketingWeeklyStats(weekStr = getCurrentWeekStr()) {
+    const tasks = this.getMarketingWeeklyTasks(weekStr).filter(t => t.active !== false);
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.completed).length;
+    const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { total, completed, pct, remaining: total - completed };
+  }
+
+  // =========================================================================
+  // MARKETING EXECUTIVE: INSTANT / PRIORITY TASKS METHODS
+  // =========================================================================
+  getMarketingInstantTasks() {
+    return (this.targets || []).filter(t => {
+      const isMkt = t.assignee === 'marketing' ||
+                    t.assigneeEmail === 'marketing@nexcrest.com' ||
+                    t.assigneeRole === 'marketing';
+      return isMkt;
+    });
   }
 
   // Reset to original defaults

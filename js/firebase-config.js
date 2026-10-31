@@ -308,6 +308,68 @@ class FirebaseSyncService {
       return false;
     }
   }
+
+  // MARKETING DAILY ROUTINES SYNC
+  subscribeMarketingDailyRoutines(onUpdated) {
+    if (!this.isActive()) return null;
+    try {
+      return this.db.collection('marketing_daily_routines').onSnapshot((snapshot) => {
+        const routines = [];
+        snapshot.forEach((doc) => {
+          routines.push({ id: doc.id, ...doc.data() });
+        });
+        if (typeof onUpdated === 'function') onUpdated(routines);
+      }, (err) => {
+        console.warn('Firestore marketing daily routines subscription notice:', err);
+      });
+    } catch (e) {
+      console.warn('Failed to subscribe to marketing daily routines:', e);
+      return null;
+    }
+  }
+
+  async saveMarketingDailyRoutine(routine) {
+    if (!this.isActive() || !routine || !routine.id) return false;
+    try {
+      const cleanData = this._cleanFirestoreData(routine);
+      await this.db.collection('marketing_daily_routines').doc(String(routine.id)).set(cleanData, { merge: true });
+      return true;
+    } catch (err) {
+      console.warn('Failed to save marketing daily routine to Firestore:', err);
+      return false;
+    }
+  }
+
+  // MARKETING WEEKLY ROUTINES SYNC
+  subscribeMarketingWeeklyRoutines(onUpdated) {
+    if (!this.isActive()) return null;
+    try {
+      return this.db.collection('marketing_weekly_routines').onSnapshot((snapshot) => {
+        const routines = [];
+        snapshot.forEach((doc) => {
+          routines.push({ id: doc.id, ...doc.data() });
+        });
+        if (typeof onUpdated === 'function') onUpdated(routines);
+      }, (err) => {
+        console.warn('Firestore marketing weekly routines subscription notice:', err);
+      });
+    } catch (e) {
+      console.warn('Failed to subscribe to marketing weekly routines:', e);
+      return null;
+    }
+  }
+
+  async saveMarketingWeeklyRoutine(routine) {
+    if (!this.isActive() || !routine || !routine.id) return false;
+    try {
+      const cleanData = this._cleanFirestoreData(routine);
+      await this.db.collection('marketing_weekly_routines').doc(String(routine.id)).set(cleanData, { merge: true });
+      return true;
+    } catch (err) {
+      console.warn('Failed to save marketing weekly routine to Firestore:', err);
+      return false;
+    }
+  }
 }
 
 // Global instance
