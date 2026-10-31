@@ -8575,10 +8575,10 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
 }
 
 .btn-preset-pill {
-  background: rgba(0, 139, 165, 0.12);
-  border: 1px solid rgba(0, 139, 165, 0.3);
-  color: var(--teal-light);
-  padding: 4px 9px;
+  background: #F1F5F9;
+  border: 1px solid #CBD5E1;
+  color: #334155;
+  padding: 4px 10px;
   border-radius: 6px;
   font-size: 11.5px;
   font-weight: 600;
@@ -8587,15 +8587,34 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
   font-family: var(--font-body);
 }
 
-.btn-preset-pill:hover,
+.btn-preset-pill:hover {
+  background: #E2E8F0;
+  border-color: #94A3B8;
+  color: #0F172A;
+}
+
 .btn-preset-pill.active {
-  background: var(--teal-primary);
-  border-color: var(--teal-primary);
-  color: #FFFFFF;
+  background: var(--teal-primary, #008BA5) !important;
+  border-color: var(--teal-primary, #008BA5) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 6px rgba(0, 139, 165, 0.25);
+}
+
+body.dark-theme .btn-preset-pill {
+  background: rgba(0, 139, 165, 0.12);
+  border-color: rgba(0, 139, 165, 0.3);
+  color: #45B2C3;
+}
+
+body.dark-theme .btn-preset-pill:hover,
+body.dark-theme .btn-preset-pill.active {
+  background: var(--teal-primary, #008BA5) !important;
+  border-color: var(--teal-primary, #008BA5) !important;
+  color: #FFFFFF !important;
 }
 
 /* =========================================================================
-   MARKETING EXECUTIVE DEDICATED WORKSPACE STYLES
+   MARKETING EXECUTIVE DEDICATED WORKSPACE STYLES (LIGHT & DARK DUAL THEME)
    ========================================================================= */
 .mkt-radar-strip {
   display: grid;
@@ -8604,9 +8623,10 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
   margin-bottom: 20px;
 }
 
+/* Radar Cards */
 .mkt-radar-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
   border-radius: 14px;
   padding: 14px 16px;
   display: flex;
@@ -8614,6 +8634,7 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
   gap: 14px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
   transition: all 0.2s ease;
 }
 
@@ -8622,7 +8643,7 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--teal-primary), var(--mint-accent));
+  background: linear-gradient(90deg, #008BA5, #2B557A);
 }
 
 .mkt-radar-icon {
@@ -8648,20 +8669,24 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
 
 .mkt-radar-info .mkt-radar-val {
   font-family: var(--font-heading);
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
-  color: #FFFFFF;
+  color: #0F172A !important;
+  line-height: 1.2;
 }
 
 .mkt-radar-info .mkt-radar-lbl {
   font-size: 12px;
-  color: var(--text-muted);
+  font-weight: 500;
+  color: #64748B !important;
+  margin-top: 2px;
 }
 
+/* Cadence Navigation Tabs */
 .mkt-cadence-tabs {
   display: flex;
   gap: 8px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid #E2E8F0;
   padding-bottom: 12px;
   margin-bottom: 16px;
   overflow-x: auto;
@@ -8676,37 +8701,40 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  border: 1px solid var(--border-color);
-  background: var(--bg-surface);
-  color: var(--text-muted);
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF;
+  color: #475569;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: all 0.2s ease;
   white-space: nowrap;
   font-family: var(--font-body);
 }
 
 .mkt-cadence-btn:hover {
-  color: #FFFFFF;
-  border-color: rgba(0, 139, 165, 0.4);
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+  color: #0F172A;
 }
 
 .mkt-cadence-btn.active {
-  background: linear-gradient(135deg, rgba(0, 139, 165, 0.25), rgba(43, 85, 122, 0.35));
-  border-color: var(--teal-primary);
-  color: #FFFFFF;
-  box-shadow: 0 0 16px rgba(0, 139, 165, 0.2);
+  background: linear-gradient(135deg, #008BA5, #2B557A) !important;
+  border-color: #008BA5 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(0, 139, 165, 0.25) !important;
 }
 
 .mkt-cadence-badge {
   padding: 2px 7px;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 11px;
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-main);
+  font-weight: 600;
+  background: #F1F5F9;
+  color: #475569;
 }
 
 .mkt-cadence-btn.active .mkt-cadence-badge {
-  background: var(--teal-primary);
-  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #FFFFFF !important;
 }
 
 .mkt-tab-content {
@@ -8715,42 +8743,59 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
   gap: 14px;
 }
 
+/* Section Banner (Cadence & Resets) */
 .mkt-section-banner {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(13, 30, 44, 0.6);
-  padding: 12px 16px;
+  background: #F8FAFC;
+  padding: 12px 18px;
   border-radius: 12px;
-  border: 1px solid var(--border-color);
+  border: 1px solid #E2E8F0;
   flex-wrap: wrap;
   gap: 8px;
 }
 
 .mkt-banner-left {
   font-size: 13px;
-  color: var(--text-muted);
+  color: #475569;
   display: flex;
   align-items: center;
   gap: 8px;
+  font-weight: 500;
 }
 
 .mkt-banner-left strong {
-  color: #FFFFFF;
+  color: #0F172A !important;
+  font-weight: 700;
 }
 
 .mkt-reset-pill {
-  font-size: 11px;
-  padding: 3px 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 10px;
   border-radius: 6px;
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: var(--mint-accent);
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  color: #065F46 !important;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
 }
 
+.mkt-reset-pill.mkt-reset-blue {
+  background: #F0F9FF;
+  border-color: #BAE6FD;
+  color: #0369A1 !important;
+}
+
+.mkt-reset-pill.mkt-reset-purple {
+  background: #FAF5FF;
+  border-color: #DDD6FE;
+  color: #6D28D9 !important;
+}
+
+/* Tasks List */
 .mkt-tasks-list {
   display: flex;
   flex-direction: column;
@@ -8758,25 +8803,29 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
 }
 
 .mkt-task-item {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
   border-radius: 14px;
-  padding: 14px 16px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mkt-task-item:hover {
-  border-color: rgba(0, 139, 165, 0.4);
-  background: #152B3C;
+  background: #FFFFFF !important;
+  border-color: #008BA5;
+  box-shadow: 0 6px 20px -4px rgba(0, 139, 165, 0.12);
+  transform: translateY(-1px);
 }
 
 .mkt-task-item.completed {
-  background: rgba(13, 30, 44, 0.5);
-  border-color: rgba(16, 185, 129, 0.3);
+  background: #F8FAFC !important;
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: none;
 }
 
 .mkt-task-left {
@@ -8787,13 +8836,14 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
   min-width: 0;
 }
 
+/* Checkbox */
 .mkt-checkbox-wrap {
   cursor: pointer;
-  width: 24px;
-  height: 24px;
-  border-radius: 7px;
-  border: 2px solid var(--border-color);
-  background: var(--bg-surface);
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: 2px solid #CBD5E1;
+  background: #FFFFFF;
   color: transparent;
   display: flex;
   align-items: center;
@@ -8802,11 +8852,16 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
   transition: all 0.2s ease;
 }
 
+.mkt-checkbox-wrap:hover {
+  border-color: #008BA5;
+  background: #F0FDFA;
+}
+
 .mkt-checkbox-wrap.checked {
-  background: var(--mint-success);
-  border-color: var(--mint-success);
-  color: #07131D;
-  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+  background: #10B981 !important;
+  border-color: #10B981 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .mkt-task-details {
@@ -8818,15 +8873,18 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
 }
 
 .mkt-task-title {
-  font-size: 14.5px;
-  font-weight: 600;
-  color: #FFFFFF;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0F172A !important;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
   transition: color 0.2s ease;
 }
 
 .mkt-task-item.completed .mkt-task-title {
   text-decoration: line-through;
-  color: var(--text-dim);
+  color: #94A3B8 !important;
+  font-weight: 500;
 }
 
 .mkt-task-meta {
@@ -8834,53 +8892,188 @@ body.light-theme .admin-status-btn.active[data-admin-status="delivered"] .admin-
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  font-size: 11.5px;
-  color: var(--text-muted);
+  font-size: 12px;
+  color: #64748B;
 }
 
+/* Instant Tasks Deadline Banners */
 .mkt-instant-deadline-banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 10px;
+  padding: 7px 12px;
   border-radius: 8px;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 600;
   margin-top: 8px;
 }
 
 .mkt-instant-deadline-banner.due-today {
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  color: #FDE68A;
+  background: #FEF3C7;
+  border: 1px solid #FCD34D;
+  color: #92400E !important;
 }
 
 .mkt-instant-deadline-banner.due-tomorrow {
-  background: rgba(234, 179, 8, 0.15);
-  border: 1px solid rgba(234, 179, 8, 0.35);
-  color: #FEF08A;
+  background: #FEF9C3;
+  border: 1px solid #FDE047;
+  color: #854D0E !important;
 }
 
 .mkt-instant-deadline-banner.overdue {
-  background: rgba(225, 29, 72, 0.15);
-  border: 1px solid rgba(225, 29, 72, 0.35);
-  color: #FDA4AF;
+  background: #FEE2E2;
+  border: 1px solid #FCA5A5;
+  color: #991B1B !important;
 }
 
 .mkt-instant-deadline-banner.upcoming {
-  background: rgba(0, 139, 165, 0.15);
-  border: 1px solid rgba(0, 139, 165, 0.35);
-  color: #CEF3E4;
+  background: #E0F2FE;
+  border: 1px solid #BAE6FD;
+  color: #0369A1 !important;
 }
 
 .mkt-instant-deadline-banner.completed {
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.25);
-  color: #A7F3D0;
+  background: #DCFCE7;
+  border: 1px solid #86EFAC;
+  color: #166534 !important;
 }
 
+/* =========================================================================
+   DARK THEME OVERRIDES FOR MARKETING WORKSPACE (Full AIMER Dark Palette)
+   ========================================================================= */
+body.dark-theme .mkt-radar-card {
+  background: #132737;
+  border-color: #1F3748;
+  box-shadow: none;
+}
 
+body.dark-theme .mkt-radar-info .mkt-radar-val {
+  color: #FFFFFF !important;
+}
 
+body.dark-theme .mkt-radar-info .mkt-radar-lbl {
+  color: #A7B4BE !important;
+}
 
+body.dark-theme .mkt-cadence-tabs {
+  border-color: #1F3748;
+}
 
+body.dark-theme .mkt-cadence-btn {
+  background: #0D1E2C;
+  border-color: #1F3748;
+  color: #A7B4BE;
+  box-shadow: none;
+}
 
+body.dark-theme .mkt-cadence-btn:hover {
+  background: #132737;
+  border-color: #008BA5;
+  color: #FFFFFF;
+}
+
+body.dark-theme .mkt-cadence-btn.active {
+  background: linear-gradient(135deg, #008BA5, #2B557A) !important;
+  border-color: #008BA5 !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 0 16px rgba(0, 139, 165, 0.3) !important;
+}
+
+body.dark-theme .mkt-cadence-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: #F6F6F6;
+}
+
+body.dark-theme .mkt-section-banner {
+  background: rgba(13, 30, 44, 0.7);
+  border-color: #1F3748;
+}
+
+body.dark-theme .mkt-banner-left {
+  color: #A7B4BE;
+}
+
+body.dark-theme .mkt-banner-left strong {
+  color: #FFFFFF !important;
+}
+
+body.dark-theme .mkt-reset-pill {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #CEF3E4 !important;
+}
+
+body.dark-theme .mkt-reset-pill.mkt-reset-blue {
+  background: rgba(56, 189, 248, 0.15);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #BAE6FD !important;
+}
+
+body.dark-theme .mkt-reset-pill.mkt-reset-purple {
+  background: rgba(167, 139, 250, 0.15);
+  border-color: rgba(167, 139, 250, 0.3);
+  color: #DDD6FE !important;
+}
+
+body.dark-theme .mkt-task-item {
+  background: #132737;
+  border-color: #1F3748;
+  box-shadow: none;
+}
+
+body.dark-theme .mkt-task-item:hover {
+  background: #183348 !important;
+  border-color: #008BA5;
+}
+
+body.dark-theme .mkt-task-item.completed {
+  background: rgba(13, 30, 44, 0.6) !important;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+body.dark-theme .mkt-checkbox-wrap {
+  background: #0D1E2C;
+  border-color: #1F3748;
+}
+
+body.dark-theme .mkt-task-title {
+  color: #FFFFFF !important;
+}
+
+body.dark-theme .mkt-task-item.completed .mkt-task-title {
+  color: #64748B !important;
+}
+
+body.dark-theme .mkt-task-meta {
+  color: #A7B4BE;
+}
+
+body.dark-theme .mkt-instant-deadline-banner.due-today {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #FDE68A !important;
+}
+
+body.dark-theme .mkt-instant-deadline-banner.due-tomorrow {
+  background: rgba(234, 179, 8, 0.15);
+  border-color: rgba(234, 179, 8, 0.35);
+  color: #FEF08A !important;
+}
+
+body.dark-theme .mkt-instant-deadline-banner.overdue {
+  background: rgba(225, 29, 72, 0.15);
+  border-color: rgba(225, 29, 72, 0.35);
+  color: #FDA4AF !important;
+}
+
+body.dark-theme .mkt-instant-deadline-banner.upcoming {
+  background: rgba(0, 139, 165, 0.15);
+  border-color: rgba(0, 139, 165, 0.35);
+  color: #CEF3E4 !important;
+}
+
+body.dark-theme .mkt-instant-deadline-banner.completed {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.25);
+  color: #A7F3D0 !important;
+}
