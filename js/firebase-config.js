@@ -233,23 +233,9 @@ class FirebaseSyncService {
     }
   }
 
-  // Seed default submissions to cloud if collection is empty
+  // Seed default submissions to cloud (disabled permanently - no demo submissions)
   async seedSubmissionsIfEmpty(seedSubs) {
-    if (!this.isActive() || !Array.isArray(seedSubs) || seedSubs.length === 0) return;
-    try {
-      const snap = await this.db.collection('submissions').limit(1).get();
-      if (snap.empty) {
-        const batch = this.db.batch();
-        seedSubs.forEach(s => {
-          const ref = this.db.collection('submissions').doc(String(s.id));
-          batch.set(ref, s);
-        });
-        await batch.commit();
-        console.log('✅ Seeded default submissions into Cloud Firestore');
-      }
-    } catch (err) {
-      console.warn('Notice seeding submissions:', err);
-    }
+    return;
   }
 
   // SUBMISSIONS SYNC: Listen to deliverables & proof links across devices

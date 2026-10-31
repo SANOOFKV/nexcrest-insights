@@ -263,7 +263,15 @@ const LEGACY_DEMO_TARGET_IDS = [
   'sep-1', 'sep-2', 'sep-3', 'sep-4', 'sep-5', 'sep-6', 'sep-7', 'sep-8'
 ];
 
-const LEGACY_DEMO_SUB_PREFIXES = ['sep-sub-', 'sub-'];
+const LEGACY_DEMO_SUB_EXACT_IDS = new Set(['sub-1', 'sub-2', 'sub-3', 'sub-4', 'sub-5', 'sub-6', 'sub-7']);
+
+function isLegacyDemoSubmission(s) {
+  if (!s || !s.id) return true;
+  const sid = String(s.id);
+  if (sid.startsWith('sep-sub-')) return true;
+  if (LEGACY_DEMO_SUB_EXACT_IDS.has(sid)) return true;
+  return false;
+}
 
 // Submissions start clean with 0 demo records
 const SEED_SUBMISSIONS = [];
@@ -310,12 +318,7 @@ class DataStore {
       });
       window.firebaseSync.subscribeSubmissions((cloudSubs) => {
         if (Array.isArray(cloudSubs)) {
-          this.submissions = cloudSubs.filter(s => {
-            if (!s || !s.id) return false;
-            const sid = String(s.id);
-            if (LEGACY_DEMO_SUB_PREFIXES.some(prefix => sid.startsWith(prefix))) return false;
-            return true;
-          });
+          this.submissions = cloudSubs.filter(s => s && s.id && !isLegacyDemoSubmission(s));
           try { localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(this.submissions)); } catch (e) {}
           this.notify();
         }
@@ -377,8 +380,7 @@ class DataStore {
   loadSubmissions() {
     const raw = localStorage.getItem(STORAGE_KEYS.SUBMISSIONS);
     if (!raw) {
-      this.saveSubmissions(SEED_SUBMISSIONS);
-      return [...SEED_SUBMISSIONS];
+      return [];
     }
     try {
       let parsed = JSON.parse(raw);
@@ -386,12 +388,7 @@ class DataStore {
 
       // Purge legacy mock demo submissions
       const initialCount = parsed.length;
-      parsed = parsed.filter(s => {
-        if (!s || !s.id) return false;
-        const sid = String(s.id);
-        if (LEGACY_DEMO_SUB_PREFIXES.some(prefix => sid.startsWith(prefix))) return false;
-        return true;
-      });
+      parsed = parsed.filter(s => s && s.id && !isLegacyDemoSubmission(s));
       if (parsed.length !== initialCount) {
         migrated = true;
       }
