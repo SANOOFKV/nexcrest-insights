@@ -2026,8 +2026,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Marketing Executive Dedicated Workspace (Daily & Weekly Routines + Instant Tasks with Deadlines)
     if (user.role === 'marketing') {
-      if (titleEl) titleEl.textContent = 'Marketing Operations Center';
-      if (subtitleEl) subtitleEl.textContent = 'Daily operational routines, weekly cadence, and manager-assigned instant deliverables.';
+      if (titleEl) titleEl.textContent = 'Marketing Workspace';
+      if (subtitleEl) subtitleEl.textContent = 'Daily routines, weekly targets, and instant tasks.';
       if (elements.memberCreativeWorkspace) elements.memberCreativeWorkspace.classList.add('hidden');
       if (elements.memberMarketingWorkspace) elements.memberMarketingWorkspace.classList.remove('hidden');
       renderMarketingWorkspace(user);
@@ -2420,13 +2420,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Date / Cadence Labels
     const dailyDateLabel = document.getElementById('mkt-daily-date-label');
     if (dailyDateLabel) {
-      const todayFormatted = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' }).format(new Date());
+      const todayFormatted = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date());
       dailyDateLabel.innerHTML = `Today: <strong>${todayFormatted}</strong>`;
     }
 
     const weeklyCadenceLabel = document.getElementById('mkt-weekly-cadence-label');
     if (weeklyCadenceLabel) {
-      weeklyCadenceLabel.innerHTML = `Active Cadence: <strong>${weekStr}</strong>`;
+      weeklyCadenceLabel.innerHTML = `Week: <strong>${weekStr}</strong>`;
     }
 
     // Render TAB 1: DAILY TASKS
@@ -2440,25 +2440,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return `
           <div class="mkt-task-item ${isDone ? 'completed' : ''}" data-task-id="${task.id}">
             <div class="mkt-task-left">
-              <div class="mkt-checkbox-wrap ${isDone ? 'checked' : ''}" data-action="toggle-daily" data-task-id="${task.id}" title="${isDone ? 'Click to mark pending' : 'Click to complete for today'}">
-                <i data-lucide="check" style="width: 15px; height: 15px;"></i>
+              <div class="mkt-checkbox-wrap ${isDone ? 'checked' : ''}" data-action="toggle-daily" data-task-id="${task.id}" title="${isDone ? 'Mark pending' : 'Mark done'}">
+                <i data-lucide="check" style="width: 14px; height: 14px;"></i>
               </div>
               <div class="mkt-task-details">
                 <div class="mkt-task-title">${escapeHtml(task.title)}</div>
                 <div class="mkt-task-meta">
-                  <span class="badge-category" style="font-size: 11px; padding: 2px 7px; background: #F1F5F9; border: 1px solid #E2E8F0; color: #475569; font-weight: 600; border-radius: 6px;">${escapeHtml(task.category)}</span>
+                  <span class="badge-category">${escapeHtml(task.category)}</span>
                   <span class="badge-brand ${escapeHtml(task.brand)}">${formatBrandName(task.brand)}</span>
                   ${isDone
-                    ? `<span style="color: #059669; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> Completed at ${timeStr}</span>`
-                    : '<span style="color: #D97706; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="clock" style="width: 13px; height: 13px;"></i> Pending Today</span>'
+                    ? `<span style="color: #059669; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="check-circle" style="width: 12px; height: 12px;"></i> Done ${timeStr}</span>`
+                    : '<span style="color: #D97706; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="clock" style="width: 12px; height: 12px;"></i> Pending</span>'
                   }
-                  ${hasNote ? '<span style="color: #008BA5; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;"><i data-lucide="file-text" style="width: 12px; height: 12px;"></i> Has Note/Link</span>' : ''}
+                  ${hasNote ? '<span style="color: #008BA5; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;"><i data-lucide="file-text" style="width: 11px; height: 11px;"></i> Note</span>' : ''}
                 </div>
               </div>
             </div>
             <div class="mkt-task-right">
-              <button type="button" class="btn btn-outline-sm btn-open-routine-note" data-task-id="${task.id}" data-task-type="daily" data-task-title="${escapeHtml(task.title)}" style="font-size: 12px; padding: 6px 12px; gap: 5px; font-weight: 600; border-radius: 8px;">
-                <i data-lucide="${hasNote ? 'file-text' : 'plus'}"></i> ${hasNote ? 'View Note' : '+ Note'}
+              <button type="button" class="btn btn-outline-sm btn-open-routine-note" data-task-id="${task.id}" data-task-type="daily" data-task-title="${escapeHtml(task.title)}" style="font-size: 11.5px; padding: 5px 10px; gap: 4px; font-weight: 600; border-radius: 7px;">
+                <i data-lucide="${hasNote ? 'file-text' : 'plus'}"></i> ${hasNote ? 'Note' : '+ Note'}
               </button>
             </div>
           </div>
@@ -2476,25 +2476,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return `
           <div class="mkt-task-item ${isDone ? 'completed' : ''}" data-task-id="${task.id}">
             <div class="mkt-task-left">
-              <div class="mkt-checkbox-wrap ${isDone ? 'checked' : ''}" data-action="toggle-weekly" data-task-id="${task.id}" title="${isDone ? 'Click to mark in-progress' : 'Click to mark delivered for this week'}">
-                <i data-lucide="check" style="width: 15px; height: 15px;"></i>
+              <div class="mkt-checkbox-wrap ${isDone ? 'checked' : ''}" data-action="toggle-weekly" data-task-id="${task.id}" title="${isDone ? 'Mark in-progress' : 'Mark delivered'}">
+                <i data-lucide="check" style="width: 14px; height: 14px;"></i>
               </div>
               <div class="mkt-task-details">
                 <div class="mkt-task-title">${escapeHtml(task.title)}</div>
                 <div class="mkt-task-meta">
-                  <span class="badge-category" style="font-size: 11px; padding: 2px 7px; background: #F1F5F9; border: 1px solid #E2E8F0; color: #475569; font-weight: 600; border-radius: 6px;">${escapeHtml(task.category)}</span>
-                  <span class="badge-format" style="font-size: 11px; padding: 2px 7px; color: #6D28D9; border: 1px solid #DDD6FE; background: #F5F3FF; border-radius: 6px; font-weight: 600;">${escapeHtml(task.dueDay || 'Weekly')}</span>
+                  <span class="badge-category">${escapeHtml(task.category)}</span>
+                  <span class="badge-format" style="color: #6D28D9; border-color: #DDD6FE; background: #F5F3FF;">${escapeHtml(task.dueDay || 'Weekly')}</span>
                   ${isDone
-                    ? '<span style="color: #059669; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="check-circle" style="width: 13px; height: 13px;"></i> Delivered for this week</span>'
-                    : '<span style="color: #D97706; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="clock" style="width: 13px; height: 13px;"></i> In Progress</span>'
+                    ? '<span style="color: #059669; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="check-circle" style="width: 12px; height: 12px;"></i> Delivered</span>'
+                    : '<span style="color: #D97706; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="clock" style="width: 12px; height: 12px;"></i> In Progress</span>'
                   }
-                  ${hasNote ? '<span style="color: #008BA5; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;"><i data-lucide="link" style="width: 12px; height: 12px;"></i> Link Attached</span>' : ''}
+                  ${hasNote ? '<span style="color: #008BA5; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;"><i data-lucide="link" style="width: 11px; height: 11px;"></i> Proof</span>' : ''}
                 </div>
               </div>
             </div>
             <div class="mkt-task-right">
-              <button type="button" class="btn btn-outline-sm btn-open-routine-note" data-task-id="${task.id}" data-task-type="weekly" data-task-title="${escapeHtml(task.title)}" style="font-size: 12px; padding: 6px 12px; gap: 5px; font-weight: 600; border-radius: 8px;">
-                <i data-lucide="${hasNote ? 'link' : 'upload-cloud'}"></i> ${hasNote ? 'View Proof' : '+ Add Proof'}
+              <button type="button" class="btn btn-outline-sm btn-open-routine-note" data-task-id="${task.id}" data-task-type="weekly" data-task-title="${escapeHtml(task.title)}" style="font-size: 11.5px; padding: 5px 10px; gap: 4px; font-weight: 600; border-radius: 7px;">
+                <i data-lucide="${hasNote ? 'link' : 'upload-cloud'}"></i> ${hasNote ? 'Proof' : '+ Proof'}
               </button>
             </div>
           </div>
@@ -2507,12 +2507,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (instantGridEl) {
       if (instantTasks.length === 0) {
         instantGridEl.innerHTML = `
-          <div class="deliverables-section-empty" style="grid-column: 1 / -1; padding: 36px 20px; text-align: center; background: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 14px;">
-            <i data-lucide="zap-off" style="width: 34px; height: 34px; color: #94A3B8; margin-bottom: 8px;"></i>
-            <h4 style="font-family: var(--font-heading); color: #0F172A; font-size: 16px; margin-bottom: 4px; font-weight: 700;">No Instant Tasks Assigned</h4>
-            <p style="font-size: 13px; color: #64748B; margin-bottom: 14px;">The manager has not assigned any ad-hoc instant tasks for marketing yet.</p>
+          <div class="deliverables-section-empty" style="grid-column: 1 / -1; padding: 32px 18px; text-align: center; background: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 14px;">
+            <i data-lucide="zap-off" style="width: 32px; height: 32px; color: #94A3B8; margin-bottom: 8px;"></i>
+            <h4 style="font-family: var(--font-heading); color: #0F172A; font-size: 15px; margin-bottom: 4px; font-weight: 700;">No Instant Tasks</h4>
+            <p style="font-size: 13px; color: #64748B; margin-bottom: 12px;">No manager-assigned instant deliverables right now.</p>
             <button type="button" class="btn btn-primary btn-sm btn-open-log-modal" data-mode="extra" style="font-weight: 600;">
-              <i data-lucide="plus-circle"></i> + Log Instant Work
+              <i data-lucide="plus-circle"></i> + Log Work
             </button>
           </div>
         `;
@@ -2526,11 +2526,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const today = new Date();
             const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : today.toISOString().split('T')[0];
             if (isDone) {
-              deadlineBanner = `<div class="mkt-instant-deadline-banner completed"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="check-circle" style="width:13px;height:13px;"></i> Completed</span><span>Delivered</span></div>`;
+              deadlineBanner = `<div class="mkt-instant-deadline-banner completed"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="check-circle" style="width:13px;height:13px;"></i> Delivered</span></div>`;
             } else if (target.deadline === todayStr) {
-              deadlineBanner = `<div class="mkt-instant-deadline-banner due-today"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="clock" style="width:13px;height:13px;"></i> Due Today (by 6:00 PM)</span><span>Urgent</span></div>`;
+              deadlineBanner = `<div class="mkt-instant-deadline-banner due-today"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="clock" style="width:13px;height:13px;"></i> Due Today (6 PM)</span><span>Urgent</span></div>`;
             } else if (target.deadline < todayStr) {
-              deadlineBanner = `<div class="mkt-instant-deadline-banner overdue"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="alert-circle" style="width:13px;height:13px;"></i> Overdue (${target.deadline})</span><span>Action Required</span></div>`;
+              deadlineBanner = `<div class="mkt-instant-deadline-banner overdue"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="alert-circle" style="width:13px;height:13px;"></i> Overdue (${target.deadline})</span><span>Action</span></div>`;
             } else {
               const targetD = new Date(target.deadline);
               const diffTime = targetD.getTime() - today.getTime();
@@ -2538,7 +2538,7 @@ document.addEventListener('DOMContentLoaded', () => {
               if (diffDays === 1) {
                 deadlineBanner = `<div class="mkt-instant-deadline-banner due-tomorrow"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="calendar" style="width:13px;height:13px;"></i> Due Tomorrow</span><span>Priority</span></div>`;
               } else {
-                deadlineBanner = `<div class="mkt-instant-deadline-banner upcoming"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="calendar" style="width:13px;height:13px;"></i> Due in ${diffDays} days (${target.deadline})</span><span>Scheduled</span></div>`;
+                deadlineBanner = `<div class="mkt-instant-deadline-banner upcoming"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="calendar" style="width:13px;height:13px;"></i> Due in ${diffDays}d</span><span>Scheduled</span></div>`;
               }
             }
           }
@@ -2563,7 +2563,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="del-card-actions">
                   ${isDone
                     ? `<button type="button" class="btn btn-outline-sm btn-block" style="color: #059669; border-color: #10B981; background: #DCFCE7; font-weight: 600;"><i data-lucide="check"></i> Delivered</button>`
-                    : `<button type="button" class="btn btn-primary btn-sm btn-block btn-open-log-modal" data-target-id="${target.id}"><i data-lucide="upload-cloud"></i> + Submit Deliverable Proof</button>`
+                    : `<button type="button" class="btn btn-primary btn-sm btn-block btn-open-log-modal" data-target-id="${target.id}"><i data-lucide="upload-cloud"></i> Submit Deliverable</button>`
                   }
                 </div>
               </div>
@@ -2606,7 +2606,7 @@ document.addEventListener('DOMContentLoaded', () => {
         existingProof = task.proofUrl || '';
       }
       if (elements.routineModalTitle) {
-        elements.routineModalTitle.innerHTML = `<i data-lucide="upload-cloud"></i> Weekly Report / Proof Link`;
+        elements.routineModalTitle.innerHTML = `<i data-lucide="upload-cloud"></i> Weekly Report & Proof`;
       }
     }
 

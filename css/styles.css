@@ -8614,28 +8614,35 @@ body.dark-theme .btn-preset-pill.active {
 }
 
 /* =========================================================================
-   MARKETING EXECUTIVE DEDICATED WORKSPACE STYLES (LIGHT & DARK DUAL THEME)
+   MARKETING EXECUTIVE DEDICATED WORKSPACE - RESPONSIVE SYSTEM (DESKTOP & MOBILE)
    ========================================================================= */
+
+/* Health Radar Cards Strip (Desktop: 4 columns) */
 .mkt-radar-strip {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
   margin-bottom: 20px;
 }
 
-/* Radar Cards */
 .mkt-radar-card {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 14px;
-  padding: 14px 16px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
   gap: 14px;
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05);
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mkt-radar-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+  border-color: #CBD5E1;
 }
 
 .mkt-radar-card::after {
@@ -8647,14 +8654,19 @@ body.dark-theme .btn-preset-pill.active {
 }
 
 .mkt-radar-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
   border: 1px solid;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.mkt-radar-card:hover .mkt-radar-icon {
+  transform: scale(1.05);
 }
 
 .mkt-radar-icon svg {
@@ -8669,7 +8681,7 @@ body.dark-theme .btn-preset-pill.active {
 
 .mkt-radar-info .mkt-radar-val {
   font-family: var(--font-heading);
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 700;
   color: #0F172A !important;
   line-height: 1.2;
@@ -8682,32 +8694,44 @@ body.dark-theme .btn-preset-pill.active {
   margin-top: 2px;
 }
 
-/* Cadence Navigation Tabs */
+/* Cadence Navigation Tabs (Desktop & Mobile) */
 .mkt-cadence-tabs {
   display: flex;
   gap: 8px;
   border-bottom: 1px solid #E2E8F0;
   padding-bottom: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.mkt-cadence-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .mkt-cadence-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 9px 18px;
   border-radius: 10px;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
   border: 1px solid #E2E8F0;
   background: #FFFFFF;
   color: #475569;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   white-space: nowrap;
   font-family: var(--font-body);
+}
+
+.mkt-cadence-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 .mkt-cadence-btn:hover {
@@ -8730,6 +8754,7 @@ body.dark-theme .btn-preset-pill.active {
   font-weight: 600;
   background: #F1F5F9;
   color: #475569;
+  line-height: 1;
 }
 
 .mkt-cadence-btn.active .mkt-cadence-badge {
@@ -8753,7 +8778,7 @@ body.dark-theme .btn-preset-pill.active {
   border-radius: 12px;
   border: 1px solid #E2E8F0;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .mkt-banner-left {
@@ -8763,6 +8788,12 @@ body.dark-theme .btn-preset-pill.active {
   align-items: center;
   gap: 8px;
   font-weight: 500;
+}
+
+.mkt-banner-left svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 .mkt-banner-left strong {
@@ -8781,6 +8812,13 @@ body.dark-theme .btn-preset-pill.active {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  white-space: nowrap;
+}
+
+.mkt-reset-pill svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
 }
 
 .mkt-reset-pill.mkt-reset-blue {
@@ -8850,6 +8888,7 @@ body.dark-theme .btn-preset-pill.active {
   justify-content: center;
   flex-shrink: 0;
   transition: all 0.2s ease;
+  user-select: none;
 }
 
 .mkt-checkbox-wrap:hover {
@@ -8896,6 +8935,17 @@ body.dark-theme .btn-preset-pill.active {
   color: #64748B;
 }
 
+.mkt-task-right {
+  flex-shrink: 0;
+}
+
+/* Instant Tasks Grid (Desktop) */
+#mkt-instant-tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 14px;
+}
+
 /* Instant Tasks Deadline Banners */
 .mkt-instant-deadline-banner {
   display: flex;
@@ -8936,6 +8986,222 @@ body.dark-theme .btn-preset-pill.active {
   background: #DCFCE7;
   border: 1px solid #86EFAC;
   color: #166534 !important;
+}
+
+/* Routine Note Modal Styling */
+#routine-note-modal .modal-card {
+  max-width: 460px;
+  width: 100%;
+}
+
+/* =========================================================================
+   RESPONSIVE BREAKPOINTS (TABLETS: <= 1024px)
+   ========================================================================= */
+@media (max-width: 1024px) {
+  .mkt-radar-strip {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  #mkt-instant-tasks-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* =========================================================================
+   RESPONSIVE BREAKPOINTS (MOBILE: <= 640px)
+   ========================================================================= */
+@media (max-width: 640px) {
+  .mkt-radar-strip {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .mkt-radar-card {
+    padding: 10px 12px;
+    gap: 10px;
+    border-radius: 12px;
+  }
+
+  .mkt-radar-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
+  .mkt-radar-icon svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .mkt-radar-info .mkt-radar-val {
+    font-size: 16px;
+  }
+
+  .mkt-radar-info .mkt-radar-lbl {
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mkt-cadence-tabs {
+    gap: 6px;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    width: 100%;
+  }
+
+  .mkt-cadence-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 8px 6px;
+    font-size: 11.5px;
+    gap: 4px;
+    justify-content: center;
+    border-radius: 8px;
+  }
+
+  .mkt-cadence-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .mkt-cadence-badge {
+    padding: 1px 5px;
+    font-size: 10px;
+    border-radius: 6px;
+  }
+
+  .mkt-section-banner {
+    padding: 9px 12px;
+    gap: 6px;
+    border-radius: 10px;
+  }
+
+  .mkt-banner-left {
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .mkt-reset-pill {
+    font-size: 10.5px;
+    padding: 3px 7px;
+    border-radius: 5px;
+  }
+
+  .mkt-tasks-list {
+    gap: 8px;
+  }
+
+  .mkt-task-item {
+    padding: 11px 12px;
+    gap: 10px;
+    border-radius: 12px;
+  }
+
+  .mkt-task-left {
+    gap: 10px;
+  }
+
+  .mkt-checkbox-wrap {
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+  }
+
+  .mkt-checkbox-wrap svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  .mkt-task-title {
+    font-size: 13.5px;
+    line-height: 1.35;
+  }
+
+  .mkt-task-meta {
+    gap: 5px;
+    font-size: 11px;
+  }
+
+  .mkt-task-meta .badge-category,
+  .mkt-task-meta .badge-brand,
+  .mkt-task-meta .badge-format {
+    font-size: 10px !important;
+    padding: 1px 5px !important;
+  }
+
+  .btn-open-routine-note {
+    padding: 5px 8px !important;
+    font-size: 11px !important;
+    gap: 4px !important;
+    border-radius: 7px !important;
+  }
+
+  #mkt-instant-tasks-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Routine Note Modal Mobile Adjustments */
+  #routine-note-modal .modal-card {
+    max-width: 100% !important;
+    width: calc(100% - 24px) !important;
+    margin: auto 12px !important;
+  }
+
+  #routine-note-modal .modal-header {
+    padding: 12px 16px !important;
+  }
+
+  #routine-note-modal .modal-form {
+    padding: 12px 16px max(16px, env(safe-area-inset-bottom)) 16px !important;
+    gap: 10px !important;
+  }
+
+  #routine-note-modal .form-group input,
+  #routine-note-modal .form-group textarea {
+    font-size: 16px !important; /* Prevents auto-zoom on iOS/Android */
+  }
+
+  #routine-note-modal .modal-footer {
+    display: flex !important;
+    gap: 8px !important;
+  }
+
+  #routine-note-modal .modal-footer .btn {
+    flex: 1 !important;
+    height: 38px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* =========================================================================
+   VERY SMALL MOBILE BREAKPOINTS (<= 380px)
+   ========================================================================= */
+@media (max-width: 380px) {
+  .mkt-cadence-btn span:not(.mkt-cadence-badge) {
+    font-size: 10.5px;
+  }
+
+  .mkt-task-item {
+    flex-wrap: wrap;
+  }
+
+  .mkt-task-right {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+    padding-left: 34px;
+  }
+
+  .btn-open-routine-note {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* =========================================================================

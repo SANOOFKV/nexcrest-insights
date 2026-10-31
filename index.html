@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=80">
+  <link rel="stylesheet" href="css/styles.css?v=81">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -807,7 +807,7 @@
             </div>
             <div class="mkt-radar-info">
               <div class="mkt-radar-val" id="mkt-radar-daily-text">0 / 4 Done</div>
-              <div class="mkt-radar-lbl">Today's Daily Routines</div>
+              <div class="mkt-radar-lbl">Daily Routines</div>
               <div class="progress-bar-container" style="height: 5px; margin-top: 6px;">
                 <div class="progress-bar-fill teal" id="mkt-radar-daily-bar" style="width: 0%;"></div>
               </div>
@@ -820,7 +820,7 @@
             </div>
             <div class="mkt-radar-info">
               <div class="mkt-radar-val" id="mkt-radar-streak-text">0 Days</div>
-              <div class="mkt-radar-lbl">Execution Habit Streak 🔥</div>
+              <div class="mkt-radar-lbl">Daily Streak 🔥</div>
             </div>
           </div>
 
@@ -830,7 +830,7 @@
             </div>
             <div class="mkt-radar-info">
               <div class="mkt-radar-val" id="mkt-radar-weekly-text">0 / 3 Delivered</div>
-              <div class="mkt-radar-lbl">This Week's Deliverables</div>
+              <div class="mkt-radar-lbl">Weekly Targets</div>
             </div>
           </div>
 
@@ -840,7 +840,7 @@
             </div>
             <div class="mkt-radar-info">
               <div class="mkt-radar-val" id="mkt-radar-instant-text">0 Active</div>
-              <div class="mkt-radar-lbl">Instant Tasks with Deadlines</div>
+              <div class="mkt-radar-lbl">Instant Tasks</div>
             </div>
           </div>
         </div>
@@ -848,8 +848,8 @@
         <!-- Cadence Navigation Tabs -->
         <div class="mkt-cadence-tabs">
           <button type="button" class="mkt-cadence-btn active" data-mkt-tab="daily" id="btn-mkt-tab-daily">
-            <i data-lucide="clock"></i>
-            <span>Daily Tasks (Today)</span>
+            <i data-lucide="check-circle-2"></i>
+            <span>Daily Tasks</span>
             <span class="mkt-cadence-badge" id="mkt-badge-daily">4</span>
           </button>
           <button type="button" class="mkt-cadence-btn" data-mkt-tab="weekly" id="btn-mkt-tab-weekly">
@@ -859,7 +859,7 @@
           </button>
           <button type="button" class="mkt-cadence-btn" data-mkt-tab="instant" id="btn-mkt-tab-instant">
             <i data-lucide="zap"></i>
-            <span>Instant / Priority Tasks</span>
+            <span>Instant Tasks</span>
             <span class="mkt-cadence-badge" id="mkt-badge-instant">0</span>
           </button>
         </div>
@@ -872,7 +872,7 @@
               <span id="mkt-daily-date-label">Today: <strong>...</strong></span>
             </div>
             <div class="mkt-reset-pill">
-              <i data-lucide="rotate-ccw"></i> Auto-Resets Every Midnight (00:00)
+              <i data-lucide="rotate-ccw"></i> Resets Daily
             </div>
           </div>
           <div id="mkt-daily-tasks-list" class="mkt-tasks-list">
@@ -888,7 +888,7 @@
               <span id="mkt-weekly-cadence-label">Active Cadence: <strong>...</strong></span>
             </div>
             <div class="mkt-reset-pill mkt-reset-blue">
-              <i data-lucide="rotate-ccw"></i> Auto-Resets Every Monday (00:00)
+              <i data-lucide="rotate-ccw"></i> Resets Mondays
             </div>
           </div>
           <div id="mkt-weekly-tasks-list" class="mkt-tasks-list">
@@ -901,10 +901,10 @@
           <div class="mkt-section-banner">
             <div class="mkt-banner-left">
               <i data-lucide="zap" style="color: #A78BFA;"></i>
-              <span>Direct Manager Assignments with <strong>Active Deadlines</strong></span>
+              <span>Manager-Assigned Tasks</span>
             </div>
             <div class="mkt-reset-pill mkt-reset-purple">
-              <i data-lucide="shield-check"></i> Requires Review Approval
+              <i data-lucide="shield-check"></i> Needs Review
             </div>
           </div>
           <div id="mkt-instant-tasks-grid" class="deliverables-cards-grid">
@@ -1776,7 +1776,7 @@
   <div id="routine-note-modal" class="modal-overlay hidden">
     <div class="modal-card spotlight-card" style="max-width: 480px;">
       <div class="modal-header">
-        <h3 id="routine-modal-title"><i data-lucide="file-text"></i> Task Note & Link</h3>
+        <h3 id="routine-modal-title"><i data-lucide="file-text"></i> Task Note & Proof</h3>
         <button class="modal-close-btn" data-close-modal="routine-note-modal">&times;</button>
       </div>
       <form id="routine-note-form" class="modal-form">
@@ -1787,20 +1787,20 @@
           <input type="text" id="routine-modal-task-name" disabled style="opacity: 0.8; cursor: not-allowed;">
         </div>
         <div class="form-group">
-          <label for="routine-modal-proof-url"><i data-lucide="link"></i> Proof / Document Link (Optional)</label>
+          <label for="routine-modal-proof-url"><i data-lucide="link"></i> Proof Link (Optional)</label>
           <div class="input-with-icon">
             <i data-lucide="link"></i>
             <input type="url" id="routine-modal-proof-url" placeholder="https://drive.google.com/... or https://loom.com/...">
           </div>
         </div>
         <div class="form-group">
-          <label for="routine-modal-note-text"><i data-lucide="message-square"></i> Execution Note (Optional)</label>
-          <textarea id="routine-modal-note-text" rows="3" placeholder="Provide any details about today's execution..."></textarea>
+          <label for="routine-modal-note-text"><i data-lucide="message-square"></i> Note (Optional)</label>
+          <textarea id="routine-modal-note-text" rows="3" placeholder="Add execution details or notes..."></textarea>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-close-modal="routine-note-modal">Close</button>
           <button type="submit" class="btn btn-primary" id="btn-save-routine-note">
-            <i data-lucide="save"></i> Save Details
+            <i data-lucide="save"></i> Save Note
           </button>
         </div>
       </form>
@@ -1814,10 +1814,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=80"></script>
-  <script src="js/data.js?v=80"></script>
-  <script src="js/auth.js?v=80"></script>
-  <script src="js/app.js?v=80"></script>
+  <script src="js/firebase-config.js?v=81"></script>
+  <script src="js/data.js?v=81"></script>
+  <script src="js/auth.js?v=81"></script>
+  <script src="js/app.js?v=81"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
