@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=83">
+  <link rel="stylesheet" href="css/styles.css?v=84">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -730,7 +730,10 @@
           <h2 class="member-workspace-title" style="font-family: var(--font-heading); font-size: 20px; font-weight: 700; margin: 0; color: var(--text-main);">Team Deliverables Workspace</h2>
           <p style="font-size: 13px; color: var(--text-muted); margin: 2px 0 0;">Manage your monthly targets, submit deliverables, and track review approvals.</p>
         </div>
-        <div class="header-action-buttons">
+        <div class="header-action-buttons" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <button type="button" id="btn-member-report" class="btn btn-secondary" title="Create or View Monthly Performance Report">
+            <i data-lucide="file-bar-chart"></i> Monthly Report
+          </button>
           <button id="btn-member-log-work" class="btn btn-primary" title="Submit completed deliverable or log extra work">
             <i data-lucide="upload-cloud"></i> + Submit Work
           </button>
@@ -888,6 +891,9 @@
             <i data-lucide="zap"></i>
             <span>Instant Tasks</span>
             <span class="mkt-cadence-badge" id="mkt-badge-instant">0</span>
+          </button>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-mkt-open-report" style="margin-left: auto; display: inline-flex; align-items: center; gap: 5px; height: 38px; border-radius: 8px;" title="Create or View Monthly Performance Report">
+            <i data-lucide="file-bar-chart"></i> Monthly Report
           </button>
         </div>
 
@@ -1858,6 +1864,161 @@
     </div>
   </div>
 
+  <!-- MODAL: Member Monthly Performance Report Generator & Historical Archive -->
+  <div id="member-monthly-report-modal" class="modal-overlay hidden">
+    <div class="modal-card spotlight-card report-modal-box">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-title-group" style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(0, 139, 165, 0.12); display: flex; align-items: center; justify-content: center; color: var(--teal-primary);">
+            <i data-lucide="file-bar-chart" style="width: 20px; height: 20px;"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 16px; font-weight: 700; font-family: var(--font-heading);">Monthly Performance Report</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 2px 0 0;">Compile, review, and archive your monthly deliverables & achievements.</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" data-close-modal="member-monthly-report-modal">&times;</button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="report-modal-body">
+        <!-- Cycle & Month Selection Toolbar -->
+        <div class="report-cycle-toolbar">
+          <div class="cycle-label">
+            <i data-lucide="calendar" style="color: var(--teal-primary); width: 15px; height: 15px;"></i>
+            <span>Reporting Month Cycle:</span>
+          </div>
+          <div class="cycle-buttons" id="report-cycle-quick-btns">
+            <button type="button" class="cycle-btn" data-report-month="2026-11">Current (Nov 2026)</button>
+            <button type="button" class="cycle-btn active" data-report-month="2026-10">Oct 2026</button>
+            <button type="button" class="cycle-btn" data-report-month="2026-09">Sep 2026</button>
+            <select class="cycle-select" id="report-month-select" title="Select custom historical cycle">
+              <option value="2026-11">November 2026</option>
+              <option value="2026-10" selected>October 2026</option>
+              <option value="2026-09">September 2026</option>
+              <option value="2026-08">August 2026</option>
+              <option value="2026-07">July 2026</option>
+              <option value="2026-06">June 2026</option>
+              <option value="2026-05">May 2026</option>
+              <option value="2026-04">April 2026</option>
+              <option value="2026-03">March 2026</option>
+              <option value="2026-02">February 2026</option>
+              <option value="2026-01">January 2026</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Printable Branded Report Document Container -->
+        <div class="report-document" id="printable-report-doc">
+          <!-- Document Header -->
+          <div class="doc-brand-header">
+            <div>
+              <div class="doc-brand-title">
+                <i data-lucide="shield-check" style="color: var(--teal-primary);"></i> Nexcrest Insights
+              </div>
+              <div style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+                Official Monthly Performance Brief
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <span class="doc-tag" id="doc-month-badge">October 2026 Cycle</span>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px;" id="doc-generated-time">
+                Generated Today
+              </div>
+            </div>
+          </div>
+
+          <!-- Document Profile Strip -->
+          <div class="doc-meta-grid">
+            <div>
+              <div class="meta-item-label">Team Member</div>
+              <div class="meta-item-val" id="doc-member-name">Avanthika</div>
+            </div>
+            <div>
+              <div class="meta-item-label">Department & Role</div>
+              <div class="meta-item-val" id="doc-member-role">Graphic Designer</div>
+            </div>
+            <div>
+              <div class="meta-item-label">Brand Scope</div>
+              <div class="meta-item-val" id="doc-member-brand">Techschool & IT</div>
+            </div>
+            <div>
+              <div class="meta-item-label">Report Period</div>
+              <div class="meta-item-val" id="doc-member-period" style="color: var(--teal-primary);">October 2026</div>
+            </div>
+          </div>
+
+          <!-- Role-Adaptive Telemetry Grid -->
+          <div class="report-kpi-grid" id="report-kpi-container">
+            <!-- Dynamically populated via JS -->
+          </div>
+
+          <!-- Deliverables Table -->
+          <div class="report-table-section">
+            <div class="report-table-title">
+              <i data-lucide="list-checks" style="color: var(--teal-primary); width: 16px; height: 16px;"></i>
+              <span>Deliverables & Work Log Summary</span>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="report-table">
+                <thead>
+                  <tr>
+                    <th>Program / Task Title</th>
+                    <th>Format</th>
+                    <th>Brand</th>
+                    <th>Target</th>
+                    <th>Completed</th>
+                    <th>Status</th>
+                    <th>Asset Link</th>
+                  </tr>
+                </thead>
+                <tbody id="report-table-body">
+                  <!-- Dynamically populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Member Self-Assessment & Highlights -->
+          <div class="highlights-box">
+            <div class="highlights-header">
+              <div class="highlights-title">
+                <i data-lucide="sparkles" style="color: #F59E0B; width: 16px; height: 16px;"></i>
+                <span>Monthly Executive Summary & Highlights</span>
+              </div>
+              <button type="button" class="btn btn-secondary" id="btn-report-auto-highlights" style="font-size: 12px; padding: 4px 10px;">
+                <i data-lucide="wand-2" style="width: 13px; height: 13px;"></i> Auto-Generate Highlights
+              </button>
+            </div>
+            <textarea class="highlights-textarea" id="report-highlights-text" placeholder="Enter personal highlights, key milestones, challenges overcome, and next month's goals..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer Actions -->
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--border-color); background: var(--bg-surface);">
+        <div class="footer-left-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary" id="btn-report-copy-briefing">
+            <i data-lucide="copy"></i> Copy Briefing
+          </button>
+          <button type="button" class="btn btn-secondary" id="btn-report-export-csv">
+            <i data-lucide="download"></i> Export CSV
+          </button>
+        </div>
+        <div class="footer-right-actions" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary" data-close-modal="member-monthly-report-modal">Close</button>
+          <button type="button" class="btn btn-secondary" id="btn-report-print">
+            <i data-lucide="printer"></i> Print / PDF
+          </button>
+          <button type="button" class="btn btn-primary" id="btn-report-save">
+            <i data-lucide="check"></i> Save & Archive Report
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
@@ -1865,10 +2026,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=83"></script>
-  <script src="js/data.js?v=83"></script>
-  <script src="js/auth.js?v=83"></script>
-  <script src="js/app.js?v=83"></script>
+  <script src="js/firebase-config.js?v=84"></script>
+  <script src="js/data.js?v=84"></script>
+  <script src="js/auth.js?v=84"></script>
+  <script src="js/app.js?v=84"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

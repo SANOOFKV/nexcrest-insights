@@ -9,7 +9,8 @@ const STORAGE_KEYS = {
   SUBMISSIONS: 'nexcrest_submissions_v2',
   SELECTED_MONTH: 'nexcrest_active_month_v2',
   MARKETING_DAILY: 'nexcrest_marketing_daily_v1',
-  MARKETING_WEEKLY: 'nexcrest_marketing_weekly_v1'
+  MARKETING_WEEKLY: 'nexcrest_marketing_weekly_v1',
+  MEMBER_REPORTS: 'nexcrest_member_reports_v1'
 };
 
 // =========================================================================
@@ -1349,6 +1350,147 @@ class DataStore {
                     t.assigneeRole === 'marketing';
       return isMkt;
     });
+  }
+
+  // =========================================================================
+  // MEMBER MONTHLY PERFORMANCE REPORTS ARCHIVE METHODS
+  // =========================================================================
+  loadMemberReports() {
+    const raw = localStorage.getItem(STORAGE_KEYS.MEMBER_REPORTS);
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  saveMemberReport(reportData) {
+    if (!reportData || !reportData.userEmail || !reportData.month) return false;
+    let reports = this.loadMemberReports();
+    const existingIndex = reports.findIndex(r => r.userEmail === reportData.userEmail && r.month === reportData.month);
+    if (existingIndex >= 0) {
+      reports[existingIndex] = { ...reports[existingIndex], ...reportData, updatedAt: new Date().toISOString() };
+    } else {
+      reports.unshift({ ...reportData, id: reportData.id || `rep-${Date.now()}`, createdAt: new Date().toISOString() });
+    }
+    try {
+      localStorage.setItem(STORAGE_KEYS.MEMBER_REPORTS, JSON.stringify(reports));
+    } catch (e) {}
+
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      try { window.firebaseSync.saveMemberReport(reportData); } catch (e) {}
+    }
+    return true;
+  }
+
+  getMemberReports(userEmail = null, month = null) {
+    let reports = this.loadMemberReports();
+    if (userEmail) {
+      reports = reports.filter(r => r.userEmail === userEmail || r.userRole === userEmail);
+    }
+    if (month) {
+      reports = reports.filter(r => r.month === month);
+    }
+    return reports;
+  }
+
+  getMemberMonthlyData(user, month) {
+    if (!user) return null;
+    const isMkt = user.role === 'marketing';
+    const monthTargets = (this.targets || []).filter(t => {
+      const matchMonth = t.month === month;
+      const matchUser = t.assignee === user.role || t.assigneeEmail === user.email || t.assigneeRole === user.role;
+      return matchMonth && matchUser;
+    });
+
+    const monthSubmissions = (this.submissions || []).filter(s => {
+      const target = this.getTargetById(s.targetId);
+      const subMonth = (target && target.month) || s.month || (s.submittedAt ? s.submittedAt.slice(0, 7) : null);
+      const matchMonth = subMonth === month;
+      const matchUser = s.authorEmail === user.email || s.authorRole === user.role || s.assignee === user.role;
+      return matchMonth && matchUser;
+    });
+
+    if (isMkt) {
+      const dailyTasks = this.getMarketingDailyTasks();
+      let totalDailyOpportunities = 0;
+      let totalDailyCompleted = 0;
+      dailyTasks.forEach(t => {
+        if (t.history) {
+          Object.entries(t.history).forEach(([dateStr, hist]) => {
+            if (dateStr.startsWith(month)) {
+              totalDailyOpportunities++;
+              if (hist && hist.completed) totalDailyCompleted++;
+            }
+          });
+        }
+      });
+
+      const weeklyTasks = this.getMarketingWeeklyTasks();
+      let totalWeeklyCompleted = 0;
+      let totalWeeklyOpportunities = 0;
+      weeklyTasks.forEach(w => {
+        if (w.history) {
+          Object.entries(w.history).forEach(([weekStr, hist]) => {
+            if (weekStr.startsWith(month.split('-')[0])) {
+              totalWeeklyOpportunities++;
+              if (hist && hist.completed) totalWeeklyCompleted++;
+            }
+          });
+        }
+      });
+
+      const streak = this.getMarketingDailyStreak();
+
+      return {
+        isMarketing: true,
+        month,
+        targets: monthTargets,
+        submissions: monthSubmissions,
+        dailyCompleted: totalDailyCompleted,
+        dailyTotal: Math.max(totalDailyOpportunities, 4),
+        weeklyCompleted: totalWeeklyCompleted,
+        weeklyTotal: Math.max(totalWeeklyOpportunities, 3),
+        streak,
+        pct: totalDailyOpportunities > 0 ? Math.round((totalDailyCompleted / totalDailyOpportunities) * 100) : (totalDailyCompleted > 0 ? 100 : 0)
+      };
+    } else {
+      let totalTarget = 0;
+      let totalCompleted = 0;
+      let totalPending = 0;
+      let extraCompleted = 0;
+
+      monthTargets.forEach(t => {
+        const prog = this.getTargetProgress(t.id);
+        totalTarget += (t.targetQty || 0);
+        totalCompleted += (prog.completed || 0);
+        totalPending += (prog.pending || 0);
+        if (prog.extra > 0) extraCompleted += prog.extra;
+      });
+
+      monthSubmissions.forEach(s => {
+        if (s.isExtra && (!s.targetId || s.targetId === 'unassigned')) {
+          if (s.status === 'approved') extraCompleted++;
+          else if (s.status === 'pending') totalPending++;
+        }
+      });
+
+      const pct = totalTarget > 0 ? Math.round((totalCompleted / totalTarget) * 100) : 0;
+
+      return {
+        isMarketing: false,
+        month,
+        targets: monthTargets,
+        submissions: monthSubmissions,
+        totalTarget,
+        totalCompleted,
+        totalPending,
+        extraCompleted,
+        pct
+      };
+    }
   }
 
   // Reset to original defaults

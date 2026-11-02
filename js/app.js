@@ -42,7 +42,9 @@ document.addEventListener('DOMContentLoaded', () => {
     pendingBatchDeleteSource: null,
     activeAdminMemberEmail: 'marketing@nexcrest.com',
     adminMarketingSelectedDate: (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0],
-    adminMarketingSelectedWeek: (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W45'
+    adminMarketingSelectedWeek: (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W45',
+    memberReportSelectedMonth: '2026-10',
+    memberReportActiveUser: null
   };
 
   // DOM Element Selectors
@@ -202,6 +204,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modals
     btnOpenAssignModal: document.getElementById('btn-open-assign-modal'),
     btnMemberLogWork: document.getElementById('btn-member-log-work'),
+    btnMemberReport: document.getElementById('btn-member-report'),
+    btnMktOpenReport: document.getElementById('btn-mkt-open-report'),
+    memberMonthlyReportModal: document.getElementById('member-monthly-report-modal'),
+    reportCycleQuickBtns: document.getElementById('report-cycle-quick-btns'),
+    reportMonthSelect: document.getElementById('report-month-select'),
+    printableReportDoc: document.getElementById('printable-report-doc'),
+    docMonthBadge: document.getElementById('doc-month-badge'),
+    docGeneratedTime: document.getElementById('doc-generated-time'),
+    docMemberName: document.getElementById('doc-member-name'),
+    docMemberRole: document.getElementById('doc-member-role'),
+    docMemberBrand: document.getElementById('doc-member-brand'),
+    docMemberPeriod: document.getElementById('doc-member-period'),
+    reportKpiContainer: document.getElementById('report-kpi-container'),
+    reportTableBody: document.getElementById('report-table-body'),
+    reportHighlightsText: document.getElementById('report-highlights-text'),
+    btnReportAutoHighlights: document.getElementById('btn-report-auto-highlights'),
+    btnReportCopyBriefing: document.getElementById('btn-report-copy-briefing'),
+    btnReportExportCsv: document.getElementById('btn-report-export-csv'),
+    btnReportPrint: document.getElementById('btn-report-print'),
+    btnReportSave: document.getElementById('btn-report-save'),
     assignTargetModal: document.getElementById('assign-target-modal'),
     logWorkModal: document.getElementById('log-work-modal'),
     reviewActionModal: document.getElementById('review-action-modal'),
@@ -2384,6 +2406,48 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
 
+        <!-- MONTHLY PERFORMANCE REPORTS ARCHIVE -->
+        <div class="hub-section-card">
+          <div class="hub-section-card-header">
+            <h3>
+              <i data-lucide="file-bar-chart" style="color: var(--teal-primary);"></i>
+              Monthly Performance Reports for ${escapeHtml(activeEmp.name)}
+            </h3>
+            <button type="button" class="btn btn-secondary btn-admin-open-member-report" data-emp-email="${escapeHtml(activeEmp.email)}">
+              <i data-lucide="eye"></i> Inspect Monthly Report
+            </button>
+          </div>
+          <div class="admin-task-list">
+            ${(() => {
+              const savedReps = window.dataStore.getMemberReports(activeEmp.email);
+              if (savedReps.length === 0) {
+                return `<div style="text-align: center; padding: 18px; color: var(--text-muted); font-size: 13px;">No archived monthly reports yet for ${escapeHtml(activeEmp.name)}. Click "Inspect Monthly Report" to view live performance for any cycle.</div>`;
+              }
+              return savedReps.map(rep => `
+                <div class="admin-task-item">
+                  <div class="admin-task-left">
+                    <div class="hub-tel-icon" style="background: rgba(0, 139, 165, 0.1); color: var(--teal-primary); width: 34px; height: 34px;">
+                      <i data-lucide="file-text" style="width: 16px; height: 16px;"></i>
+                    </div>
+                    <div>
+                      <div class="admin-task-title">${escapeHtml(getMonthFullName(rep.month))} Performance Report</div>
+                      <div class="admin-task-meta">
+                        <span class="badge-tag">Archived ${formatDate(rep.generatedAt)}</span>
+                        ${rep.summary ? `<span style="font-weight: 600; color: var(--text-main);">Execution: ${rep.summary.pct}%</span>` : ''}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="admin-task-actions">
+                    <button type="button" class="btn btn-secondary btn-admin-view-saved-report" data-report-month="${escapeHtml(rep.month)}" data-emp-email="${escapeHtml(activeEmp.email)}">
+                      <i data-lucide="external-link"></i> View Brief
+                    </button>
+                  </div>
+                </div>
+              `).join('');
+            })()}
+          </div>
+        </div>
+
         <!-- 3. INSTANT DELIVERABLES ASSIGNED BY ADMIN -->
         <div class="hub-section-card">
           <div class="hub-section-card-header">
@@ -2548,6 +2612,48 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
 
+        <!-- MONTHLY PERFORMANCE REPORTS ARCHIVE -->
+        <div class="hub-section-card">
+          <div class="hub-section-card-header">
+            <h3>
+              <i data-lucide="file-bar-chart" style="color: var(--teal-primary);"></i>
+              Monthly Performance Reports for ${escapeHtml(activeEmp.name)}
+            </h3>
+            <button type="button" class="btn btn-secondary btn-admin-open-member-report" data-emp-email="${escapeHtml(activeEmp.email)}">
+              <i data-lucide="eye"></i> Inspect Monthly Report
+            </button>
+          </div>
+          <div class="admin-task-list">
+            ${(() => {
+              const savedReps = window.dataStore.getMemberReports(activeEmp.email);
+              if (savedReps.length === 0) {
+                return `<div style="text-align: center; padding: 18px; color: var(--text-muted); font-size: 13px;">No archived monthly reports yet for ${escapeHtml(activeEmp.name)}. Click "Inspect Monthly Report" to view live performance for any cycle.</div>`;
+              }
+              return savedReps.map(rep => `
+                <div class="admin-task-item">
+                  <div class="admin-task-left">
+                    <div class="hub-tel-icon" style="background: rgba(0, 139, 165, 0.1); color: var(--teal-primary); width: 34px; height: 34px;">
+                      <i data-lucide="file-text" style="width: 16px; height: 16px;"></i>
+                    </div>
+                    <div>
+                      <div class="admin-task-title">${escapeHtml(getMonthFullName(rep.month))} Performance Report</div>
+                      <div class="admin-task-meta">
+                        <span class="badge-tag">Archived ${formatDate(rep.generatedAt)}</span>
+                        ${rep.summary ? `<span style="font-weight: 600; color: var(--text-main);">Quota Pace: ${rep.summary.pct}%</span>` : ''}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="admin-task-actions">
+                    <button type="button" class="btn btn-secondary btn-admin-view-saved-report" data-report-month="${escapeHtml(rep.month)}" data-emp-email="${escapeHtml(activeEmp.email)}">
+                      <i data-lucide="external-link"></i> View Brief
+                    </button>
+                  </div>
+                </div>
+              `).join('');
+            })()}
+          </div>
+        </div>
+
         <!-- 2. ASSIGNED TARGETS -->
         <div class="hub-section-card">
           <div class="hub-section-card-header">
@@ -2599,6 +2705,408 @@ document.addEventListener('DOMContentLoaded', () => {
 
       </div>
     `;
+  }
+
+  // =========================================================================
+  // MEMBER MONTHLY PERFORMANCE REPORT & ARCHIVE CONTROLLERS
+  // =========================================================================
+  function getMonthFullName(ym) {
+    const monthFull = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    if (!ym) return 'Current Month';
+    const parts = ym.split('-');
+    if (parts.length < 2) return ym;
+    const mIdx = parseInt(parts[1], 10) - 1;
+    return `${monthFull[mIdx] || parts[1]} ${parts[0]}`;
+  }
+
+  function openMemberReportModal(preselectedMonth = null, targetUser = null) {
+    state.memberReportActiveUser = targetUser || state.user;
+    if (!state.memberReportActiveUser) return;
+
+    const defaultMonth = window.dataStore.getActiveMonth() || '2026-10';
+    state.memberReportSelectedMonth = preselectedMonth || state.memberReportSelectedMonth || defaultMonth;
+
+    renderMemberReportModal();
+
+    if (elements.memberMonthlyReportModal) {
+      elements.memberMonthlyReportModal.classList.remove('hidden');
+    }
+    refreshIcons();
+  }
+
+  function closeMemberReportModal() {
+    if (elements.memberMonthlyReportModal) {
+      elements.memberMonthlyReportModal.classList.add('hidden');
+    }
+  }
+
+  function renderMemberReportModal() {
+    const user = state.memberReportActiveUser || state.user;
+    if (!user) return;
+
+    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || '2026-10';
+    const monthName = getMonthFullName(selectedMonth);
+
+    // Update Quick Buttons and Select
+    if (elements.reportCycleQuickBtns) {
+      elements.reportCycleQuickBtns.querySelectorAll('.cycle-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.reportMonth === selectedMonth);
+      });
+    }
+    if (elements.reportMonthSelect) {
+      elements.reportMonthSelect.value = selectedMonth;
+    }
+
+    // Populate Document Header & Meta
+    if (elements.docMonthBadge) {
+      elements.docMonthBadge.textContent = `${monthName} Cycle`;
+    }
+    if (elements.docGeneratedTime) {
+      const now = new Date();
+      elements.docGeneratedTime.textContent = `Generated ${now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} • ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    if (elements.docMemberName) {
+      elements.docMemberName.textContent = user.name || 'Team Member';
+    }
+    if (elements.docMemberRole) {
+      elements.docMemberRole.textContent = user.title || (user.role ? user.role.toUpperCase() : 'Team Member');
+    }
+    if (elements.docMemberBrand) {
+      elements.docMemberBrand.textContent = formatBrandName(user.brand || 'Both');
+    }
+    if (elements.docMemberPeriod) {
+      elements.docMemberPeriod.textContent = monthName;
+    }
+
+    // Fetch month's aggregated data
+    const data = window.dataStore.getMemberMonthlyData(user, selectedMonth);
+    if (!data) return;
+
+    // Render Role-Adaptive KPI Cards
+    if (elements.reportKpiContainer) {
+      if (data.isMarketing) {
+        elements.reportKpiContainer.innerHTML = `
+          <div class="report-kpi-card">
+            <div class="report-kpi-icon" style="background: rgba(0, 139, 165, 0.12); color: var(--teal-primary);">
+              <i data-lucide="check-circle-2"></i>
+            </div>
+            <div>
+              <div class="report-kpi-val">${data.dailyCompleted} / ${data.dailyTotal}</div>
+              <div class="report-kpi-lbl">Daily Routines (${data.pct}%)</div>
+            </div>
+          </div>
+          <div class="report-kpi-card">
+            <div class="report-kpi-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--amber-warning);">
+              <i data-lucide="flame"></i>
+            </div>
+            <div>
+              <div class="report-kpi-val">${data.streak} Days 🔥</div>
+              <div class="report-kpi-lbl">Active Streak</div>
+            </div>
+          </div>
+          <div class="report-kpi-card">
+            <div class="report-kpi-icon" style="background: rgba(56, 189, 248, 0.12); color: #0284C7;">
+              <i data-lucide="calendar"></i>
+            </div>
+            <div>
+              <div class="report-kpi-val">${data.weeklyCompleted} Delivered</div>
+              <div class="report-kpi-lbl">Weekly Campaigns</div>
+            </div>
+          </div>
+          <div class="report-kpi-card">
+            <div class="report-kpi-icon" style="background: rgba(124, 58, 237, 0.12); color: #7C3AED;">
+              <i data-lucide="zap"></i>
+            </div>
+            <div>
+              <div class="report-kpi-val">${data.targets.length} Assigned</div>
+              <div class="report-kpi-lbl">Instant Deliverables</div>
+            </div>
+          </div>
+        `;
+      } else {
+        elements.reportKpiContainer.innerHTML = `
+          <div class="report-kpi-card">
+            <div class="report-kpi-icon" style="background: rgba(124, 58, 237, 0.12); color: #7C3AED;">
+              <i data-lucide="target"></i>
+            </div>
+            <div>
+              <div class="report-kpi-val">${data.totalTarget} Items</div>
+              <div class="report-kpi-lbl">Monthly Quota</div>
+            </div>
+          </div>
+          <div class="report-kpi-card">
+            <div class="report-kpi-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--mint-success);">
+              <i data-lucide="check-circle"></i>
+            </div>
+            <div>
+              <div class="report-kpi-val">${data.totalCompleted} Approved</div>
+              <div class="report-kpi-lbl">Completed (${data.pct}%)</div>
+            </div>
+          </div>
+          <div class="report-kpi-card">
+            <div class="report-kpi-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--amber-warning);">
+              <i data-lucide="inbox"></i>
+            </div>
+            <div>
+              <div class="report-kpi-val">${data.totalPending} Pending</div>
+              <div class="report-kpi-lbl">In Review</div>
+            </div>
+          </div>
+          <div class="report-kpi-card">
+            <div class="report-kpi-icon" style="background: rgba(0, 139, 165, 0.12); color: var(--teal-primary);">
+              <i data-lucide="trending-up"></i>
+            </div>
+            <div>
+              <div class="report-kpi-val">${data.extraCompleted > 0 ? '+' + data.extraCompleted + ' Extra ⚡' : '0 Extra'}</div>
+              <div class="report-kpi-lbl">Over-achievement</div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Render Deliverables Table
+    if (elements.reportTableBody) {
+      if (data.isMarketing) {
+        const instantRows = data.targets.map(t => {
+          const prog = window.dataStore.getTargetProgress(t.id);
+          const isDone = prog.completed >= (Number(t.targetQty) || 1);
+          return `
+            <tr>
+              <td><strong>${escapeHtml(t.program)}</strong> ${t.isExtra ? '<span class="badge-extra-work" style="font-size: 10px; padding: 1px 5px;">⭐ Extra</span>' : ''}</td>
+              <td><span style="font-size: 11px; padding: 2px 6px; background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: 4px;">${escapeHtml(t.format || 'Deliverable')}</span></td>
+              <td>${formatBrandName(t.brand)}</td>
+              <td>${t.targetQty}</td>
+              <td><strong style="color: var(--mint-success);">${prog.completed}</strong></td>
+              <td>
+                <span class="badge-status ${isDone ? 'approved' : 'pending'}">
+                  <i data-lucide="${isDone ? 'check' : 'clock'}" style="width: 11px; height: 11px;"></i>
+                  ${isDone ? 'Delivered' : 'Pending'}
+                </span>
+              </td>
+              <td>-</td>
+            </tr>
+          `;
+        });
+
+        const dailySummaryRow = `
+          <tr>
+            <td><strong>Daily Repetitive Routines</strong> (IT & Techschool, Lead Ops, Reviews, Learning)</td>
+            <td><span style="font-size: 11px; padding: 2px 6px; background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: 4px;">Daily Cadence</span></td>
+            <td>Both</td>
+            <td>${data.dailyTotal}</td>
+            <td><strong style="color: var(--mint-success);">${data.dailyCompleted}</strong></td>
+            <td>
+              <span class="badge-status ${data.dailyCompleted > 0 ? 'approved' : 'pending'}">
+                <i data-lucide="${data.dailyCompleted > 0 ? 'check' : 'clock'}" style="width: 11px; height: 11px;"></i>
+                ${data.dailyCompleted > 0 ? 'Active' : 'Pending'}
+              </span>
+            </td>
+            <td><span style="font-size: 11px; color: var(--text-dim);">Daily Log</span></td>
+          </tr>
+        `;
+
+        const weeklySummaryRow = `
+          <tr>
+            <td><strong>Weekly Campaign Reports & Life at Nexcrest Reels</strong></td>
+            <td><span style="font-size: 11px; padding: 2px 6px; background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: 4px;">Weekly Cadence</span></td>
+            <td>Both</td>
+            <td>${data.weeklyTotal}</td>
+            <td><strong style="color: var(--mint-success);">${data.weeklyCompleted}</strong></td>
+            <td>
+              <span class="badge-status ${data.weeklyCompleted > 0 ? 'approved' : 'pending'}">
+                <i data-lucide="${data.weeklyCompleted > 0 ? 'check' : 'clock'}" style="width: 11px; height: 11px;"></i>
+                ${data.weeklyCompleted > 0 ? 'Active' : 'Pending'}
+              </span>
+            </td>
+            <td><span style="font-size: 11px; color: var(--text-dim);">Weekly Archive</span></td>
+          </tr>
+        `;
+
+        elements.reportTableBody.innerHTML = [dailySummaryRow, weeklySummaryRow, ...instantRows].join('');
+      } else {
+        if (data.targets.length === 0 && data.submissions.length === 0) {
+          elements.reportTableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 18px;">No deliverables recorded for ${escapeHtml(monthName)}.</td></tr>`;
+        } else {
+          const targetRows = data.targets.map(t => {
+            const prog = window.dataStore.getTargetProgress(t.id);
+            const isDone = prog.completed >= (Number(t.targetQty) || 1);
+            const subMatch = data.submissions.find(s => String(s.targetId) === String(t.id));
+
+            return `
+              <tr>
+                <td><strong>${escapeHtml(t.program)}</strong> ${t.isExtra ? '<span class="badge-extra-work" style="font-size: 10px; padding: 1px 5px;">⭐ Extra</span>' : ''}</td>
+                <td><span style="font-size: 11px; padding: 2px 6px; background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: 4px;">${escapeHtml(t.format)}</span></td>
+                <td>${formatBrandName(t.brand)}</td>
+                <td>${t.targetQty}</td>
+                <td><strong style="color: var(--mint-success);">${prog.completed}</strong></td>
+                <td>
+                  <span class="badge-status ${isDone ? 'approved' : prog.pending > 0 ? 'pending' : 'pending'}">
+                    <i data-lucide="${isDone ? 'check' : 'clock'}" style="width: 11px; height: 11px;"></i>
+                    ${isDone ? 'Approved' : prog.pending > 0 ? 'In Review' : 'Pending'}
+                  </span>
+                </td>
+                <td>
+                  ${subMatch && subMatch.url ? `<a href="${safeUrl(subMatch.url)}" target="_blank" rel="noopener noreferrer" style="color: var(--teal-primary); text-decoration: none; font-size: 11.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;"><i data-lucide="external-link" style="width: 12px; height: 12px;"></i> View Asset</a>` : '-'}
+                </td>
+              </tr>
+            `;
+          });
+
+          const standaloneExtraRows = data.submissions.filter(s => s.isExtra && (!s.targetId || s.targetId === 'unassigned')).map(s => `
+            <tr>
+              <td><strong>${escapeHtml(s.program || s.title)}</strong> <span class="badge-extra-work" style="font-size: 10px; padding: 1px 5px;">⭐ Extra Work</span></td>
+              <td><span style="font-size: 11px; padding: 2px 6px; background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: 4px;">${escapeHtml(s.format || 'Deliverable')}</span></td>
+              <td>${formatBrandName(s.brand)}</td>
+              <td>0</td>
+              <td><strong style="color: var(--mint-success);">1</strong></td>
+              <td>
+                <span class="badge-status ${s.status === 'approved' ? 'approved' : 'pending'}">
+                  <i data-lucide="${s.status === 'approved' ? 'check' : 'clock'}" style="width: 11px; height: 11px;"></i>
+                  ${s.status === 'approved' ? 'Approved' : 'In Review'}
+                </span>
+              </td>
+              <td>
+                ${s.url ? `<a href="${safeUrl(s.url)}" target="_blank" rel="noopener noreferrer" style="color: var(--teal-primary); text-decoration: none; font-size: 11.5px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;"><i data-lucide="external-link" style="width: 12px; height: 12px;"></i> View Asset</a>` : '-'}
+              </td>
+            </tr>
+          `);
+
+          elements.reportTableBody.innerHTML = [...targetRows, ...standaloneExtraRows].join('');
+        }
+      }
+    }
+
+    // Check for saved highlights
+    const savedReports = window.dataStore.getMemberReports(user.email, selectedMonth);
+    if (savedReports.length > 0 && savedReports[0].highlights) {
+      if (elements.reportHighlightsText) {
+        elements.reportHighlightsText.value = savedReports[0].highlights;
+      }
+    } else {
+      autoGenerateReportHighlights(false);
+    }
+
+    refreshIcons();
+  }
+
+  function autoGenerateReportHighlights(showToastNotice = true) {
+    const user = state.memberReportActiveUser || state.user;
+    if (!user) return;
+    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || '2026-10';
+    const monthName = getMonthFullName(selectedMonth);
+    const data = window.dataStore.getMemberMonthlyData(user, selectedMonth);
+    if (!data) return;
+
+    let text = '';
+    if (data.isMarketing) {
+      text = `• Successfully executed daily repetitive routines with ${data.pct}% on-time consistency for ${monthName}.\n• Maintained active continuous habit streak (${data.streak} days) with zero lead assignment backlog.\n• Completed all weekly management reviews and brand reputation milestones for IT & Techschool.`;
+    } else {
+      text = `• Successfully completed ${data.totalCompleted} deliverables out of ${data.totalTarget} monthly quota for ${monthName} (${data.pct}% pacing).\n• ${data.extraCompleted > 0 ? `Over-achieved department target with +${data.extraCompleted} extra self-initiated deliverables.` : `Delivered all marketing and brand launch collaterals within schedule.`}\n• Maintained 100% brand consistency across Techschool and IT programs.`;
+    }
+
+    if (elements.reportHighlightsText) {
+      elements.reportHighlightsText.value = text;
+    }
+    if (showToastNotice) {
+      showToast('✨ Auto-generated summary based on monthly metrics!', 'info');
+    }
+  }
+
+  function copyReportBriefing() {
+    const user = state.memberReportActiveUser || state.user;
+    if (!user) return;
+    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || '2026-10';
+    const monthName = getMonthFullName(selectedMonth);
+    const data = window.dataStore.getMemberMonthlyData(user, selectedMonth);
+    const highlights = elements.reportHighlightsText ? elements.reportHighlightsText.value.trim() : '';
+
+    let text = '';
+    if (data && data.isMarketing) {
+      text = `📊 *Nexcrest Insights - Monthly Performance Brief*\n👤 *Member:* ${user.name} (${user.title || user.role})\n📅 *Period:* ${monthName}\n⚡ *Daily Routines:* ${data.dailyCompleted} / ${data.dailyTotal} (${data.pct}%)\n🔥 *Habit Streak:* ${data.streak} Days\n\n*Key Highlights:*\n${highlights}`;
+    } else if (data) {
+      text = `📊 *Nexcrest Insights - Monthly Performance Brief*\n👤 *Member:* ${user.name} (${user.title || user.role})\n📅 *Period:* ${monthName}\n🎯 *Target:* ${data.totalTarget} | *Approved:* ${data.totalCompleted} (${data.pct}%)\n⭐ *Extra Work:* ${data.extraCompleted > 0 ? '+' + data.extraCompleted : '0'}\n\n*Key Highlights:*\n${highlights}`;
+    }
+
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('📋 Executive briefing copied to clipboard!', 'success');
+    }).catch(() => {
+      showToast('📋 Briefing ready to copy.', 'info');
+    });
+  }
+
+  function exportMemberReportCSV() {
+    const user = state.memberReportActiveUser || state.user;
+    if (!user) return;
+    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || '2026-10';
+    const data = window.dataStore.getMemberMonthlyData(user, selectedMonth);
+    if (!data) return;
+
+    const headers = ["Month", "Member Name", "Role", "Program / Task", "Format", "Brand", "Target", "Completed", "Status", "Proof URL"];
+    const rows = (data.targets || []).map(t => {
+      const prog = window.dataStore.getTargetProgress(t.id);
+      const isDone = prog.completed >= (Number(t.targetQty) || 1);
+      const sub = (data.submissions || []).find(s => String(s.targetId) === String(t.id));
+      return [
+        selectedMonth,
+        user.name,
+        user.title || user.role,
+        t.program,
+        t.format,
+        formatBrandName(t.brand),
+        t.targetQty,
+        prog.completed,
+        isDone ? 'Approved' : 'Pending',
+        sub ? sub.url : ''
+      ].map(v => `"${String(v || '').replace(/"/g, '""')}"`).join(',');
+    });
+
+    const csv = "\uFEFF" + [headers.join(','), ...rows].join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Nexcrest_Report_${user.name.replace(/\s+/g, '_')}_${selectedMonth}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`📊 Downloaded CSV Report for ${selectedMonth}!`, 'success');
+  }
+
+  function saveMemberReport() {
+    const user = state.memberReportActiveUser || state.user;
+    if (!user) return;
+    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || '2026-10';
+    const data = window.dataStore.getMemberMonthlyData(user, selectedMonth);
+    const highlights = elements.reportHighlightsText ? elements.reportHighlightsText.value.trim() : '';
+
+    const reportObj = {
+      id: `report-${user.role || 'member'}-${selectedMonth}`,
+      userEmail: user.email,
+      userName: user.name,
+      userRole: user.role,
+      userTitle: user.title,
+      brand: user.brand || 'Both',
+      month: selectedMonth,
+      generatedAt: new Date().toISOString(),
+      highlights,
+      summary: data
+    };
+
+    window.dataStore.saveMemberReport(reportObj);
+    showToast(`💾 Saved official performance report for ${getMonthFullName(selectedMonth)} to company archives!`, 'success');
+    if (state.activeManagerTab === 'member-hub') {
+      renderAdminMemberHub();
+    }
+    setTimeout(closeMemberReportModal, 900);
+  }
+
+  function printMemberReport() {
+    window.print();
   }
 
   // =========================================================================
@@ -3614,6 +4122,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Monthly Report Cycle Select Dropdown
+  if (elements.reportMonthSelect) {
+    elements.reportMonthSelect.addEventListener('change', (e) => {
+      state.memberReportSelectedMonth = e.target.value;
+      renderMemberReportModal();
+    });
+  }
+
   elements.filterRoleSelect.addEventListener('change', (e) => {
     state.filters.role = e.target.value;
     renderManagerTargetsTable();
@@ -4430,6 +4946,62 @@ document.addEventListener('DOMContentLoaded', () => {
     if (assignCreativeBtn) {
       const email = assignCreativeBtn.dataset.empEmail;
       openAssignTargetModal(email);
+      return;
+    }
+
+    // Open Member Monthly Report Modal
+    if (e.target.closest('#btn-member-report') || e.target.closest('#btn-mkt-open-report')) {
+      openMemberReportModal();
+      return;
+    }
+
+    // Admin Inspect Member Report from Hub
+    const adminInspectReportBtn = e.target.closest('.btn-admin-open-member-report');
+    if (adminInspectReportBtn) {
+      const email = adminInspectReportBtn.dataset.empEmail;
+      const targetUser = window.authService.getUserByEmail(email);
+      openMemberReportModal(null, targetUser);
+      return;
+    }
+
+    // Admin View Saved Archived Report from Hub
+    const adminViewSavedBtn = e.target.closest('.btn-admin-view-saved-report');
+    if (adminViewSavedBtn) {
+      const email = adminViewSavedBtn.dataset.empEmail;
+      const month = adminViewSavedBtn.dataset.reportMonth;
+      const targetUser = window.authService.getUserByEmail(email);
+      openMemberReportModal(month, targetUser);
+      return;
+    }
+
+    // Cycle quick buttons in Report modal
+    const cycleBtn = e.target.closest('.cycle-btn[data-report-month]');
+    if (cycleBtn) {
+      const m = cycleBtn.dataset.reportMonth;
+      state.memberReportSelectedMonth = m;
+      renderMemberReportModal();
+      return;
+    }
+
+    // Report Modal Actions
+    if (e.target.closest('#btn-report-auto-highlights')) {
+      autoGenerateReportHighlights(true);
+      return;
+    }
+    if (e.target.closest('#btn-report-copy-briefing')) {
+      copyReportBriefing();
+      return;
+    }
+    if (e.target.closest('#btn-report-export-csv')) {
+      exportMemberReportCSV();
+      return;
+    }
+    if (e.target.closest('#btn-report-print')) {
+      printMemberReport();
+      return;
+    }
+    if (e.target.closest('#btn-report-save')) {
+      saveMemberReport();
       return;
     }
 
