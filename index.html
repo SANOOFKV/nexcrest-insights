@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=82">
+  <link rel="stylesheet" href="css/styles.css?v=83">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -135,6 +135,10 @@
         <div class="tab-pills">
           <button id="tab-btn-overview" class="tab-pill active" data-manager-tab="overview">
             <i data-lucide="layout-dashboard"></i> Overview
+          </button>
+          <button id="tab-btn-member-hub" class="tab-pill" data-manager-tab="member-hub">
+            <i data-lucide="user-check"></i> Member Hub
+            <span class="pill-count" id="member-hub-count">3</span>
           </button>
           <button id="tab-btn-targets" class="tab-pill" data-manager-tab="all-targets">
             <i data-lucide="layers"></i> Targets
@@ -431,6 +435,29 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- TAB 0.5: Personalized Member Operations Hub -->
+      <div id="tab-member-hub" class="tab-pane hidden">
+        <!-- Member Hub Selector -->
+        <div class="member-switcher-hub">
+          <div class="hub-title-row">
+            <div>
+              <h3 style="font-family: var(--font-heading); font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin: 0 0 4px;">
+                <i data-lucide="users" style="color: var(--teal-primary);"></i> Team Members Operational Center
+              </h3>
+              <p style="font-size: 12.5px; color: var(--text-muted); margin: 0;">Select any team member to inspect real-time daily routines, campaign deliverables, and individual targets.</p>
+            </div>
+          </div>
+          <div class="member-tabs-grid" id="admin-member-switcher-grid">
+            <!-- Dynamically populated via JavaScript -->
+          </div>
+        </div>
+
+        <!-- Active Member Personalized Workspace Pane -->
+        <div id="admin-member-personalized-pane">
+          <!-- Dynamically populated via JavaScript -->
         </div>
       </div>
 
@@ -1800,6 +1827,37 @@
     </div>
   </div>
 
+  <!-- Admin Routine Proof & Note Inspection Modal -->
+  <div id="admin-routine-proof-modal" class="modal-overlay hidden">
+    <div class="modal-card spotlight-card" style="max-width: 460px;">
+      <div class="modal-header">
+        <h3 id="admin-proof-modal-title" style="display: flex; align-items: center; gap: 8px; margin: 0; font-size: 16px;">
+          <i data-lucide="file-text" style="color: var(--teal-primary);"></i> Task Proof
+        </h3>
+        <button class="modal-close-btn" data-close-modal="admin-routine-proof-modal">&times;</button>
+      </div>
+      <div class="modal-form" style="padding: 16px; display: flex; flex-direction: column; gap: 14px;">
+        <div class="form-group" style="margin: 0;">
+          <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">Execution Note</label>
+          <div id="admin-proof-modal-note" style="padding: 11px 14px; background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13.5px; line-height: 1.45; color: var(--text-main); min-height: 48px;"></div>
+        </div>
+        <div class="form-group" id="admin-proof-modal-link-group" style="margin: 0;">
+          <label style="font-size: 11.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">Attached Document / URL</label>
+          <a id="admin-proof-modal-link" href="#" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; color: var(--teal-primary); font-weight: 600; text-decoration: none; word-break: break-all;">
+            <i data-lucide="external-link" style="width: 15px; height: 15px; flex-shrink: 0;"></i>
+            <span id="admin-proof-modal-url-text">Open Proof Link</span>
+          </a>
+        </div>
+        <div class="modal-footer" style="padding: 8px 0 0; display: flex; gap: 8px; justify-content: flex-end; border: none;">
+          <button type="button" class="btn btn-secondary" data-close-modal="admin-routine-proof-modal">Close</button>
+          <button type="button" class="btn btn-primary" id="btn-admin-verify-task" style="gap: 5px;">
+            <i data-lucide="check-check"></i> Acknowledge
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
@@ -1807,10 +1865,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=82"></script>
-  <script src="js/data.js?v=82"></script>
-  <script src="js/auth.js?v=82"></script>
-  <script src="js/app.js?v=82"></script>
+  <script src="js/firebase-config.js?v=83"></script>
+  <script src="js/data.js?v=83"></script>
+  <script src="js/auth.js?v=83"></script>
+  <script src="js/app.js?v=83"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

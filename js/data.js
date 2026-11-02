@@ -1360,3 +1360,5 @@ class DataStore {
 
 // Global instance
 window.dataStore = new DataStore();
+window.getTodayDateStr = getTodayDateStr;
+window.getCurrentWeekStr = getCurrentWeekStr;

@@ -39,7 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
     selectedMemberTargetIds: new Set(),
     selectedUserModalTargetIds: new Set(),
     pendingBatchDeleteIds: [],
-    pendingBatchDeleteSource: null
+    pendingBatchDeleteSource: null,
+    activeAdminMemberEmail: 'marketing@nexcrest.com',
+    adminMarketingSelectedDate: (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0],
+    adminMarketingSelectedWeek: (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W45'
   };
 
   // DOM Element Selectors
@@ -108,6 +111,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Manager Tabs & Tables
     managerTabBtns: document.querySelectorAll('[data-manager-tab]'),
+    tabMemberHub: document.getElementById('tab-member-hub'),
+    tabBtnMemberHub: document.getElementById('tab-btn-member-hub'),
+    memberHubCount: document.getElementById('member-hub-count'),
+    adminMemberSwitcherGrid: document.getElementById('admin-member-switcher-grid'),
+    adminMemberPersonalizedPane: document.getElementById('admin-member-personalized-pane'),
+    adminRoutineProofModal: document.getElementById('admin-routine-proof-modal'),
+    adminProofModalTitle: document.getElementById('admin-proof-modal-title'),
+    adminProofModalNote: document.getElementById('admin-proof-modal-note'),
+    adminProofModalLinkGroup: document.getElementById('admin-proof-modal-link-group'),
+    adminProofModalLink: document.getElementById('admin-proof-modal-link'),
+    adminProofModalUrlText: document.getElementById('admin-proof-modal-url-text'),
+    btnAdminVerifyTask: document.getElementById('btn-admin-verify-task'),
     tabAllTargets: document.getElementById('tab-all-targets'),
     tabReviewQueue: document.getElementById('tab-review-queue'),
     tabActivityLog: document.getElementById('tab-activity-log'),
@@ -891,6 +906,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderManagerActiveTab() {
     const tabs = [
       { key: 'overview', el: elements.tabOverview },
+      { key: 'member-hub', el: elements.tabMemberHub },
       { key: 'all-targets', el: elements.tabAllTargets },
       { key: 'review-queue', el: elements.tabReviewQueue },
       { key: 'team-roster', el: elements.tabTeamRoster },
@@ -914,6 +930,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (state.activeManagerTab === 'overview') {
       renderOverviewDashboard();
+    } else if (state.activeManagerTab === 'member-hub') {
+      renderAdminMemberHub();
     } else if (state.activeManagerTab === 'all-targets') {
       renderManagerTargetsTable();
     } else if (state.activeManagerTab === 'review-queue') {
@@ -1990,6 +2008,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <!-- Card Actions Footer -->
           <div class="employee-card-footer">
             <div class="emp-action-buttons" style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button type="button" class="btn-emp-assign btn-card-inspect-hub" data-emp-email="${escapeHtml(emp.email)}" title="Open in Member Hub">
+                <i data-lucide="user-check" style="width: 14px; height: 14px;"></i> Hub
+              </button>
               <button type="button" class="btn-emp-assign btn-card-assign-task" data-emp-email="${escapeHtml(emp.email)}" data-emp-role="${escapeHtml(emp.role)}" data-emp-name="${escapeHtml(emp.name)}" title="Assign Target">
                 <i data-lucide="plus-circle" style="width: 14px; height: 14px;"></i> Assign
               </button>
@@ -2013,6 +2034,572 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshIcons();
   }
 
+
+  // =========================================================================
+  // ADMIN PERSONALIZED MEMBER OPERATIONS HUB & MARKETING LIVE TRACKER
+  // =========================================================================
+
+  function adminMktShiftDate(days) {
+    const current = state.adminMarketingSelectedDate || ((typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0]);
+    const [y, m, d] = current.split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    dateObj.setDate(dateObj.getDate() + days);
+    const yStr = dateObj.getFullYear();
+    const mStr = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const dStr = String(dateObj.getDate()).padStart(2, '0');
+    state.adminMarketingSelectedDate = `${yStr}-${mStr}-${dStr}`;
+    renderAdminMemberHub();
+  }
+
+  function adminMktJumpToday() {
+    state.adminMarketingSelectedDate = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
+    renderAdminMemberHub();
+  }
+
+  function openAdminRoutineProofModal(title, note, proofUrl) {
+    if (!elements.adminRoutineProofModal) return;
+    if (elements.adminProofModalTitle) {
+      elements.adminProofModalTitle.innerHTML = `<i data-lucide="file-text" style="color: var(--teal-primary);"></i> ${escapeHtml(title)}`;
+    }
+    if (elements.adminProofModalNote) {
+      elements.adminProofModalNote.textContent = note ? note : 'No notes submitted for this task execution.';
+    }
+    if (elements.adminProofModalLinkGroup) {
+      if (proofUrl && proofUrl.trim()) {
+        elements.adminProofModalLinkGroup.style.display = 'block';
+        if (elements.adminProofModalLink) {
+          elements.adminProofModalLink.href = safeUrl(proofUrl);
+        }
+        if (elements.adminProofModalUrlText) {
+          elements.adminProofModalUrlText.textContent = proofUrl;
+        }
+      } else {
+        elements.adminProofModalLinkGroup.style.display = 'none';
+      }
+    }
+    elements.adminRoutineProofModal.classList.remove('hidden');
+    refreshIcons();
+  }
+
+  function renderAdminMemberHub() {
+    if (!elements.adminMemberSwitcherGrid || !elements.adminMemberPersonalizedPane) return;
+
+    const employees = window.authService.getEmployees();
+    if (!employees || employees.length === 0) {
+      elements.adminMemberPersonalizedPane.innerHTML = `
+        <div style="text-align: center; padding: 48px 20px; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-light);">
+          <i data-lucide="user-x" style="width: 40px; height: 40px; margin-bottom: 12px; color: var(--text-dim); opacity: 0.6;"></i>
+          <h4 style="font-family: var(--font-heading); margin-bottom: 6px;">No Team Members Found</h4>
+          <p style="font-size: 13px; color: var(--text-muted);">Please add employees in the Team Roster tab to view their personalized operational hub.</p>
+        </div>
+      `;
+      refreshIcons();
+      return;
+    }
+
+    if (elements.memberHubCount) {
+      elements.memberHubCount.textContent = employees.length;
+    }
+
+    // Ensure active member exists
+    let activeEmp = employees.find(e => e.email === state.activeAdminMemberEmail);
+    if (!activeEmp) {
+      activeEmp = employees.find(e => e.role === 'marketing') || employees[0];
+      state.activeAdminMemberEmail = activeEmp.email;
+    }
+
+    const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
+    const selectedDateStr = state.adminMarketingSelectedDate || todayStr;
+    const selectedWeekStr = state.adminMarketingSelectedWeek || ((typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W45');
+
+    // 1. Render Member Switcher Cards Grid
+    elements.adminMemberSwitcherGrid.innerHTML = employees.map(emp => {
+      const isSelected = emp.email === state.activeAdminMemberEmail;
+      const isMkt = emp.role === 'marketing';
+
+      let chipHtml = '';
+      if (isMkt) {
+        const mktDailyStats = window.dataStore.getMarketingDailyStats(selectedDateStr);
+        const allDone = mktDailyStats.total > 0 && mktDailyStats.completed === mktDailyStats.total;
+        chipHtml = `
+          <div class="member-status-chip ${allDone ? 'green' : mktDailyStats.completed > 0 ? 'green' : 'amber'}">
+            <i data-lucide="${allDone ? 'check-check' : mktDailyStats.completed > 0 ? 'check-circle' : 'clock'}" style="width: 12px; height: 12px;"></i>
+            ${mktDailyStats.completed} / ${mktDailyStats.total} Routines (${mktDailyStats.pct}%)
+          </div>
+        `;
+      } else {
+        const stats = window.dataStore.getEmployeeStats(emp);
+        chipHtml = `
+          <div class="member-status-chip neutral">
+            <i data-lucide="target" style="width: 12px; height: 12px;"></i>
+            ${stats.totalCompleted} / ${stats.totalTarget} Target (${stats.pct}%)
+          </div>
+        `;
+      }
+
+      return `
+        <div class="member-tab-card ${isSelected ? 'active' : ''}" data-hub-emp-email="${escapeHtml(emp.email)}">
+          <div class="member-avatar ${escapeHtml(emp.role)}">${escapeHtml(emp.avatar || emp.name.charAt(0))}</div>
+          <div class="member-details">
+            <div class="member-name" title="${escapeHtml(emp.name)}">${escapeHtml(emp.name)}</div>
+            <div class="member-role-title" title="${escapeHtml(emp.title || emp.role)}">${escapeHtml(emp.title || emp.role)}</div>
+            ${chipHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Switcher card click event handlers
+    elements.adminMemberSwitcherGrid.querySelectorAll('.member-tab-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const email = card.dataset.hubEmpEmail;
+        if (email && email !== state.activeAdminMemberEmail) {
+          state.activeAdminMemberEmail = email;
+          renderAdminMemberHub();
+        }
+      });
+    });
+
+    // 2. Render Active Member Personalized Workspace Pane
+    if (activeEmp.role === 'marketing') {
+      renderAdminMarketingExecutiveSection(activeEmp, selectedDateStr, selectedWeekStr, todayStr);
+    } else {
+      renderAdminCreativeMemberSection(activeEmp);
+    }
+
+    refreshIcons();
+  }
+
+  function renderAdminMarketingExecutiveSection(activeEmp, selectedDateStr, selectedWeekStr, todayStr) {
+    const dailyTasks = window.dataStore.getMarketingDailyTasks(selectedDateStr).filter(t => t.active !== false);
+    const dailyStats = window.dataStore.getMarketingDailyStats(selectedDateStr);
+    const streak = window.dataStore.getMarketingDailyStreak();
+    const weeklyTasks = window.dataStore.getMarketingWeeklyTasks(selectedWeekStr).filter(t => t.active !== false);
+    const weeklyStats = window.dataStore.getMarketingWeeklyStats(selectedWeekStr);
+    const instantTasks = window.dataStore.getMarketingInstantTasks();
+
+    // Date formatting
+    const isToday = selectedDateStr === todayStr;
+    const parts = selectedDateStr.split('-');
+    const dateObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+    const formattedDate = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    const displayDateHeader = (isToday ? 'Today: ' : '') + formattedDate;
+
+    elements.adminMemberPersonalizedPane.innerHTML = `
+      <!-- Hero Profile & Date Navigator -->
+      <div class="member-personalized-hero">
+        <div class="hero-top-row">
+          <div class="hero-profile">
+            <div class="hero-profile-avatar marketing">${escapeHtml(activeEmp.avatar || 'ME')}</div>
+            <div class="hero-profile-info">
+              <h2>${escapeHtml(activeEmp.name)} — Marketing Operations Center</h2>
+              <p>Tracking daily recurring routines, weekly campaigns, and manager-assigned instant deliverables.</p>
+            </div>
+          </div>
+
+          <!-- Interactive Date Navigator -->
+          <div class="date-navigator">
+            <button type="button" class="date-nav-btn" id="btn-admin-mkt-prev" title="Previous Day">
+              <i data-lucide="chevron-left"></i>
+            </button>
+            <div class="date-display-badge">
+              <i data-lucide="calendar" style="color: var(--teal-primary);"></i>
+              <span id="admin-display-date-text">${escapeHtml(displayDateHeader)}</span>
+            </div>
+            <button type="button" class="date-nav-btn" id="btn-admin-mkt-next" title="Next Day">
+              <i data-lucide="chevron-right"></i>
+            </button>
+            ${!isToday ? `
+              <button type="button" class="btn btn-secondary" id="btn-admin-mkt-today" style="padding: 4px 9px; font-size: 11px; height: 28px; margin-left: 2px;">
+                <i data-lucide="rotate-ccw" style="width: 11px; height: 11px;"></i> Today
+              </button>
+            ` : ''}
+          </div>
+        </div>
+
+        <!-- 4-Card Telemetry Grid -->
+        <div class="hub-telemetry-grid">
+          <div class="hub-telemetry-card">
+            <div class="hub-tel-icon" style="background: rgba(0, 139, 165, 0.12); color: var(--teal-primary);">
+              <i data-lucide="check-circle-2"></i>
+            </div>
+            <div>
+              <div class="hub-tel-val">${dailyStats.completed} / ${dailyStats.total} Done</div>
+              <div class="hub-tel-lbl">Daily Routines (${dailyStats.pct}%)</div>
+            </div>
+          </div>
+
+          <div class="hub-telemetry-card">
+            <div class="hub-tel-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--amber-warning);">
+              <i data-lucide="flame"></i>
+            </div>
+            <div>
+              <div class="hub-tel-val">${streak} Days 🔥</div>
+              <div class="hub-tel-lbl">Habit Streak</div>
+            </div>
+          </div>
+
+          <div class="hub-telemetry-card">
+            <div class="hub-tel-icon" style="background: rgba(56, 189, 248, 0.12); color: #0284C7;">
+              <i data-lucide="calendar"></i>
+            </div>
+            <div>
+              <div class="hub-tel-val">${weeklyStats.completed} / ${weeklyStats.total} Delivered</div>
+              <div class="hub-tel-lbl">Weekly Deliverables</div>
+            </div>
+          </div>
+
+          <div class="hub-telemetry-card">
+            <div class="hub-tel-icon" style="background: rgba(124, 58, 237, 0.12); color: #7C3AED;">
+              <i data-lucide="zap"></i>
+            </div>
+            <div>
+              <div class="hub-tel-val">${instantTasks.length} Active</div>
+              <div class="hub-tel-lbl">Instant Deliverables</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Operational Sections Grid -->
+      <div class="hub-operations-grid">
+
+        <!-- 1. DAILY REPETITIVE ROUTINES LIVE TRACKER -->
+        <div class="hub-section-card">
+          <div class="hub-section-card-header">
+            <h3>
+              <i data-lucide="check-circle-2" style="color: var(--teal-primary);"></i>
+              Daily Repetitive Tasks Live Tracker
+            </h3>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <span class="badge-tag" style="background: #ECFDF5; color: #065F46; border-color: #A7F3D0; font-size: 11px;">
+                <i data-lucide="rotate-ccw" style="width: 11px; height: 11px;"></i> Resets Every Midnight
+              </span>
+              <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">For ${escapeHtml(formattedDate)}</span>
+            </div>
+          </div>
+
+          <div class="admin-task-list">
+            ${dailyTasks.map(task => {
+              const isDone = Boolean(task.completed);
+              const hasProof = Boolean(task.proofUrl && task.proofUrl.trim());
+              const hasNote = Boolean(task.note && task.note.trim());
+
+              return `
+                <div class="admin-task-item ${isDone ? 'completed' : ''}">
+                  <div class="admin-task-left">
+                    <div class="admin-check-pill ${isDone ? 'done' : 'pending'}">
+                      ${isDone ? '✓' : '⏳'}
+                    </div>
+                    <div>
+                      <div class="admin-task-title">${escapeHtml(task.title)}</div>
+                      <div class="admin-task-meta">
+                        <span class="badge-tag">${escapeHtml(task.category || 'Routine')}</span>
+                        <span class="badge-tag">${formatBrandName(task.brand || 'Both')}</span>
+                        ${isDone ? `
+                          <span style="color: var(--mint-success); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                            <i data-lucide="clock" style="width: 12px; height: 12px;"></i> Done at ${escapeHtml(task.completedAt || 'Today')}
+                          </span>
+                        ` : `
+                          <span style="color: var(--amber-warning); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                            <i data-lucide="alert-circle" style="width: 12px; height: 12px;"></i> Pending Today
+                          </span>
+                        `}
+                        ${hasNote ? `
+                          <span style="color: var(--teal-primary); font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">
+                            <i data-lucide="file-text" style="width: 11px; height: 11px;"></i> Note Added
+                          </span>
+                        ` : ''}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="admin-task-actions">
+                    ${(hasProof || hasNote) ? `
+                      <button type="button" class="btn btn-admin-view-proof" data-proof-title="${escapeHtml(task.title)}" data-proof-note="${escapeHtml(task.note || '')}" data-proof-url="${escapeHtml(task.proofUrl || '')}">
+                        <i data-lucide="${hasProof ? 'external-link' : 'file-text'}"></i> ${hasProof ? 'View Proof' : 'View Note'}
+                      </button>
+                    ` : isDone ? `
+                      <span style="font-size: 12px; color: var(--mint-success); font-weight: 600;">Completed</span>
+                    ` : `
+                      <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">Awaiting Submission</span>
+                    `}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- 2. WEEKLY DELIVERABLES TRACKER -->
+        <div class="hub-section-card">
+          <div class="hub-section-card-header">
+            <h3>
+              <i data-lucide="calendar" style="color: #0284C7;"></i>
+              Weekly Campaign Deliverables (Active: ${escapeHtml(selectedWeekStr)})
+            </h3>
+            <span class="badge-tag" style="background: #F0F9FF; color: #0369A1; border-color: #BAE6FD; font-size: 11px;">
+              Resets Mondays
+            </span>
+          </div>
+
+          <div class="admin-task-list">
+            ${weeklyTasks.map(task => {
+              const isDone = Boolean(task.completed);
+              const hasProof = Boolean(task.proofUrl && task.proofUrl.trim());
+              const hasNote = Boolean(task.note && task.note.trim());
+
+              return `
+                <div class="admin-task-item ${isDone ? 'completed' : ''}">
+                  <div class="admin-task-left">
+                    <div class="admin-check-pill ${isDone ? 'done' : 'pending'}">
+                      ${isDone ? '✓' : '⏳'}
+                    </div>
+                    <div>
+                      <div class="admin-task-title">${escapeHtml(task.title)}</div>
+                      <div class="admin-task-meta">
+                        <span class="badge-tag">${escapeHtml(task.category || 'Campaign')}</span>
+                        <span class="badge-tag">${escapeHtml(task.dueDay || 'Weekly')}</span>
+                        ${isDone ? `
+                          <span style="color: var(--mint-success); font-weight: 600;">Delivered</span>
+                        ` : `
+                          <span style="color: var(--amber-warning); font-weight: 600;">In Progress</span>
+                        `}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="admin-task-actions">
+                    ${(hasProof || hasNote) ? `
+                      <button type="button" class="btn btn-admin-view-proof" data-proof-title="${escapeHtml(task.title)}" data-proof-note="${escapeHtml(task.note || '')}" data-proof-url="${escapeHtml(task.proofUrl || '')}">
+                        <i data-lucide="${hasProof ? 'external-link' : 'file-text'}"></i> ${hasProof ? 'View Report' : 'View Note'}
+                      </button>
+                    ` : isDone ? `
+                      <span style="font-size: 12px; color: var(--mint-success); font-weight: 600;">Delivered</span>
+                    ` : `
+                      <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">${escapeHtml(task.dueDay || 'In Progress')}</span>
+                    `}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- 3. INSTANT DELIVERABLES ASSIGNED BY ADMIN -->
+        <div class="hub-section-card">
+          <div class="hub-section-card-header">
+            <h3>
+              <i data-lucide="zap" style="color: #7C3AED;"></i>
+              Manager-Assigned Instant Tasks (${instantTasks.length})
+            </h3>
+            <button type="button" class="btn btn-primary" id="btn-admin-assign-instant-mkt">
+              <i data-lucide="plus-circle"></i> + Assign Instant Task
+            </button>
+          </div>
+
+          <div class="admin-task-list">
+            ${instantTasks.length === 0 ? `
+              <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px;">
+                No instant tasks assigned yet. Click "+ Assign Instant Task" to assign urgent or one-off tasks with custom deadlines.
+              </div>
+            ` : instantTasks.map(t => {
+              const prog = window.dataStore.getTargetProgress(t.id);
+              const isDone = prog.completed >= (Number(t.targetQty) || 1);
+              return `
+                <div class="admin-task-item" style="border-left: 4px solid ${isDone ? 'var(--mint-success)' : 'var(--amber-warning)'};">
+                  <div class="admin-task-left">
+                    <div class="hub-tel-icon" style="background: rgba(124, 58, 237, 0.1); color: #7C3AED; width: 34px; height: 34px;">
+                      <i data-lucide="${isDone ? 'check-circle' : 'clock'}" style="width: 16px; height: 16px;"></i>
+                    </div>
+                    <div>
+                      <div class="admin-task-title">${escapeHtml(t.program)}</div>
+                      <div class="admin-task-meta">
+                        <span class="badge-tag">${formatBrandName(t.brand)}</span>
+                        <span class="badge-tag">${escapeHtml(t.category || 'General')}</span>
+                        <span class="badge-tag">${escapeHtml(t.format || 'Deliverable')}</span>
+                        ${t.deadline ? formatDeadlineBadge(t.deadline, isDone) : ''}
+                        <span style="font-weight: 600; color: var(--text-main);">Progress: ${prog.completed} / ${t.targetQty}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="admin-task-actions">
+                    <button type="button" class="btn btn-card-view-tasks" data-emp-email="marketing@nexcrest.com" data-emp-name="${escapeHtml(activeEmp.name)}" data-emp-role="marketing">
+                      <i data-lucide="list-checks"></i> Manage
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+      </div>
+    `;
+  }
+
+  function renderAdminCreativeMemberSection(activeEmp) {
+    const stats = window.dataStore.getEmployeeStats(activeEmp);
+    const userTargets = (window.dataStore.getTargets() || []).filter(t => t.assignee === activeEmp.role || t.assigneeEmail === activeEmp.email);
+    const userPendingSubmissions = (window.dataStore.getSubmissions({ status: 'pending' }) || []).filter(s => s.assignee === activeEmp.role || s.authorEmail === activeEmp.email);
+
+    elements.adminMemberPersonalizedPane.innerHTML = `
+      <!-- Hero Profile & Target Actions -->
+      <div class="member-personalized-hero">
+        <div class="hero-top-row">
+          <div class="hero-profile">
+            <div class="hero-profile-avatar ${escapeHtml(activeEmp.role)}">${escapeHtml(activeEmp.avatar || activeEmp.name.charAt(0))}</div>
+            <div class="hero-profile-info">
+              <h2>${escapeHtml(activeEmp.name)} — ${escapeHtml(activeEmp.title || 'Creative Operations')}</h2>
+              <p>Monthly target quota tracking, direct review queue approvals, and individual deliverables.</p>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-admin-assign-creative" data-emp-email="${escapeHtml(activeEmp.email)}">
+            <i data-lucide="plus-circle"></i> + Assign Target to ${escapeHtml(activeEmp.name)}
+          </button>
+        </div>
+
+        <!-- 4-Card Telemetry Grid -->
+        <div class="hub-telemetry-grid">
+          <div class="hub-telemetry-card">
+            <div class="hub-tel-icon" style="background: rgba(124, 58, 237, 0.12); color: #7C3AED;">
+              <i data-lucide="target"></i>
+            </div>
+            <div>
+              <div class="hub-tel-val">${stats.totalTarget} Items</div>
+              <div class="hub-tel-lbl">Monthly Target</div>
+            </div>
+          </div>
+
+          <div class="hub-telemetry-card">
+            <div class="hub-tel-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--mint-success);">
+              <i data-lucide="check-circle"></i>
+            </div>
+            <div>
+              <div class="hub-tel-val">${stats.totalCompleted} Approved</div>
+              <div class="hub-tel-lbl">Completed (${stats.pct}%)</div>
+            </div>
+          </div>
+
+          <div class="hub-telemetry-card">
+            <div class="hub-tel-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--amber-warning);">
+              <i data-lucide="inbox"></i>
+            </div>
+            <div>
+              <div class="hub-tel-val">${stats.totalPending} In Review</div>
+              <div class="hub-tel-lbl">Awaiting Approval</div>
+            </div>
+          </div>
+
+          <div class="hub-telemetry-card">
+            <div class="hub-tel-icon" style="background: rgba(0, 139, 165, 0.12); color: var(--teal-primary);">
+              <i data-lucide="trending-up"></i>
+            </div>
+            <div>
+              <div class="hub-tel-val">${stats.extraCompleted > 0 ? '+' + stats.extraCompleted + ' Extra ⚡' : stats.remainingTarget + ' Remaining'}</div>
+              <div class="hub-tel-lbl">${stats.extraCompleted > 0 ? 'Over-achievement' : 'Target Remaining'}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Operational Sections Grid -->
+      <div class="hub-operations-grid">
+
+        <!-- 1. PENDING REVIEWS FOR THIS MEMBER -->
+        <div class="hub-section-card">
+          <div class="hub-section-card-header">
+            <h3>
+              <i data-lucide="inbox" style="color: var(--amber-warning);"></i>
+              Pending Review Queue for ${escapeHtml(activeEmp.name)} (${userPendingSubmissions.length})
+            </h3>
+            <span style="font-size: 12px; color: var(--text-muted);">Inspect, approve, or request rework directly</span>
+          </div>
+
+          <div class="admin-task-list">
+            ${userPendingSubmissions.length === 0 ? `
+              <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px;">
+                No submissions currently awaiting review for ${escapeHtml(activeEmp.name)}. All submitted work is up to date.
+              </div>
+            ` : userPendingSubmissions.map(sub => `
+              <div class="admin-task-item" style="border-left: 4px solid var(--amber-warning);">
+                <div class="admin-task-left">
+                  <div>
+                    <div class="admin-task-title">${escapeHtml(sub.program)} - ${escapeHtml(sub.title)}</div>
+                    <div class="admin-task-meta">
+                      <span class="badge-tag">${formatBrandName(sub.brand)}</span>
+                      <span class="badge-tag">${escapeHtml(sub.format)}</span>
+                      <span style="color: var(--amber-warning); font-weight: 600;">Submitted: ${formatDate(sub.submittedAt)}</span>
+                      ${sub.isExtra ? '<span class="badge-extra-work" style="font-size: 10px; padding: 1px 6px;">⭐ Extra Work</span>' : ''}
+                    </div>
+                  </div>
+                </div>
+                <div class="admin-task-actions">
+                  ${sub.url ? `
+                    <a href="${safeUrl(sub.url)}" target="_blank" rel="noopener noreferrer" class="btn" style="padding: 6px 10px;">
+                      <i data-lucide="external-link"></i> Link
+                    </a>
+                  ` : ''}
+                  <button type="button" class="btn btn-primary btn-open-review-modal" data-sub-id="${escapeHtml(sub.id)}">
+                    <i data-lucide="check-circle-2"></i> Review & Approve
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- 2. ASSIGNED TARGETS -->
+        <div class="hub-section-card">
+          <div class="hub-section-card-header">
+            <h3>
+              <i data-lucide="layers" style="color: var(--teal-primary);"></i>
+              Assigned Monthly Targets (${userTargets.length})
+            </h3>
+            <button type="button" class="btn btn-secondary btn-card-view-tasks" data-emp-email="${escapeHtml(activeEmp.email)}" data-emp-name="${escapeHtml(activeEmp.name)}" data-emp-role="${escapeHtml(activeEmp.role)}">
+              <i data-lucide="list-checks"></i> Manage All Targets
+            </button>
+          </div>
+
+          <div class="admin-task-list">
+            ${userTargets.length === 0 ? `
+              <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 13px;">
+                No targets currently assigned for this member. Click "+ Assign Target" above to assign monthly deliverables.
+              </div>
+            ` : userTargets.map(t => {
+              const prog = window.dataStore.getTargetProgress(t.id);
+              const isDone = prog.completed >= (Number(t.targetQty) || 1);
+
+              return `
+                <div class="admin-task-item ${isDone ? 'completed' : ''}">
+                  <div class="admin-task-left">
+                    <div class="admin-check-pill ${isDone ? 'done' : 'pending'}">
+                      ${isDone ? '✓' : '🎯'}
+                    </div>
+                    <div>
+                      <div class="admin-task-title">${escapeHtml(t.program)}</div>
+                      <div class="admin-task-meta">
+                        <span class="badge-tag">${formatBrandName(t.brand)}</span>
+                        <span class="badge-tag">${escapeHtml(t.category)}</span>
+                        <span class="badge-tag">${escapeHtml(t.format)}</span>
+                        ${t.deadline ? formatDeadlineBadge(t.deadline, isDone) : ''}
+                        <span style="font-weight: 600; color: var(--text-main);">Progress: ${prog.completed} / ${t.targetQty} (${prog.pct}%)</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="admin-task-actions">
+                    <button type="button" class="btn btn-action-edit" data-id="${escapeHtml(t.id)}" title="Edit Target">
+                      <i data-lucide="edit-3"></i> Edit
+                    </button>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+      </div>
+    `;
+  }
 
   // =========================================================================
   // TEAM MEMBER VIEW CONTROLLER (Graphic Designer / Video / Marketing)
@@ -3790,6 +4377,62 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Inspect Member in Hub (from Roster or anywhere)
+    const inspectHubBtn = e.target.closest('.btn-card-inspect-hub');
+    if (inspectHubBtn) {
+      const email = inspectHubBtn.dataset.empEmail;
+      if (email) state.activeAdminMemberEmail = email;
+      state.activeManagerTab = 'member-hub';
+      elements.managerTabBtns.forEach(b => {
+        if (b.dataset.managerTab === 'member-hub') b.classList.add('active');
+        else b.classList.remove('active');
+      });
+      renderManagerActiveTab();
+      return;
+    }
+
+    // Admin Marketing Hub Date Navigator
+    const prevDateBtn = e.target.closest('#btn-admin-mkt-prev');
+    if (prevDateBtn) {
+      adminMktShiftDate(-1);
+      return;
+    }
+    const nextDateBtn = e.target.closest('#btn-admin-mkt-next');
+    if (nextDateBtn) {
+      adminMktShiftDate(1);
+      return;
+    }
+    const jumpTodayBtn = e.target.closest('#btn-admin-mkt-today');
+    if (jumpTodayBtn) {
+      adminMktJumpToday();
+      return;
+    }
+
+    // Admin Routine Proof & Note View
+    const viewProofBtn = e.target.closest('.btn-admin-view-proof');
+    if (viewProofBtn) {
+      const title = viewProofBtn.dataset.proofTitle || 'Task Proof';
+      const note = viewProofBtn.dataset.proofNote || '';
+      const url = viewProofBtn.dataset.proofUrl || '';
+      openAdminRoutineProofModal(title, note, url);
+      return;
+    }
+
+    // Admin Hub Assign Instant Task (Marketing)
+    const assignInstantMktBtn = e.target.closest('#btn-admin-assign-instant-mkt');
+    if (assignInstantMktBtn) {
+      openAssignTargetModal('marketing@nexcrest.com');
+      return;
+    }
+
+    // Admin Hub Assign Creative Target
+    const assignCreativeBtn = e.target.closest('.btn-admin-assign-creative');
+    if (assignCreativeBtn) {
+      const email = assignCreativeBtn.dataset.empEmail;
+      openAssignTargetModal(email);
+      return;
+    }
+
     // Card Assign Task (Roster)
     const cardAssignBtn = e.target.closest('.btn-card-assign-task');
     if (cardAssignBtn) {
@@ -4010,6 +4653,16 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.routineNoteModal.classList.add('hidden');
       }
       renderMarketingWorkspace(state.user);
+    });
+  }
+
+  // Admin Routine Proof Acknowledge Handler
+  if (elements.btnAdminVerifyTask) {
+    elements.btnAdminVerifyTask.addEventListener('click', () => {
+      if (elements.adminRoutineProofModal) {
+        elements.adminRoutineProofModal.classList.add('hidden');
+      }
+      showToast('Task execution acknowledged by Admin.', 'success');
     });
   }
 
