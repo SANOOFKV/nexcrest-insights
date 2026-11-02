@@ -3952,19 +3952,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Assign Target Deadline Presets
-    const targetPresetBtn = e.target.closest('#target-deadline-presets .btn-preset-pill');
-    if (targetPresetBtn && targetPresetBtn.dataset.preset) {
-      const preset = targetPresetBtn.dataset.preset;
-      const calcDate = calculateDatePreset(preset);
-      if (elements.targetDeadline) {
-        elements.targetDeadline.value = calcDate;
-        updateDeadlineQuickPreview(elements.targetDeadline, elements.targetDeadlineQuickPreview);
-      }
-      document.querySelectorAll('#target-deadline-presets .btn-preset-pill').forEach(b => b.classList.remove('active'));
-      targetPresetBtn.classList.add('active');
-      return;
-    }
 
     // Log Extra Work Deadline Presets
     const extraPresetBtn = e.target.closest('#log-extra-deadline-presets .btn-preset-pill');
