@@ -1940,7 +1940,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const mktWeekStr = (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W44';
       const mktDailyStats = isMarketing ? window.dataStore.getMarketingDailyStats(mktTodayStr) : null;
       const mktWeeklyStats = isMarketing ? window.dataStore.getMarketingWeeklyStats(mktWeekStr) : null;
-      const mktStreak = isMarketing ? window.dataStore.getMarketingDailyStreak() : 0;
+      const mktActiveMonth = isMarketing ? (window.dataStore.getActiveMonth() || '2026-10') : '2026-10';
+      const mktMonthlyStats = isMarketing ? window.dataStore.getMarketingMonthlyStats(mktActiveMonth) : null;
 
       const statsStripHtml = isMarketing ? `
         <!-- Marketing Routines Strip -->
@@ -1953,9 +1954,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="emp-stat-val" style="color: #38BDF8;">${mktWeeklyStats.completed}/${mktWeeklyStats.total}</span>
             <span class="emp-stat-lbl">Weekly</span>
           </div>
-          <div class="emp-stat-item" style="color: #FBBF24;">
-            <span class="emp-stat-val" style="color: #FBBF24;">${mktStreak}d 🔥</span>
-            <span class="emp-stat-lbl">Streak</span>
+          <div class="emp-stat-item" style="color: #10B981;">
+            <span class="emp-stat-val" style="color: #10B981;">${mktMonthlyStats.completed}/${mktMonthlyStats.total}</span>
+            <span class="emp-stat-lbl">Monthly</span>
           </div>
           <div class="emp-stat-item">
             <span class="emp-stat-val" style="color: var(--teal-light);">${stats.targetsCount}</span>
@@ -2195,7 +2196,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderAdminMarketingExecutiveSection(activeEmp, selectedDateStr, selectedWeekStr, todayStr) {
     const dailyTasks = window.dataStore.getMarketingDailyTasks(selectedDateStr).filter(t => t.active !== false);
     const dailyStats = window.dataStore.getMarketingDailyStats(selectedDateStr);
-    const streak = window.dataStore.getMarketingDailyStreak();
     const weeklyTasks = window.dataStore.getMarketingWeeklyTasks(selectedWeekStr).filter(t => t.active !== false);
     const weeklyStats = window.dataStore.getMarketingWeeklyStats(selectedWeekStr);
     const instantTasks = window.dataStore.getMarketingInstantTasks();
@@ -2252,12 +2252,12 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
 
           <div class="hub-telemetry-card">
-            <div class="hub-tel-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--amber-warning);">
-              <i data-lucide="flame"></i>
+            <div class="hub-tel-icon" style="background: rgba(16, 185, 129, 0.12); color: #10B981;">
+              <i data-lucide="file-check"></i>
             </div>
             <div>
-              <div class="hub-tel-val">${streak} Days 🔥</div>
-              <div class="hub-tel-lbl">Habit Streak</div>
+              <div class="hub-tel-val">${monthlyStats.completed} / ${monthlyStats.total} Delivered</div>
+              <div class="hub-tel-lbl">Monthly Deliverables (${monthlyStats.pct}%)</div>
             </div>
           </div>
 
@@ -2799,15 +2799,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </div>
           <div class="report-kpi-card">
-            <div class="report-kpi-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--amber-warning);">
-              <i data-lucide="flame"></i>
-            </div>
-            <div>
-              <div class="report-kpi-val">${data.streak} Days 🔥</div>
-              <div class="report-kpi-lbl">Active Streak</div>
-            </div>
-          </div>
-          <div class="report-kpi-card">
             <div class="report-kpi-icon" style="background: rgba(56, 189, 248, 0.12); color: #0284C7;">
               <i data-lucide="calendar"></i>
             </div>
@@ -3003,7 +2994,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let text = '';
     if (data.isMarketing) {
-      text = `• Successfully executed daily repetitive routines with ${data.pct}% on-time consistency for ${monthName}.\n• Maintained active continuous habit streak (${data.streak} days) with zero lead assignment backlog.\n• Completed all weekly management reviews and brand reputation milestones for IT & Techschool.`;
+      text = `• Successfully executed daily repetitive routines with ${data.pct}% on-time consistency for ${monthName}.\n• Completed all monthly and weekly institutional reviews with zero lead assignment backlog.\n• Completed all weekly management reviews and brand reputation milestones for IT & Techschool.`;
     } else {
       text = `• Successfully completed ${data.totalCompleted} deliverables out of ${data.totalTarget} monthly quota for ${monthName} (${data.pct}% pacing).\n• ${data.extraCompleted > 0 ? `Over-achieved department target with +${data.extraCompleted} extra self-initiated deliverables.` : `Delivered all marketing and brand launch collaterals within schedule.`}\n• Maintained 100% brand consistency across Techschool and IT programs.`;
     }
@@ -3026,7 +3017,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let text = '';
     if (data && data.isMarketing) {
-      text = `📊 *Nexcrest Insights - Monthly Performance Brief*\n👤 *Member:* ${user.name} (${user.title || user.role})\n📅 *Period:* ${monthName}\n⚡ *Daily Routines:* ${data.dailyCompleted} / ${data.dailyTotal} (${data.pct}%)\n🔥 *Habit Streak:* ${data.streak} Days\n\n*Key Highlights:*\n${highlights}`;
+      text = `📊 *Nexcrest Insights - Monthly Performance Brief*\n👤 *Member:* ${user.name} (${user.title || user.role})\n📅 *Period:* ${monthName}\n⚡ *Daily Routines:* ${data.dailyCompleted} / ${data.dailyTotal} (${data.pct}%)\n\n*Key Highlights:*\n${highlights}`;
     } else if (data) {
       text = `📊 *Nexcrest Insights - Monthly Performance Brief*\n👤 *Member:* ${user.name} (${user.title || user.role})\n📅 *Period:* ${monthName}\n🎯 *Target:* ${data.totalTarget} | *Approved:* ${data.totalCompleted} (${data.pct}%)\n⭐ *Extra Work:* ${data.extraCompleted > 0 ? '+' + data.extraCompleted : '0'}\n\n*Key Highlights:*\n${highlights}`;
     }
@@ -3469,7 +3460,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const dailyTasks = window.dataStore.getMarketingDailyTasks(todayStr);
     const dailyStats = window.dataStore.getMarketingDailyStats(todayStr);
-    const dailyStreak = window.dataStore.getMarketingDailyStreak();
 
     const weeklyTasks = window.dataStore.getMarketingWeeklyTasks(weekStr);
     const weeklyStats = window.dataStore.getMarketingWeeklyStats(weekStr);
@@ -3481,9 +3471,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const dailyRadarBar = document.getElementById('mkt-radar-daily-bar');
     if (dailyRadarText) dailyRadarText.textContent = `${dailyStats.completed} / ${dailyStats.total} Done`;
     if (dailyRadarBar) dailyRadarBar.style.width = `${dailyStats.pct}%`;
-
-    const streakRadarText = document.getElementById('mkt-radar-streak-text');
-    if (streakRadarText) streakRadarText.textContent = `${dailyStreak} Day${dailyStreak === 1 ? '' : 's'}`;
 
     const weeklyRadarText = document.getElementById('mkt-radar-weekly-text');
     if (weeklyRadarText) weeklyRadarText.textContent = `${weeklyStats.completed} / ${weeklyStats.total} Delivered`;

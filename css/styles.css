@@ -8621,17 +8621,17 @@ body.dark-theme .btn-preset-pill.active {
    MARKETING EXECUTIVE DEDICATED WORKSPACE - RESPONSIVE SYSTEM (DESKTOP & MOBILE)
    ========================================================================= */
 
-/* Health Radar Cards Strip (Desktop: 5 columns) */
+/* Health Radar Cards Strip (Desktop: 4 columns) */
 .mkt-radar-strip {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 14px;
   margin-bottom: 20px;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1024px) {
   .mkt-radar-strip {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 }
@@ -9027,10 +9027,6 @@ body.dark-theme .btn-preset-pill.active {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
     margin-bottom: 14px;
-  }
-
-  .mkt-radar-card:last-child:nth-child(odd) {
-    grid-column: 1 / -1;
   }
 
   .mkt-radar-card {
