@@ -8705,16 +8705,38 @@ body.dark-theme .btn-preset-pill.active {
   margin-top: 2px;
 }
 
-/* Cadence Navigation Tabs (Desktop & Mobile) */
-.mkt-cadence-tabs {
+/* Cadence Navigation Bar (Desktop & Mobile) */
+.mkt-cadence-bar {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   border-bottom: 1px solid #E2E8F0;
   padding-bottom: 12px;
   margin-bottom: 18px;
+}
+
+.mkt-cadence-tabs {
+  display: flex;
+  gap: 8px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  flex: 1;
+  min-width: 0;
+}
+
+#btn-mkt-open-report {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-weight: 600;
+  font-size: 13px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .mkt-cadence-tabs::-webkit-scrollbar {
@@ -9024,136 +9046,207 @@ body.dark-theme .btn-preset-pill.active {
    ========================================================================= */
 @media (max-width: 640px) {
   .mkt-radar-strip {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    margin-bottom: 14px;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
   }
 
   .mkt-radar-card {
-    padding: 10px 12px;
-    gap: 10px;
-    border-radius: 12px;
+    padding: 12px 12px !important;
+    gap: 10px !important;
+    border-radius: 12px !important;
+    min-width: 0 !important;
+    align-items: center !important;
   }
 
   .mkt-radar-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 9px !important;
+    flex-shrink: 0 !important;
   }
 
   .mkt-radar-icon svg {
-    width: 17px;
-    height: 17px;
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .mkt-radar-info {
+    min-width: 0 !important;
+    flex: 1 !important;
   }
 
   .mkt-radar-info .mkt-radar-val {
-    font-size: 16px;
+    font-size: 16px !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
   }
 
   .mkt-radar-info .mkt-radar-lbl {
-    font-size: 11px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 11px !important;
+    white-space: normal !important;
+    line-height: 1.25 !important;
+    margin-top: 2px !important;
+    word-break: break-word !important;
+  }
+
+  /* Mobile Cadence Bar & Scrollable Tabs */
+  .mkt-cadence-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 14px !important;
   }
 
   .mkt-cadence-tabs {
-    gap: 6px;
-    padding-bottom: 8px;
-    margin-bottom: 12px;
-    width: 100%;
+    display: flex !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    padding: 2px 2px 6px 2px !important;
+    width: 100% !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  .mkt-cadence-tabs::-webkit-scrollbar {
+    display: none !important;
   }
 
   .mkt-cadence-btn {
-    flex: 1 1 0;
-    min-width: 0;
-    padding: 8px 6px;
-    font-size: 11.5px;
-    gap: 4px;
-    justify-content: center;
-    border-radius: 8px;
+    flex: 0 0 auto !important;
+    min-width: auto !important;
+    padding: 9px 15px !important;
+    font-size: 12.5px !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+    border-radius: 9px !important;
   }
 
   .mkt-cadence-btn svg {
-    width: 14px;
-    height: 14px;
+    width: 15px !important;
+    height: 15px !important;
   }
 
   .mkt-cadence-badge {
-    padding: 1px 5px;
-    font-size: 10px;
-    border-radius: 6px;
+    padding: 2px 6px !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
+  }
+
+  #btn-mkt-open-report {
+    width: 100% !important;
+    justify-content: center !important;
+    height: 40px !important;
+    font-size: 13px !important;
+    border-radius: 9px !important;
   }
 
   .mkt-section-banner {
-    padding: 9px 12px;
-    gap: 6px;
-    border-radius: 10px;
+    padding: 10px 14px !important;
+    gap: 8px !important;
+    border-radius: 11px !important;
+    justify-content: space-between !important;
   }
 
   .mkt-banner-left {
-    font-size: 12px;
-    gap: 6px;
+    font-size: 12px !important;
+    gap: 6px !important;
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
   }
 
   .mkt-reset-pill {
-    font-size: 10.5px;
-    padding: 3px 7px;
-    border-radius: 5px;
+    font-size: 11px !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
   }
 
   .mkt-tasks-list {
-    gap: 8px;
+    gap: 10px !important;
   }
 
+  /* Full Width Responsive Task Item on Mobile */
   .mkt-task-item {
-    padding: 11px 12px;
-    gap: 10px;
-    border-radius: 12px;
+    padding: 13px 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 11px !important;
+    border-radius: 13px !important;
   }
 
   .mkt-task-left {
-    gap: 10px;
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
 
   .mkt-checkbox-wrap {
-    width: 24px;
-    height: 24px;
-    border-radius: 7px;
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 7px !important;
+    flex-shrink: 0 !important;
+    margin-top: 2px !important;
   }
 
   .mkt-checkbox-wrap svg {
-    width: 13px !important;
-    height: 13px !important;
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .mkt-task-details {
+    flex: 1 !important;
+    min-width: 0 !important;
+    width: 100% !important;
   }
 
   .mkt-task-title {
-    font-size: 13.5px;
-    line-height: 1.35;
+    font-size: 14.5px !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+    word-break: break-word !important;
+    white-space: normal !important;
   }
 
   .mkt-task-meta {
-    gap: 5px;
-    font-size: 11px;
+    gap: 6px !important;
+    font-size: 11.5px !important;
+    margin-top: 3px !important;
+    flex-wrap: wrap !important;
   }
 
   .mkt-task-meta .badge-category,
   .mkt-task-meta .badge-brand,
   .mkt-task-meta .badge-format {
-    font-size: 10px !important;
-    padding: 1px 5px !important;
+    font-size: 10.5px !important;
+    padding: 2px 7px !important;
+  }
+
+  .mkt-task-right {
+    width: 100% !important;
+    display: flex !important;
+    padding-top: 8px !important;
+    border-top: 1px dashed rgba(255, 255, 255, 0.08) !important;
   }
 
   .btn-open-routine-note {
-    padding: 5px 8px !important;
-    font-size: 11px !important;
-    gap: 4px !important;
-    border-radius: 7px !important;
+    width: 100% !important;
+    justify-content: center !important;
+    height: 36px !important;
+    font-size: 12px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
   }
 
   #mkt-instant-tasks-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
   }
 
   /* Routine Note Modal Mobile Adjustments */
@@ -9193,25 +9286,37 @@ body.dark-theme .btn-preset-pill.active {
    VERY SMALL MOBILE BREAKPOINTS (<= 380px)
    ========================================================================= */
 @media (max-width: 380px) {
-  .mkt-cadence-btn span:not(.mkt-cadence-badge) {
-    font-size: 10.5px;
+  .mkt-radar-strip {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 6px !important;
   }
 
-  .mkt-task-item {
-    flex-wrap: wrap;
+  .mkt-radar-card {
+    padding: 10px 8px !important;
+    gap: 8px !important;
   }
 
-  .mkt-task-right {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 4px;
-    padding-left: 34px;
+  .mkt-radar-icon {
+    width: 32px !important;
+    height: 32px !important;
   }
 
-  .btn-open-routine-note {
-    width: 100%;
-    justify-content: center;
+  .mkt-radar-icon svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .mkt-radar-info .mkt-radar-val {
+    font-size: 14px !important;
+  }
+
+  .mkt-radar-info .mkt-radar-lbl {
+    font-size: 10px !important;
+  }
+
+  .mkt-cadence-btn {
+    padding: 7px 11px !important;
+    font-size: 11.5px !important;
   }
 }
 
@@ -9232,8 +9337,16 @@ body.dark-theme .mkt-radar-info .mkt-radar-lbl {
   color: #A7B4BE !important;
 }
 
+body.dark-theme .mkt-cadence-bar {
+  border-color: #1F3748;
+}
+
 body.dark-theme .mkt-cadence-tabs {
   border-color: #1F3748;
+}
+
+body.dark-theme .mkt-task-right {
+  border-top-color: #1F3748 !important;
 }
 
 body.dark-theme .mkt-cadence-btn {

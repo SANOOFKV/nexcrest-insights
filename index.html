@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=86">
+  <link rel="stylesheet" href="css/styles.css?v=87">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -878,30 +878,32 @@
           </div>
         </div>
 
-        <!-- Cadence Navigation Tabs -->
-        <div class="mkt-cadence-tabs">
-          <button type="button" class="mkt-cadence-btn active" data-mkt-tab="daily" id="btn-mkt-tab-daily">
-            <i data-lucide="check-circle-2"></i>
-            <span>Daily Tasks</span>
-            <span class="mkt-cadence-badge" id="mkt-badge-daily">4</span>
-          </button>
-          <button type="button" class="mkt-cadence-btn" data-mkt-tab="weekly" id="btn-mkt-tab-weekly">
-            <i data-lucide="calendar-range"></i>
-            <span>Weekly Tasks</span>
-            <span class="mkt-cadence-badge" id="mkt-badge-weekly">3</span>
-          </button>
-          <button type="button" class="mkt-cadence-btn" data-mkt-tab="monthly" id="btn-mkt-tab-monthly">
-            <i data-lucide="calendar"></i>
-            <span>Monthly Tasks</span>
-            <span class="mkt-cadence-badge" id="mkt-badge-monthly">2</span>
-          </button>
-          <button type="button" class="mkt-cadence-btn" data-mkt-tab="instant" id="btn-mkt-tab-instant">
-            <i data-lucide="zap"></i>
-            <span>Instant Tasks</span>
-            <span class="mkt-cadence-badge" id="mkt-badge-instant">0</span>
-          </button>
-          <button type="button" class="btn btn-secondary btn-sm" id="btn-mkt-open-report" style="margin-left: auto; display: inline-flex; align-items: center; gap: 5px; height: 38px; border-radius: 8px;" title="Create or View Monthly Performance Report">
-            <i data-lucide="file-bar-chart"></i> Monthly Report
+        <!-- Cadence Navigation Bar -->
+        <div class="mkt-cadence-bar">
+          <div class="mkt-cadence-tabs">
+            <button type="button" class="mkt-cadence-btn active" data-mkt-tab="daily" id="btn-mkt-tab-daily">
+              <i data-lucide="check-circle-2"></i>
+              <span>Daily Tasks</span>
+              <span class="mkt-cadence-badge" id="mkt-badge-daily">4</span>
+            </button>
+            <button type="button" class="mkt-cadence-btn" data-mkt-tab="weekly" id="btn-mkt-tab-weekly">
+              <i data-lucide="calendar-range"></i>
+              <span>Weekly Tasks</span>
+              <span class="mkt-cadence-badge" id="mkt-badge-weekly">3</span>
+            </button>
+            <button type="button" class="mkt-cadence-btn" data-mkt-tab="monthly" id="btn-mkt-tab-monthly">
+              <i data-lucide="calendar"></i>
+              <span>Monthly Tasks</span>
+              <span class="mkt-cadence-badge" id="mkt-badge-monthly">2</span>
+            </button>
+            <button type="button" class="mkt-cadence-btn" data-mkt-tab="instant" id="btn-mkt-tab-instant">
+              <i data-lucide="zap"></i>
+              <span>Instant Tasks</span>
+              <span class="mkt-cadence-badge" id="mkt-badge-instant">0</span>
+            </button>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-mkt-open-report" title="Create or View Monthly Performance Report">
+            <i data-lucide="file-bar-chart"></i> <span>Monthly Report</span>
           </button>
         </div>
 
@@ -2050,10 +2052,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=86"></script>
-  <script src="js/data.js?v=86"></script>
-  <script src="js/auth.js?v=86"></script>
-  <script src="js/app.js?v=86"></script>
+  <script src="js/firebase-config.js?v=87"></script>
+  <script src="js/data.js?v=87"></script>
+  <script src="js/auth.js?v=87"></script>
+  <script src="js/app.js?v=87"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
