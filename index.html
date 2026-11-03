@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=84">
+  <link rel="stylesheet" href="css/styles.css?v=85">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -865,6 +865,19 @@
           </div>
 
           <div class="mkt-radar-card">
+            <div class="mkt-radar-icon" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.25); color: #10B981;">
+              <i data-lucide="file-check"></i>
+            </div>
+            <div class="mkt-radar-info">
+              <div class="mkt-radar-val" id="mkt-radar-monthly-text">0 / 2 Done</div>
+              <div class="mkt-radar-lbl">Monthly Deliverables</div>
+              <div class="progress-bar-container" style="height: 5px; margin-top: 6px;">
+                <div class="progress-bar-fill mint" id="mkt-radar-monthly-bar" style="width: 0%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mkt-radar-card">
             <div class="mkt-radar-icon" style="background: rgba(124, 58, 237, 0.1); border-color: rgba(124, 58, 237, 0.25); color: #7C3AED;">
               <i data-lucide="zap"></i>
             </div>
@@ -886,6 +899,11 @@
             <i data-lucide="calendar-range"></i>
             <span>Weekly Tasks</span>
             <span class="mkt-cadence-badge" id="mkt-badge-weekly">3</span>
+          </button>
+          <button type="button" class="mkt-cadence-btn" data-mkt-tab="monthly" id="btn-mkt-tab-monthly">
+            <i data-lucide="calendar"></i>
+            <span>Monthly Tasks</span>
+            <span class="mkt-cadence-badge" id="mkt-badge-monthly">2</span>
           </button>
           <button type="button" class="mkt-cadence-btn" data-mkt-tab="instant" id="btn-mkt-tab-instant">
             <i data-lucide="zap"></i>
@@ -925,6 +943,22 @@
             </div>
           </div>
           <div id="mkt-weekly-tasks-list" class="mkt-tasks-list">
+            <!-- Injected via JavaScript -->
+          </div>
+        </div>
+
+        <!-- TAB 3: MONTHLY TASKS -->
+        <div id="mkt-tab-content-monthly" class="mkt-tab-content hidden">
+          <div class="mkt-section-banner">
+            <div class="mkt-banner-left">
+              <i data-lucide="calendar-days" style="color: #10B981;"></i>
+              <span id="mkt-monthly-cadence-label">Month: <strong>...</strong></span>
+            </div>
+            <div class="mkt-reset-pill" style="background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.25);">
+              <i data-lucide="calendar-check"></i> Monthly Cadence
+            </div>
+          </div>
+          <div id="mkt-monthly-tasks-list" class="mkt-tasks-list">
             <!-- Injected via JavaScript -->
           </div>
         </div>
@@ -2026,10 +2060,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=84"></script>
-  <script src="js/data.js?v=84"></script>
-  <script src="js/auth.js?v=84"></script>
-  <script src="js/app.js?v=84"></script>
+  <script src="js/firebase-config.js?v=85"></script>
+  <script src="js/data.js?v=85"></script>
+  <script src="js/auth.js?v=85"></script>
+  <script src="js/app.js?v=85"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

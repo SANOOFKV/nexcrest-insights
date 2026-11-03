@@ -10,11 +10,12 @@ const STORAGE_KEYS = {
   SELECTED_MONTH: 'nexcrest_active_month_v2',
   MARKETING_DAILY: 'nexcrest_marketing_daily_v1',
   MARKETING_WEEKLY: 'nexcrest_marketing_weekly_v1',
+  MARKETING_MONTHLY: 'nexcrest_marketing_monthly_v1',
   MEMBER_REPORTS: 'nexcrest_member_reports_v1'
 };
 
 // =========================================================================
-// MARKETING EXECUTIVE CADENCES: DAILY & WEEKLY ROUTINES SPECIFICATION
+// MARKETING EXECUTIVE CADENCES: DAILY, WEEKLY & MONTHLY ROUTINES SPECIFICATION
 // =========================================================================
 const DEFAULT_MARKETING_DAILY_ROUTINES = [
   {
@@ -83,6 +84,29 @@ const DEFAULT_MARKETING_WEEKLY_ROUTINES = [
     brand: 'Both',
     dueDay: 'Every Saturday',
     icon: 'film',
+    active: true,
+    history: {}
+  }
+];
+
+const DEFAULT_MARKETING_MONTHLY_ROUTINES = [
+  {
+    id: 'mm-1',
+    title: 'Monthly Reports of IT and Techschool',
+    category: 'Reporting',
+    brand: 'Both',
+    schedule: 'Monthly (End of Month)',
+    icon: 'file-text',
+    active: true,
+    history: {}
+  },
+  {
+    id: 'mm-2',
+    title: 'Social media Monthly Performance Reports',
+    category: 'Analytics',
+    brand: 'Both',
+    schedule: 'Monthly (End of Month)',
+    icon: 'trending-up',
     active: true,
     history: {}
   }
@@ -377,6 +401,7 @@ class DataStore {
     this.submissions = this.loadSubmissions();
     this.marketingDaily = this.loadMarketingDaily();
     this.marketingWeekly = this.loadMarketingWeekly();
+    this.marketingMonthly = this.loadMarketingMonthly();
     this.activeMonth = localStorage.getItem(STORAGE_KEYS.SELECTED_MONTH) || '2026-10';
     this.initCloudSync();
   }
@@ -433,6 +458,15 @@ class DataStore {
         window.firebaseSync.subscribeMarketingWeeklyRoutines((cloudWeekly) => {
           if (Array.isArray(cloudWeekly) && cloudWeekly.length > 0) {
             this._mergeCloudWeeklyRoutines(cloudWeekly);
+            this.notify();
+          }
+        });
+      }
+
+      if (typeof window.firebaseSync.subscribeMarketingMonthlyRoutines === 'function') {
+        window.firebaseSync.subscribeMarketingMonthlyRoutines((cloudMonthly) => {
+          if (Array.isArray(cloudMonthly) && cloudMonthly.length > 0) {
+            this._mergeCloudMonthlyRoutines(cloudMonthly);
             this.notify();
           }
         });
@@ -902,14 +936,23 @@ class DataStore {
     return { totalTarget, totalCompleted, totalPending, pct, extraCompleted };
   }
 
+  isMarketingTarget(t) {
+    if (!t) return false;
+    const a = (t.assignee || '').toLowerCase();
+    const r = (t.assigneeRole || '').toLowerCase();
+    const e = (t.assigneeEmail || '').toLowerCase();
+    return a === 'marketing' || r === 'marketing' || e === 'marketing@nexcrest.com' || a.includes('marketing') || e.includes('marketing');
+  }
+
   getOverallStats() {
     const designerStats = this.getRoleStats('designer');
     const videoStats = this.getRoleStats('videographer');
     const marketingStats = this.getRoleStats('marketing');
 
-    const totalTarget = designerStats.totalTarget + videoStats.totalTarget + marketingStats.totalTarget;
-    const totalCompleted = designerStats.totalCompleted + videoStats.totalCompleted + marketingStats.totalCompleted;
-    const totalPending = designerStats.totalPending + videoStats.totalPending + marketingStats.totalPending;
+    // Marketing Executive pool is strictly independent and monitored separately — excluded from creative monthly targets
+    const totalTarget = designerStats.totalTarget + videoStats.totalTarget;
+    const totalCompleted = designerStats.totalCompleted + videoStats.totalCompleted;
+    const totalPending = designerStats.totalPending + videoStats.totalPending;
     const pct = totalTarget > 0 ? Math.round((totalCompleted / totalTarget) * 100) : (totalCompleted > 0 ? 100 : 0);
     const extraCompleted = Math.max(0, totalCompleted - totalTarget);
 
@@ -928,7 +971,8 @@ class DataStore {
   // Comprehensive Dashboard Overview Calculation (Matching user photo + Graphs)
   getDashboardOverview(customMonth = null) {
     const month = customMonth || this.activeMonth;
-    const targets = this.targets.filter(t => t.month === month);
+    // Marketing Executive pool is strictly independent and monitored separately — excluded from creative monthly target counts
+    const targets = this.targets.filter(t => t.month === month && !this.isMarketingTarget(t));
 
     let totalTarget = 0;
     let totalPublished = 0;
@@ -1340,6 +1384,171 @@ class DataStore {
     return { total, completed, pct, remaining: total - completed };
   }
 
+  updateMarketingWeeklyTaskNote(taskId, weekStr = getCurrentWeekStr(), note = '', proofUrl = '') {
+    if (!Array.isArray(this.marketingWeekly)) {
+      this.marketingWeekly = this.loadMarketingWeekly();
+    }
+    const task = this.marketingWeekly.find(t => t.id === taskId);
+    if (!task) return null;
+
+    if (!task.history) task.history = {};
+    const current = task.history[weekStr] || { completed: true, completedAt: new Date().toISOString() };
+    task.history[weekStr] = {
+      ...current,
+      completed: true,
+      completedAt: current.completedAt || new Date().toISOString(),
+      note: note,
+      proofUrl: proofUrl
+    };
+
+    this.saveMarketingWeekly(this.marketingWeekly);
+
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.saveMarketingWeeklyRoutine(task);
+    }
+
+    this.notify();
+    return task;
+  }
+
+  // =========================================================================
+  // MARKETING EXECUTIVE: MONTHLY RECURRING ROUTINES METHODS
+  // =========================================================================
+  loadMarketingMonthly() {
+    const raw = localStorage.getItem(STORAGE_KEYS.MARKETING_MONTHLY);
+    if (!raw) {
+      const initial = JSON.parse(JSON.stringify(DEFAULT_MARKETING_MONTHLY_ROUTINES));
+      try { localStorage.setItem(STORAGE_KEYS.MARKETING_MONTHLY, JSON.stringify(initial)); } catch (e) {}
+      return initial;
+    }
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const idMap = new Map(parsed.map(r => [r.id, r]));
+        DEFAULT_MARKETING_MONTHLY_ROUTINES.forEach(def => {
+          if (!idMap.has(def.id)) {
+            parsed.push(JSON.parse(JSON.stringify(def)));
+          }
+        });
+        return parsed;
+      }
+    } catch (e) {
+      console.warn('Error parsing local marketing monthly routines:', e);
+    }
+    return JSON.parse(JSON.stringify(DEFAULT_MARKETING_MONTHLY_ROUTINES));
+  }
+
+  saveMarketingMonthly(routines) {
+    this.marketingMonthly = routines;
+    try {
+      localStorage.setItem(STORAGE_KEYS.MARKETING_MONTHLY, JSON.stringify(routines));
+    } catch (e) {
+      console.error('Failed to save marketing monthly routines locally:', e);
+    }
+  }
+
+  _mergeCloudMonthlyRoutines(cloudRoutines) {
+    if (!Array.isArray(cloudRoutines) || !cloudRoutines.length) return;
+    const current = this.marketingMonthly || [];
+    const map = new Map(current.map(r => [r.id, r]));
+
+    cloudRoutines.forEach(c => {
+      if (map.has(c.id)) {
+        const local = map.get(c.id);
+        const mergedHistory = { ...(local.history || {}), ...(c.history || {}) };
+        map.set(c.id, { ...local, ...c, history: mergedHistory });
+      } else {
+        map.set(c.id, c);
+      }
+    });
+
+    this.marketingMonthly = Array.from(map.values());
+    try { localStorage.setItem(STORAGE_KEYS.MARKETING_MONTHLY, JSON.stringify(this.marketingMonthly)); } catch (e) {}
+  }
+
+  getMarketingMonthlyTasks(monthStr = null) {
+    const targetMonth = monthStr || this.activeMonth || '2026-10';
+    if (!Array.isArray(this.marketingMonthly)) {
+      this.marketingMonthly = this.loadMarketingMonthly();
+    }
+    return this.marketingMonthly.map(task => {
+      const hist = (task.history && task.history[targetMonth]) || null;
+      return {
+        ...task,
+        completed: Boolean(hist && hist.completed),
+        completedAt: hist ? hist.completedAt : null,
+        note: hist ? (hist.note || '') : '',
+        proofUrl: hist ? (hist.proofUrl || '') : ''
+      };
+    });
+  }
+
+  toggleMarketingMonthlyTask(taskId, monthStr = null, note = '', proofUrl = '') {
+    const targetMonth = monthStr || this.activeMonth || '2026-10';
+    if (!Array.isArray(this.marketingMonthly)) {
+      this.marketingMonthly = this.loadMarketingMonthly();
+    }
+    const task = this.marketingMonthly.find(t => t.id === taskId);
+    if (!task) return null;
+
+    if (!task.history) task.history = {};
+    const current = task.history[targetMonth] || { completed: false };
+    const willBeCompleted = !current.completed;
+
+    task.history[targetMonth] = {
+      completed: willBeCompleted,
+      completedAt: willBeCompleted ? new Date().toISOString() : null,
+      note: note || (current.note || ''),
+      proofUrl: proofUrl || (current.proofUrl || '')
+    };
+
+    this.saveMarketingMonthly(this.marketingMonthly);
+
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.saveMarketingMonthlyRoutine(task);
+    }
+
+    this.notify();
+    return task;
+  }
+
+  updateMarketingMonthlyTaskNote(taskId, monthStr = null, note = '', proofUrl = '') {
+    const targetMonth = monthStr || this.activeMonth || '2026-10';
+    if (!Array.isArray(this.marketingMonthly)) {
+      this.marketingMonthly = this.loadMarketingMonthly();
+    }
+    const task = this.marketingMonthly.find(t => t.id === taskId);
+    if (!task) return null;
+
+    if (!task.history) task.history = {};
+    const current = task.history[targetMonth] || { completed: true, completedAt: new Date().toISOString() };
+    task.history[targetMonth] = {
+      ...current,
+      completed: true,
+      completedAt: current.completedAt || new Date().toISOString(),
+      note: note,
+      proofUrl: proofUrl
+    };
+
+    this.saveMarketingMonthly(this.marketingMonthly);
+
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.saveMarketingMonthlyRoutine(task);
+    }
+
+    this.notify();
+    return task;
+  }
+
+  getMarketingMonthlyStats(monthStr = null) {
+    const targetMonth = monthStr || this.activeMonth || '2026-10';
+    const tasks = this.getMarketingMonthlyTasks(targetMonth).filter(t => t.active !== false);
+    const total = tasks.length;
+    const completed = tasks.filter(t => t.completed).length;
+    const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { total, completed, pct, remaining: total - completed };
+  }
+
   // =========================================================================
   // MARKETING EXECUTIVE: INSTANT / PRIORITY TASKS METHODS
   // =========================================================================
@@ -1442,6 +1651,10 @@ class DataStore {
         }
       });
 
+      const monthlyTasks = this.getMarketingMonthlyTasks(month);
+      const monthlyCompleted = monthlyTasks.filter(t => t.completed).length;
+      const monthlyTotal = monthlyTasks.length;
+
       const streak = this.getMarketingDailyStreak();
 
       return {
@@ -1453,6 +1666,9 @@ class DataStore {
         dailyTotal: Math.max(totalDailyOpportunities, 4),
         weeklyCompleted: totalWeeklyCompleted,
         weeklyTotal: Math.max(totalWeeklyOpportunities, 3),
+        monthlyCompleted,
+        monthlyTotal,
+        monthlyTasks,
         streak,
         pct: totalDailyOpportunities > 0 ? Math.round((totalDailyCompleted / totalDailyOpportunities) * 100) : (totalDailyCompleted > 0 ? 100 : 0)
       };

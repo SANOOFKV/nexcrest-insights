@@ -5157,6 +5157,20 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Marketing Monthly Checkbox Toggle
+    const monthlyCheck = e.target.closest('.mkt-checkbox-wrap[data-action="toggle-monthly"]');
+    if (monthlyCheck && monthlyCheck.dataset.taskId) {
+      const activeMonth = window.dataStore.getActiveMonth() || '2026-10';
+      const updated = window.dataStore.toggleMarketingMonthlyTask(monthlyCheck.dataset.taskId, activeMonth);
+      if (updated && updated.history && updated.history[activeMonth] && updated.history[activeMonth].completed) {
+        showToast(`✅ Delivered "${updated.title}" for ${getMonthFullName(activeMonth)}!`, 'success');
+      } else {
+        showToast(`Marked "${updated ? updated.title : 'Task'}" in progress for ${getMonthFullName(activeMonth)}.`, 'info');
+      }
+      renderMarketingWorkspace(state.user);
+      return;
+    }
+
     // Routine Note Modal Open
     const openNoteBtn = e.target.closest('.btn-open-routine-note');
     if (openNoteBtn) {

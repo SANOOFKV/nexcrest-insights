@@ -370,6 +370,37 @@ class FirebaseSyncService {
       return false;
     }
   }
+
+  // MARKETING MONTHLY ROUTINES SYNC
+  subscribeMarketingMonthlyRoutines(onUpdated) {
+    if (!this.isActive()) return null;
+    try {
+      return this.db.collection('marketing_monthly_routines').onSnapshot((snapshot) => {
+        const routines = [];
+        snapshot.forEach((doc) => {
+          routines.push({ id: doc.id, ...doc.data() });
+        });
+        if (typeof onUpdated === 'function') onUpdated(routines);
+      }, (err) => {
+        console.warn('Firestore marketing monthly routines subscription notice:', err);
+      });
+    } catch (e) {
+      console.warn('Failed to subscribe to marketing monthly routines:', e);
+      return null;
+    }
+  }
+
+  async saveMarketingMonthlyRoutine(routine) {
+    if (!this.isActive() || !routine || !routine.id) return false;
+    try {
+      const cleanData = this._cleanFirestoreData(routine);
+      await this.db.collection('marketing_monthly_routines').doc(String(routine.id)).set(cleanData, { merge: true });
+      return true;
+    } catch (err) {
+      console.warn('Failed to save marketing monthly routine to Firestore:', err);
+      return false;
+    }
+  }
 }
 
 // Global instance

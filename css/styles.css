@@ -1058,7 +1058,11 @@ body.dark-theme .btn-light:hover {
 }
 
 .progress-bar-fill.teal {
-  background: linear-gradient(90deg, #EF2424, #FF5A3C);
+  background: linear-gradient(90deg, #008BA5, #45B2C3);
+}
+
+.progress-bar-fill.mint {
+  background: linear-gradient(90deg, #059669, #10B981);
 }
 
 .stat-footer {
@@ -8617,12 +8621,19 @@ body.dark-theme .btn-preset-pill.active {
    MARKETING EXECUTIVE DEDICATED WORKSPACE - RESPONSIVE SYSTEM (DESKTOP & MOBILE)
    ========================================================================= */
 
-/* Health Radar Cards Strip (Desktop: 4 columns) */
+/* Health Radar Cards Strip (Desktop: 5 columns) */
 .mkt-radar-strip {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 14px;
   margin-bottom: 20px;
+}
+
+@media (max-width: 1200px) {
+  .mkt-radar-strip {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
 }
 
 .mkt-radar-card {
@@ -9016,6 +9027,10 @@ body.dark-theme .btn-preset-pill.active {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
     margin-bottom: 14px;
+  }
+
+  .mkt-radar-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 
   .mkt-radar-card {
