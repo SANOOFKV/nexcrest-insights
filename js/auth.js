@@ -273,20 +273,17 @@ class AuthService {
             }
           });
 
-          // Always ensure the core manager admin profile exists and uses secure cryptographic hash
-          if (!parsed['manager@nexcrest.com']) {
-            parsed['manager@nexcrest.com'] = { ...DEFAULT_USERS['manager@nexcrest.com'] };
-            migrated = true;
-          } else if (!parsed['manager@nexcrest.com'].passwordHash) {
-            parsed['manager@nexcrest.com'].passwordHash = 'ad66d6793d4dc6ddeaa846f6d6b2ba7fd3bdcbce026f652a1a1d751e9c60babb';
-            delete parsed['manager@nexcrest.com'].password;
-            migrated = true;
-          }
-
-          // If code modified DEFAULT_USERS and user has no manual override, synchronize with code
+          // Always ensure all default system profiles exist (manager, designer, videographer, marketing)
           const customProfiles = this.loadCustomProfiles();
           Object.keys(DEFAULT_USERS).forEach(email => {
-            if (!customProfiles[email] && DEFAULT_USERS[email] && parsed[email]) {
+            if (!parsed[email]) {
+              parsed[email] = { ...DEFAULT_USERS[email] };
+              migrated = true;
+            } else if (!parsed[email].passwordHash && DEFAULT_USERS[email].passwordHash) {
+              parsed[email].passwordHash = DEFAULT_USERS[email].passwordHash;
+              delete parsed[email].password;
+              migrated = true;
+            } else if (!customProfiles[email] && DEFAULT_USERS[email]) {
               if (DEFAULT_USERS[email].name && parsed[email].name !== DEFAULT_USERS[email].name && parsed[email].name === 'Marketing Manager') {
                 parsed[email].name = DEFAULT_USERS[email].name;
                 parsed[email].avatar = this.getInitials(DEFAULT_USERS[email].name);

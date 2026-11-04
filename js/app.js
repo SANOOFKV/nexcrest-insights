@@ -3564,6 +3564,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const weeklyTasks = window.dataStore.getMarketingWeeklyTasks(weekStr);
     const weeklyStats = window.dataStore.getMarketingWeeklyStats(weekStr);
 
+    const activeMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : '2026-10';
+    const monthlyTasks = window.dataStore.getMarketingMonthlyTasks(activeMonth);
+    const monthlyStats = window.dataStore.getMarketingMonthlyStats(activeMonth);
+
     const instantTasks = window.dataStore.getMarketingInstantTasks(user);
 
     // Update Radar Cards
@@ -3575,15 +3579,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const weeklyRadarText = document.getElementById('mkt-radar-weekly-text');
     if (weeklyRadarText) weeklyRadarText.textContent = `${weeklyStats.completed} / ${weeklyStats.total} Delivered`;
 
+    const monthlyRadarText = document.getElementById('mkt-radar-monthly-text');
+    const monthlyRadarBar = document.getElementById('mkt-radar-monthly-bar');
+    if (monthlyRadarText) monthlyRadarText.textContent = `${monthlyStats.completed} / ${monthlyStats.total} Done`;
+    if (monthlyRadarBar) monthlyRadarBar.style.width = `${monthlyStats.pct}%`;
+
     const instantRadarText = document.getElementById('mkt-radar-instant-text');
     if (instantRadarText) instantRadarText.textContent = `${instantTasks.length} Active`;
 
     // Badges in Tabs
     const badgeDaily = document.getElementById('mkt-badge-daily');
     const badgeWeekly = document.getElementById('mkt-badge-weekly');
+    const badgeMonthly = document.getElementById('mkt-badge-monthly');
     const badgeInstant = document.getElementById('mkt-badge-instant');
     if (badgeDaily) badgeDaily.textContent = dailyTasks.length;
     if (badgeWeekly) badgeWeekly.textContent = weeklyTasks.length;
+    if (badgeMonthly) badgeMonthly.textContent = monthlyTasks.length;
     if (badgeInstant) badgeInstant.textContent = instantTasks.length;
 
     // Active Tab Switching State
@@ -3594,9 +3605,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const tabDaily = document.getElementById('mkt-tab-content-daily');
     const tabWeekly = document.getElementById('mkt-tab-content-weekly');
+    const tabMonthly = document.getElementById('mkt-tab-content-monthly');
     const tabInstant = document.getElementById('mkt-tab-content-instant');
     if (tabDaily) tabDaily.classList.toggle('hidden', state.mktActiveTab !== 'daily');
     if (tabWeekly) tabWeekly.classList.toggle('hidden', state.mktActiveTab !== 'weekly');
+    if (tabMonthly) tabMonthly.classList.toggle('hidden', state.mktActiveTab !== 'monthly');
     if (tabInstant) tabInstant.classList.toggle('hidden', state.mktActiveTab !== 'instant');
 
     // Date / Cadence Labels
@@ -3609,6 +3622,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const weeklyCadenceLabel = document.getElementById('mkt-weekly-cadence-label');
     if (weeklyCadenceLabel) {
       weeklyCadenceLabel.innerHTML = `Week: <strong>${weekStr}</strong>`;
+    }
+
+    const monthlyCadenceLabel = document.getElementById('mkt-monthly-cadence-label');
+    if (monthlyCadenceLabel) {
+      monthlyCadenceLabel.innerHTML = `Month: <strong>${escapeHtml(getMonthFullName(activeMonth))}</strong>`;
     }
 
     // Render TAB 1: DAILY TASKS
@@ -3684,7 +3702,45 @@ document.addEventListener('DOMContentLoaded', () => {
       }).join('');
     }
 
-    // Render TAB 3: INSTANT TASKS (WITH DEADLINE OPTION)
+    // Render TAB 3: MONTHLY TASKS
+    const monthlyListEl = document.getElementById('mkt-monthly-tasks-list');
+    if (monthlyListEl) {
+      monthlyListEl.innerHTML = monthlyTasks.map(task => {
+        const isDone = task.completed;
+        const timeStr = task.completedAt ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(task.completedAt)) : '';
+        const hasNote = Boolean(task.note || task.proofUrl);
+
+        return `
+          <div class="mkt-task-item ${isDone ? 'completed' : ''}" data-task-id="${task.id}">
+            <div class="mkt-task-left">
+              <div class="mkt-checkbox-wrap ${isDone ? 'checked' : ''}" data-action="toggle-monthly" data-task-id="${task.id}" title="${isDone ? 'Mark in-progress' : 'Mark delivered'}">
+                <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+              </div>
+              <div class="mkt-task-details">
+                <div class="mkt-task-title">${escapeHtml(task.title)}</div>
+                <div class="mkt-task-meta">
+                  <span class="badge-category">${escapeHtml(task.category)}</span>
+                  <span class="badge-brand ${escapeHtml(task.brand)}">${formatBrandName(task.brand)}</span>
+                  <span class="badge-format" style="color: #065F46; border-color: #A7F3D0; background: #ECFDF5;">Monthly Routine</span>
+                  ${isDone
+                    ? `<span style="color: #059669; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="check-circle" style="width: 12px; height: 12px;"></i> Delivered ${timeStr ? '(' + timeStr + ')' : ''}</span>`
+                    : '<span style="color: #D97706; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="clock" style="width: 12px; height: 12px;"></i> Due End of Month</span>'
+                  }
+                  ${hasNote ? '<span style="color: #008BA5; font-weight: 600; display: inline-flex; align-items: center; gap: 3px;"><i data-lucide="link" style="width: 11px; height: 11px;"></i> Proof / Note</span>' : ''}
+                </div>
+              </div>
+            </div>
+            <div class="mkt-task-right">
+              <button type="button" class="btn btn-outline-sm btn-open-routine-note" data-task-id="${task.id}" data-task-type="monthly" data-task-title="${escapeHtml(task.title)}" style="font-size: 11.5px; padding: 5px 10px; gap: 4px; font-weight: 600; border-radius: 7px;">
+                <i data-lucide="${hasNote ? 'file-text' : 'plus'}"></i> ${hasNote ? 'Report & Proof' : '+ Report & Proof'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render TAB 4: INSTANT TASKS (WITH DEADLINE OPTION)
     const instantGridEl = document.getElementById('mkt-instant-tasks-grid');
     if (instantGridEl) {
       if (instantTasks.length === 0) {
@@ -3778,6 +3834,17 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       if (elements.routineModalTitle) {
         elements.routineModalTitle.innerHTML = `<i data-lucide="file-text"></i> Today's Daily Note & Proof`;
+      }
+    } else if (taskType === 'monthly') {
+      const activeMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : '2026-10';
+      const tasks = window.dataStore.getMarketingMonthlyTasks(activeMonth);
+      const task = tasks.find(t => t.id === taskId);
+      if (task) {
+        existingNote = task.note || '';
+        existingProof = task.proofUrl || '';
+      }
+      if (elements.routineModalTitle) {
+        elements.routineModalTitle.innerHTML = `<i data-lucide="file-check"></i> Monthly Report & Proof`;
       }
     } else {
       const weekStr = (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W44';
@@ -5328,6 +5395,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
         window.dataStore.updateMarketingDailyTaskNote(taskId, todayStr, noteText, proofUrl);
         showToast('Saved note & link for today’s routine.', 'success');
+      } else if (taskType === 'monthly') {
+        const activeMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : '2026-10';
+        window.dataStore.updateMarketingMonthlyTaskNote(taskId, activeMonth, noteText, proofUrl);
+        showToast(`Saved monthly report & proof for ${getMonthFullName(activeMonth)}.`, 'success');
       } else {
         const weekStr = (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W44';
         window.dataStore.toggleMarketingWeeklyTask(taskId, weekStr, noteText, proofUrl);
