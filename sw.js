@@ -3,7 +3,7 @@
  * Version: v79
  */
 
-const CACHE_NAME = 'nexcrest-insights-shell-v87';
+const CACHE_NAME = 'nexcrest-insights-shell-v88';
 const CORE_ASSETS = [
   './',
   './index.html',

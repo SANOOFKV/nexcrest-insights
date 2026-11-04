@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     activeAdminMemberEmail: 'marketing@nexcrest.com',
     adminMarketingSelectedDate: (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0],
     adminMarketingSelectedWeek: (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W45',
+    adminMarketingSelectedMonth: '2026-10',
     memberReportSelectedMonth: '2026-10',
     memberReportActiveUser: null
   };
@@ -2079,6 +2080,22 @@ document.addEventListener('DOMContentLoaded', () => {
     renderAdminMemberHub();
   }
 
+  function adminMktShiftMonth(delta) {
+    const current = state.adminMarketingSelectedMonth || ((window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : '2026-10');
+    const [yStr, mStr] = current.split('-');
+    let y = parseInt(yStr, 10);
+    let m = parseInt(mStr, 10) + delta;
+    if (m < 1) {
+      m = 12;
+      y -= 1;
+    } else if (m > 12) {
+      m = 1;
+      y += 1;
+    }
+    state.adminMarketingSelectedMonth = `${y}-${String(m).padStart(2, '0')}`;
+    renderAdminMemberHub();
+  }
+
   function openAdminRoutineProofModal(title, note, proofUrl) {
     if (!elements.adminRoutineProofModal) return;
     if (elements.adminProofModalTitle) {
@@ -2134,6 +2151,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
     const selectedDateStr = state.adminMarketingSelectedDate || todayStr;
     const selectedWeekStr = state.adminMarketingSelectedWeek || ((typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W45');
+    const defaultMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : '2026-10';
+    const selectedMonthStr = state.adminMarketingSelectedMonth || defaultMonth;
 
     // 1. Render Member Switcher Cards Grid
     elements.adminMemberSwitcherGrid.innerHTML = employees.map(emp => {
@@ -2143,11 +2162,12 @@ document.addEventListener('DOMContentLoaded', () => {
       let chipHtml = '';
       if (isMkt) {
         const mktDailyStats = window.dataStore.getMarketingDailyStats(selectedDateStr);
+        const mktMonthlyStats = window.dataStore.getMarketingMonthlyStats(selectedMonthStr);
         const allDone = mktDailyStats.total > 0 && mktDailyStats.completed === mktDailyStats.total;
         chipHtml = `
           <div class="member-status-chip ${allDone ? 'green' : mktDailyStats.completed > 0 ? 'green' : 'amber'}">
             <i data-lucide="${allDone ? 'check-check' : mktDailyStats.completed > 0 ? 'check-circle' : 'clock'}" style="width: 12px; height: 12px;"></i>
-            ${mktDailyStats.completed} / ${mktDailyStats.total} Routines (${mktDailyStats.pct}%)
+            Daily: ${mktDailyStats.completed}/${mktDailyStats.total} • Monthly: ${mktMonthlyStats.completed}/${mktMonthlyStats.total}
           </div>
         `;
       } else {
@@ -2185,7 +2205,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Render Active Member Personalized Workspace Pane
     if (activeEmp.role === 'marketing') {
-      renderAdminMarketingExecutiveSection(activeEmp, selectedDateStr, selectedWeekStr, todayStr);
+      renderAdminMarketingExecutiveSection(activeEmp, selectedDateStr, selectedWeekStr, selectedMonthStr, todayStr);
     } else {
       renderAdminCreativeMemberSection(activeEmp);
     }
@@ -2193,11 +2213,13 @@ document.addEventListener('DOMContentLoaded', () => {
     refreshIcons();
   }
 
-  function renderAdminMarketingExecutiveSection(activeEmp, selectedDateStr, selectedWeekStr, todayStr) {
+  function renderAdminMarketingExecutiveSection(activeEmp, selectedDateStr, selectedWeekStr, selectedMonthStr, todayStr) {
     const dailyTasks = window.dataStore.getMarketingDailyTasks(selectedDateStr).filter(t => t.active !== false);
     const dailyStats = window.dataStore.getMarketingDailyStats(selectedDateStr);
     const weeklyTasks = window.dataStore.getMarketingWeeklyTasks(selectedWeekStr).filter(t => t.active !== false);
     const weeklyStats = window.dataStore.getMarketingWeeklyStats(selectedWeekStr);
+    const monthlyTasks = window.dataStore.getMarketingMonthlyTasks(selectedMonthStr).filter(t => t.active !== false);
+    const monthlyStats = window.dataStore.getMarketingMonthlyStats(selectedMonthStr);
     const instantTasks = window.dataStore.getMarketingInstantTasks();
 
     // Date formatting
@@ -2398,6 +2420,84 @@ document.addEventListener('DOMContentLoaded', () => {
                       <span style="font-size: 12px; color: var(--mint-success); font-weight: 600;">Delivered</span>
                     ` : `
                       <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">${escapeHtml(task.dueDay || 'In Progress')}</span>
+                    `}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- 3. MONTHLY DELIVERABLES LIVE TRACKER -->
+        <div class="hub-section-card" style="border-color: rgba(16, 185, 129, 0.4);">
+          <div class="hub-section-card-header">
+            <h3>
+              <i data-lucide="file-check" style="color: var(--mint-success);"></i>
+              Monthly Deliverables Live Tracker (${monthlyStats.completed} / ${monthlyStats.total} Delivered)
+            </h3>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+              <span class="badge-tag" style="background: rgba(16, 185, 129, 0.12); color: var(--mint-success); border-color: rgba(16, 185, 129, 0.3); font-size: 11px;">
+                Due End of Month
+              </span>
+              <div class="date-navigator" style="margin: 0;">
+                <button type="button" class="date-nav-btn" id="btn-admin-mkt-prev-month" title="Previous Month">
+                  <i data-lucide="chevron-left"></i>
+                </button>
+                <div class="date-display-badge" style="padding: 3px 8px;">
+                  <i data-lucide="calendar" style="color: var(--mint-success);"></i>
+                  <span id="admin-display-month-text">${escapeHtml(getMonthFullName(selectedMonthStr))}</span>
+                </div>
+                <button type="button" class="date-nav-btn" id="btn-admin-mkt-next-month" title="Next Month">
+                  <i data-lucide="chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-task-list">
+            ${monthlyTasks.map(task => {
+              const isDone = Boolean(task.completed);
+              const hasProof = Boolean(task.proofUrl && task.proofUrl.trim());
+              const hasNote = Boolean(task.note && task.note.trim());
+
+              return `
+                <div class="admin-task-item ${isDone ? 'completed' : ''}">
+                  <div class="admin-task-left">
+                    <div class="admin-check-pill ${isDone ? 'done' : 'pending'}">
+                      ${isDone ? '✓' : '⏳'}
+                    </div>
+                    <div>
+                      <div class="admin-task-title">${escapeHtml(task.title)}</div>
+                      <div class="admin-task-meta">
+                        <span class="badge-tag">${escapeHtml(task.category || 'Monthly')}</span>
+                        <span class="badge-tag">${formatBrandName(task.brand || 'Both')}</span>
+                        <span class="badge-tag" style="background: rgba(16, 185, 129, 0.12); color: var(--mint-success); border-color: rgba(16, 185, 129, 0.25);">Monthly Routine</span>
+                        ${isDone ? `
+                          <span style="color: var(--mint-success); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                            <i data-lucide="check-circle" style="width: 12px; height: 12px;"></i> Delivered for ${escapeHtml(getMonthFullName(selectedMonthStr))}
+                          </span>
+                        ` : `
+                          <span style="color: var(--amber-warning); font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                            <i data-lucide="clock" style="width: 12px; height: 12px;"></i> Due End of Month
+                          </span>
+                        `}
+                        ${hasNote ? `
+                          <span style="color: var(--teal-primary); font-weight: 600; display: inline-flex; align-items: center; gap: 3px;">
+                            <i data-lucide="file-text" style="width: 11px; height: 11px;"></i> Note Added
+                          </span>
+                        ` : ''}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="admin-task-actions">
+                    ${(hasProof || hasNote) ? `
+                      <button type="button" class="btn btn-admin-view-proof" data-proof-title="${escapeHtml(task.title)}" data-proof-note="${escapeHtml(task.note || '')}" data-proof-url="${escapeHtml(task.proofUrl || '')}">
+                        <i data-lucide="${hasProof ? 'external-link' : 'file-text'}"></i> ${hasProof ? 'View Report & Proof' : 'View Note'}
+                      </button>
+                    ` : isDone ? `
+                      <span style="font-size: 12px; color: var(--mint-success); font-weight: 600;">Delivered</span>
+                    ` : `
+                      <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">Awaiting Submission</span>
                     `}
                   </div>
                 </div>
@@ -4908,6 +5008,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const jumpTodayBtn = e.target.closest('#btn-admin-mkt-today');
     if (jumpTodayBtn) {
       adminMktJumpToday();
+      return;
+    }
+
+    // Admin Marketing Hub Month Navigator
+    const prevMonthBtn = e.target.closest('#btn-admin-mkt-prev-month');
+    if (prevMonthBtn) {
+      adminMktShiftMonth(-1);
+      return;
+    }
+    const nextMonthBtn = e.target.closest('#btn-admin-mkt-next-month');
+    if (nextMonthBtn) {
+      adminMktShiftMonth(1);
       return;
     }
 
