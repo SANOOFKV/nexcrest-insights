@@ -1102,7 +1102,7 @@ class DataStore {
     const remaining = Math.max(0, totalTarget - totalPublished);
     const extraCompleted = Math.max(0, totalPublished - totalTarget);
 
-    // Days left calculation (Calendar Days & Mon-Fri Working Days)
+    // Days left calculation (Calendar Days & Mon-Sat Working Days)
     let daysLeft = 0;
     let workingDaysLeft = 0;
     const now = new Date();
@@ -1117,7 +1117,8 @@ class DataStore {
 
       for (let d = currentDay + 1; d <= daysInMonth; d++) {
         const dayOfWeek = new Date(targetYear, targetMonth - 1, d).getDay();
-        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        // Working days: Monday (1) to Saturday (6), excluding Sunday (0)
+        if (dayOfWeek !== 0) {
           workingDaysLeft++;
         }
       }
@@ -1128,7 +1129,8 @@ class DataStore {
       daysLeft = daysInMonth;
       for (let d = 1; d <= daysInMonth; d++) {
         const dayOfWeek = new Date(targetYear, targetMonth - 1, d).getDay();
-        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        // Working days: Monday (1) to Saturday (6), excluding Sunday (0)
+        if (dayOfWeek !== 0) {
           workingDaysLeft++;
         }
       }

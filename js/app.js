@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     memberCategory: 'all',
     memberStatusFilter: 'pending', // Option B: 'pending' (default) | 'delivered' | 'all'
     modalTasksFilter: 'pending',   // 'pending' (default) | 'delivered' | 'all'
-    pacingMode: 'calendar', // 'calendar' | 'working'
+    pacingMode: 'working', // 'working' (Mon-Sat) | 'calendar'
     tableSort: {
       col: 'program',
       order: 'asc'
@@ -1119,15 +1119,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const effectiveDays = isWorkingDays ? ov.workingDaysLeft : ov.daysLeft;
 
     if (ovDaysLeftLabel) {
-      ovDaysLeftLabel.textContent = isWorkingDays ? 'WORK DAYS' : 'DAYS LEFT';
+      ovDaysLeftLabel.textContent = isWorkingDays ? 'WORK DAYS (MON-SAT)' : 'DAYS LEFT';
     }
     if (btnToggleWorkdays) {
       if (isWorkingDays) {
         btnToggleWorkdays.classList.add('active');
-        if (workdaysToggleText) workdaysToggleText.textContent = 'Mon-Fri Active';
+        if (workdaysToggleText) workdaysToggleText.textContent = 'Mon-Sat Active';
       } else {
         btnToggleWorkdays.classList.remove('active');
-        if (workdaysToggleText) workdaysToggleText.textContent = 'Working Days';
+        if (workdaysToggleText) workdaysToggleText.textContent = 'Calendar Days';
       }
     }
 
@@ -1139,7 +1139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.ovPacingText.textContent = '100% Monthly Target Achieved!';
       } else {
         const pacePerDay = effectiveDays > 0 ? (ov.remaining / effectiveDays).toFixed(1) : ov.remaining;
-        elements.ovPacingText.textContent = `${ov.remaining} posts remaining (${pacePerDay}/day needed across ${effectiveDays} ${isWorkingDays ? 'workdays' : 'days'})`;
+        elements.ovPacingText.textContent = `${ov.remaining} posts remaining (${pacePerDay}/day needed across ${effectiveDays} ${isWorkingDays ? 'workdays (Mon-Sat)' : 'calendar days'})`;
       }
     }
 
@@ -5158,12 +5158,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // Toggle Business Days (Mon-Fri) vs Calendar Days
+    // Toggle Business Days (Mon-Sat) vs Calendar Days
     const toggleWorkdaysBtn = e.target.closest('#btn-toggle-workdays-mode');
     if (toggleWorkdaysBtn) {
       state.pacingMode = state.pacingMode === 'working' ? 'calendar' : 'working';
       renderOverviewDashboard();
-      showToast(state.pacingMode === 'working' ? '💼 Mon-Fri Working Days Pacing activated' : '📅 Calendar Days Pacing activated', 'info');
+      showToast(state.pacingMode === 'working' ? '💼 Mon-Sat Working Days Pacing activated' : '📅 Calendar Days Pacing activated', 'info');
       return;
     }
 

@@ -3,15 +3,15 @@
  * Version: v79
  */
 
-const CACHE_NAME = 'nexcrest-insights-shell-v92';
+const CACHE_NAME = 'nexcrest-insights-shell-v93';
 const CORE_ASSETS = [
   './',
   './index.html',
-  './css/styles.css?v=92',
-  './js/firebase-config.js?v=92',
-  './js/data.js?v=92',
-  './js/auth.js?v=92',
-  './js/app.js?v=92',
+  './css/styles.css?v=93',
+  './js/firebase-config.js?v=93',
+  './js/data.js?v=93',
+  './js/auth.js?v=93',
+  './js/app.js?v=93',
   './assets/nexcrest_icon.png',
   './manifest.webmanifest'
 ];

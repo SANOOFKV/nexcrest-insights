@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=92">
+  <link rel="stylesheet" href="css/styles.css?v=93">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -255,8 +255,8 @@
               <span class="tele-box-title" id="ov-days-left-label">DAYS LEFT</span>
               <span class="tele-box-val" id="ov-days-left">0</span>
             </div>
-            <button type="button" id="btn-toggle-workdays-mode" class="telemetry-toggle-btn" title="Toggle Working Days">
-              <i data-lucide="briefcase"></i> <span id="workdays-toggle-text">Working Days</span>
+            <button type="button" id="btn-toggle-workdays-mode" class="telemetry-toggle-btn active" title="Toggle Working Days (Monday to Saturday)">
+              <i data-lucide="briefcase"></i> <span id="workdays-toggle-text">Mon-Sat Active</span>
             </button>
           </div>
         </div>
@@ -2110,10 +2110,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=92"></script>
-  <script src="js/data.js?v=92"></script>
-  <script src="js/auth.js?v=92"></script>
-  <script src="js/app.js?v=92"></script>
+  <script src="js/firebase-config.js?v=93"></script>
+  <script src="js/data.js?v=93"></script>
+  <script src="js/auth.js?v=93"></script>
+  <script src="js/app.js?v=93"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
