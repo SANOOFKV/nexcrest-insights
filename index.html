@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=96">
+  <link rel="stylesheet" href="css/styles.css?v=97">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -57,13 +57,8 @@
         </div>
       </div>
 
-      <!-- Header Actions: Sync Status, Command Palette, Calendar & User Profile -->
+      <!-- Header Actions: Calendar & User Profile -->
       <div class="header-actions">
-        <!-- Live Cloud Sync Status Indicator -->
-        <div id="cloud-sync-status-indicator" class="sync-status-pill synced" title="Cloud Sync Status" style="display: none;">
-          <span class="sync-dot"></span>
-          <span class="sync-label" id="cloud-sync-label">Synced</span>
-        </div>
 
         <button type="button" id="btn-calendar-picker" class="cycle-calendar-btn" title="Cycle Calendar" aria-label="Cycle Calendar" style="display: none;">
           <i data-lucide="calendar"></i>
@@ -2118,10 +2113,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=96"></script>
-  <script src="js/data.js?v=96"></script>
-  <script src="js/auth.js?v=96"></script>
-  <script src="js/app.js?v=96"></script>
+  <script src="js/firebase-config.js?v=97"></script>
+  <script src="js/data.js?v=97"></script>
+  <script src="js/auth.js?v=97"></script>
+  <script src="js/app.js?v=97"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

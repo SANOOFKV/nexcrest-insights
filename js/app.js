@@ -53,8 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Top Bar
     monthSelector: document.getElementById('month-selector'),
     btnCalendarPicker: document.getElementById('btn-calendar-picker'),
-    cloudSyncStatusIndicator: document.getElementById('cloud-sync-status-indicator'),
-    cloudSyncLabel: document.getElementById('cloud-sync-label'),
     monthDisplay: document.getElementById('current-month-display'),
     headerUserProfileMenu: document.getElementById('header-user-profile-menu'),
     btnOpenUserProfile: document.getElementById('btn-open-user-profile'),
@@ -976,7 +974,6 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.authModal.classList.remove('hidden');
       if (elements.headerUserProfileMenu) elements.headerUserProfileMenu.style.display = 'none';
       if (elements.btnCalendarPicker) elements.btnCalendarPicker.style.display = 'none';
-      if (elements.cloudSyncStatusIndicator) elements.cloudSyncStatusIndicator.style.display = 'none';
       if (elements.reviewAlertBanner) elements.reviewAlertBanner.classList.add('hidden');
       elements.managerView.classList.remove('active');
       elements.managerView.classList.add('hidden');
@@ -988,7 +985,6 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.authModal.classList.add('hidden');
     if (elements.headerUserProfileMenu) elements.headerUserProfileMenu.style.display = 'flex';
     if (elements.btnCalendarPicker) elements.btnCalendarPicker.style.display = 'inline-flex';
-    if (elements.cloudSyncStatusIndicator) elements.cloudSyncStatusIndicator.style.display = 'inline-flex';
 
     elements.headerUserName.textContent = user.name;
     if (elements.headerRoleBadge) elements.headerRoleBadge.textContent = user.title;
@@ -6351,17 +6347,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Wire Real-Time Cloud Sync Indicator
-  if (window.firebaseSync && typeof window.firebaseSync.onSyncStatusChange === 'function') {
-    window.firebaseSync.onSyncStatusChange((status, label) => {
-      if (elements.cloudSyncStatusIndicator) {
-        elements.cloudSyncStatusIndicator.className = `sync-status-pill ${status}`;
-        if (elements.cloudSyncLabel) {
-          elements.cloudSyncLabel.textContent = label;
-        }
-      }
-    });
-  }
 
   // Exclusive System Theme: High-End Light Theme Only (Dark theme removed entirely)
   function initTheme() {
