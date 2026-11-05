@@ -590,17 +590,23 @@ class AuthService {
       try {
         const parsed = JSON.parse(raw);
         if (parsed && parsed.email) {
-          const norm = parsed.email.toLowerCase();
-          const custom = this.loadCustomProfiles()[norm];
-          if (custom && custom.name) {
-            parsed.name = custom.name;
-            if (custom.title) parsed.title = custom.title;
-          }
+          const norm = parsed.email.toLowerCase().trim();
+          // Strictly validate that user account exists in system roster
           if (this.users[norm]) {
-            return { ...this.users[norm], ...parsed };
+            const authoritativeRole = this.users[norm].role;
+            const custom = this.loadCustomProfiles()[norm];
+            const sessionUser = {
+              ...this.users[norm],
+              // Enforce authoritative role from user store to prevent privilege escalation via DevTools
+              role: authoritativeRole,
+              name: (custom && custom.name) || this.users[norm].name,
+              title: (custom && custom.title) || this.users[norm].title
+            };
+            delete sessionUser.password;
+            delete sessionUser.passwordHash;
+            return sessionUser;
           }
         }
-        return parsed;
       } catch (e) {
         console.error('Failed to parse user session', e);
       }

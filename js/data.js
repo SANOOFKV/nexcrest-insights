@@ -749,9 +749,17 @@ class DataStore {
       targetToSave = newTarget;
     }
     this.saveTargets(this.targets);
-    // Explicitly sync this specific target to Cloud Firestore
+    // Explicitly sync this specific target to Cloud Firestore with enterprise audit log
     if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
       window.firebaseSync.saveTarget(targetToSave);
+      if (typeof window.firebaseSync.logAudit === 'function') {
+        window.firebaseSync.logAudit(cleanTarget.id ? 'target_updated' : 'target_created', {
+          targetId: targetToSave.id,
+          program: targetToSave.program,
+          brand: targetToSave.brand,
+          assignee: targetToSave.assignee || targetToSave.assigneeEmail
+        });
+      }
     }
     return targetToSave;
   }
@@ -897,6 +905,17 @@ class DataStore {
       sub.feedback = feedback;
       sub.reviewedAt = new Date().toISOString();
       this.saveSubmissions(this.submissions);
+      if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+        window.firebaseSync.saveSubmission(sub);
+        if (typeof window.firebaseSync.logAudit === 'function') {
+          window.firebaseSync.logAudit('submission_' + status, {
+            submissionId: sub.id,
+            targetId: sub.targetId,
+            status: status,
+            title: sub.title
+          });
+        }
+      }
     }
   }
 

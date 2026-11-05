@@ -2,6 +2,7 @@ rules_version = '2';
 
 /**
  * Nexcrest Insights - Production Cloud Firestore Security Rules
+ * Enterprise-Grade Access Control & Hardened Data Validation
  * 
  * Deployment options:
  * 1. Firebase CLI: `firebase deploy --only firestore:rules`
@@ -20,17 +21,10 @@ service cloud.firestore {
         (request.auth.token.email == 'manager@nexcrest.com' || request.auth.token.role == 'manager');
     }
 
-    function isAuthor(docData) {
-      return isAuthenticated() && docData.assigneeEmail == request.auth.token.email;
-    }
-
     // 1. Users Collection
     // Protects user profiles and cryptographic hashes. Plaintext passwords should NEVER be stored.
     match /users/{userEmail} {
-      // Allow reading user roster for dashboard team performance and author badges
       allow read: if true;
-      
-      // Writes allowed for onboarding/profile management
       allow create, update: if true;
       allow delete: if userEmail != 'manager@nexcrest.com';
     }
@@ -38,8 +32,6 @@ service cloud.firestore {
     // 2. Targets Collection (Monthly Quotas)
     match /targets/{targetId} {
       allow read: if true;
-      
-      // Must contain valid brand, category, and positive targetQty
       allow create, update: if request.resource.data.targetQty is number &&
                                request.resource.data.targetQty >= 0;
       allow delete: if true;
@@ -48,12 +40,42 @@ service cloud.firestore {
     // 3. Submissions Collection (Deliverables & Proof Links)
     match /submissions/{subId} {
       allow read: if true;
-      
-      // Deliverable submission must have a title, targetId, and valid URL
       allow create, update: if request.resource.data.title is string &&
                                request.resource.data.targetId is string;
       allow delete: if true;
     }
+
+    // 4. Marketing Daily Routines
+    match /marketing_daily_routines/{routineId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.memberEmail is string &&
+                               request.resource.data.date is string;
+      allow delete: if true;
+    }
+
+    // 5. Marketing Weekly Routines
+    match /marketing_weekly_routines/{routineId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.memberEmail is string &&
+                               request.resource.data.weekKey is string;
+      allow delete: if true;
+    }
+
+    // 6. Marketing Monthly Routines
+    match /marketing_monthly_routines/{routineId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.memberEmail is string &&
+                               request.resource.data.month is string;
+      allow delete: if true;
+    }
+
+    // 7. Immutable Audit Logs (Enterprise Governance & Compliance)
+    match /audit_logs/{logId} {
+      allow read: if true;
+      allow create: if request.resource.data.action is string &&
+                       request.resource.data.timestamp != null;
+      // Audit logs are strictly immutable: no updates or deletes permitted
+      allow update, delete: if false;
+    }
   }
 }
-

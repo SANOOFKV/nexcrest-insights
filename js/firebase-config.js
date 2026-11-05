@@ -24,10 +24,73 @@ class FirebaseSyncService {
   constructor() {
     this.db = null;
     this.isReady = false;
+    this.syncStatus = 'synced'; // 'synced' | 'syncing' | 'offline' | 'error'
+    this.syncListeners = [];
+    this.pendingOpsCount = 0;
     this.listeners = [];
     this.deletedTargetIds = new Set(LEGACY_PURGED_TARGET_IDS);
     this.deletedSubmissionIds = new Set();
     this.init();
+    this.initNetworkListeners();
+  }
+
+  initNetworkListeners() {
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+      window.addEventListener('online', () => {
+        this._setSyncStatus('synced', 'Cloud Synced');
+      });
+      window.addEventListener('offline', () => {
+        this._setSyncStatus('offline', 'Offline (Local Cache)');
+      });
+    }
+  }
+
+  onSyncStatusChange(callback) {
+    if (typeof callback === 'function') {
+      this.syncListeners.push(callback);
+      callback(this.syncStatus, this.getStatusText());
+    }
+  }
+
+  _setSyncStatus(status, text) {
+    this.syncStatus = status;
+    const label = text || this.getStatusText();
+    this.syncListeners.forEach(cb => {
+      try { cb(status, label); } catch (e) { console.warn('Sync listener error:', e); }
+    });
+  }
+
+  getStatusText() {
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      return 'Offline (Local)';
+    }
+    if (this.syncStatus === 'syncing') {
+      return 'Syncing Cloud...';
+    }
+    if (this.syncStatus === 'error') {
+      return 'Sync Error';
+    }
+    return this.isActive() ? 'Cloud Synced' : 'Local Mode';
+  }
+
+  _trackOperationStart() {
+    this.pendingOpsCount++;
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      this._setSyncStatus('offline');
+      return;
+    }
+    this._setSyncStatus('syncing');
+  }
+
+  _trackOperationEnd(success = true) {
+    this.pendingOpsCount = Math.max(0, this.pendingOpsCount - 1);
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+      this._setSyncStatus('offline');
+      return;
+    }
+    if (this.pendingOpsCount === 0) {
+      this._setSyncStatus(success ? 'synced' : 'error');
+    }
   }
 
   init() {
@@ -186,12 +249,15 @@ class FirebaseSyncService {
   // Save target to cloud
   async saveTarget(target) {
     if (!this.isActive() || !target || !target.id) return false;
+    this._trackOperationStart();
     try {
       this.deletedTargetIds.delete(String(target.id));
       const cleanData = this._cleanFirestoreData(target);
       await this.db.collection('targets').doc(String(target.id)).set(cleanData, { merge: true });
+      this._trackOperationEnd(true);
       return true;
     } catch (err) {
+      this._trackOperationEnd(false);
       console.error('Failed to save target to Firestore:', err);
       return false;
     }
@@ -262,12 +328,15 @@ class FirebaseSyncService {
   // Save deliverable submission to cloud
   async saveSubmission(sub) {
     if (!this.isActive() || !sub || !sub.id) return false;
+    this._trackOperationStart();
     try {
       this.deletedSubmissionIds.delete(String(sub.id));
       const cleanData = this._cleanFirestoreData(sub);
       await this.db.collection('submissions').doc(String(sub.id)).set(cleanData, { merge: true });
+      this._trackOperationEnd(true);
       return true;
     } catch (err) {
+      this._trackOperationEnd(false);
       console.error('Failed to save submission to Firestore:', err);
       return false;
     }
@@ -330,11 +399,14 @@ class FirebaseSyncService {
 
   async saveMarketingDailyRoutine(routine) {
     if (!this.isActive() || !routine || !routine.id) return false;
+    this._trackOperationStart();
     try {
       const cleanData = this._cleanFirestoreData(routine);
       await this.db.collection('marketing_daily_routines').doc(String(routine.id)).set(cleanData, { merge: true });
+      this._trackOperationEnd(true);
       return true;
     } catch (err) {
+      this._trackOperationEnd(false);
       console.warn('Failed to save marketing daily routine to Firestore:', err);
       return false;
     }
@@ -361,11 +433,14 @@ class FirebaseSyncService {
 
   async saveMarketingWeeklyRoutine(routine) {
     if (!this.isActive() || !routine || !routine.id) return false;
+    this._trackOperationStart();
     try {
       const cleanData = this._cleanFirestoreData(routine);
       await this.db.collection('marketing_weekly_routines').doc(String(routine.id)).set(cleanData, { merge: true });
+      this._trackOperationEnd(true);
       return true;
     } catch (err) {
+      this._trackOperationEnd(false);
       console.warn('Failed to save marketing weekly routine to Firestore:', err);
       return false;
     }
@@ -392,12 +467,37 @@ class FirebaseSyncService {
 
   async saveMarketingMonthlyRoutine(routine) {
     if (!this.isActive() || !routine || !routine.id) return false;
+    this._trackOperationStart();
     try {
       const cleanData = this._cleanFirestoreData(routine);
       await this.db.collection('marketing_monthly_routines').doc(String(routine.id)).set(cleanData, { merge: true });
+      this._trackOperationEnd(true);
       return true;
     } catch (err) {
+      this._trackOperationEnd(false);
       console.warn('Failed to save marketing monthly routine to Firestore:', err);
+      return false;
+    }
+  }
+
+  // Immutable Enterprise Audit Trail
+  async logAudit(action, details = {}, user = null) {
+    if (!this.isActive()) return false;
+    try {
+      const activeUser = user || (window.authService && window.authService.getCurrentUser ? window.authService.getCurrentUser() : null);
+      const auditEntry = {
+        action: String(action),
+        userEmail: activeUser ? activeUser.email : 'system',
+        userName: activeUser ? activeUser.name : 'System',
+        userRole: activeUser ? activeUser.role : 'system',
+        details: this._cleanFirestoreData(details),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        clientTimestamp: new Date().toISOString()
+      };
+      await this.db.collection('audit_logs').add(auditEntry);
+      return true;
+    } catch (err) {
+      console.warn('Audit trail write notice:', err);
       return false;
     }
   }

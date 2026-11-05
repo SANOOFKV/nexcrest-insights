@@ -10275,3 +10275,287 @@ body.dark-theme .admin-task-item.completed {
   height: 13px;
   color: var(--teal-primary);
 }
+
+
+/* ==========================================================================
+   GLOBAL STANDARDS & UI ENHANCEMENTS (P0-P3 AUDIT HARDENED)
+   - Live Cloud Sync Status Indicator
+   - Command Palette (Ctrl+K / Cmd+K)
+   - Mobile Touch & Safe-Area Polishing
+   - Accessible Keyboard Navigation & Focus Rings
+   ========================================================================== */
+
+/* Universal Accessible Focus Rings (a11y) */
+:focus-visible {
+  outline: 2px solid var(--teal-primary, #EF2424);
+  outline-offset: 2px;
+}
+
+/* 1. Live Cloud Sync Status Pill */
+.sync-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  cursor: default;
+}
+.sync-status-pill .sync-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.sync-status-pill.synced {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  color: #059669;
+}
+.sync-status-pill.synced .sync-dot {
+  background: #10B981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+.sync-status-pill.syncing {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: #D97706;
+}
+.sync-status-pill.syncing .sync-dot {
+  background: #F59E0B;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.5);
+  animation: pulse-sync-dot 1.2s infinite ease-in-out;
+}
+.sync-status-pill.offline {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #DC2626;
+}
+.sync-status-pill.offline .sync-dot {
+  background: #EF4444;
+}
+
+@keyframes pulse-sync-dot {
+  0% { transform: scale(0.85); opacity: 0.6; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.85); opacity: 0.6; }
+}
+
+/* 2. Command Palette Trigger Button (Header) */
+.command-palette-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px !important;
+  font-size: 12px;
+}
+.command-palette-trigger-btn .kbd-shortcut-hint {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.06);
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: var(--text-dim);
+  font-family: monospace;
+}
+
+/* 3. Global Command Palette Modal (Ctrl+K) */
+.command-palette-overlay {
+  z-index: 10000;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(7, 19, 29, 0.45);
+  align-items: flex-start !important;
+  padding-top: max(60px, 12vh) !important;
+}
+.command-palette-card {
+  max-width: 620px;
+  width: 92%;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 30px 70px -10px rgba(0, 0, 0, 0.28), 0 10px 24px -5px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface, #FFFFFF);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  display: flex;
+  flex-direction: column;
+  animation: command-slide-down 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes command-slide-down {
+  from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.command-palette-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: transparent;
+}
+.command-search-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--teal-primary, #EF2424);
+  flex-shrink: 0;
+}
+.command-palette-input {
+  flex: 1;
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  font-size: 15px !important;
+  font-weight: 500;
+  color: var(--text-main);
+  font-family: var(--font-body);
+  padding: 0 !important;
+}
+.command-esc-hint {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+  color: var(--text-dim);
+  font-family: monospace;
+}
+.command-palette-results {
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 8px 10px;
+  overscroll-behavior: contain;
+}
+.command-group-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  padding: 8px 12px 4px;
+}
+.command-palette-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  user-select: none;
+}
+.command-palette-item:hover,
+.command-palette-item.selected {
+  background: rgba(239, 36, 36, 0.08);
+  color: var(--teal-primary, #EF2424);
+}
+.command-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+}
+.command-item-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+.command-item-title {
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.command-item-subtitle {
+  font-size: 11.5px;
+  color: var(--text-dim);
+  margin-left: 6px;
+}
+.command-item-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+.command-palette-empty {
+  padding: 28px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+.command-palette-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  padding: 9px 18px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 11px;
+  color: var(--text-dim);
+  background: rgba(0, 0, 0, 0.02);
+}
+.command-palette-footer kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  font-size: 10px;
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* 4. Enhanced Mobile Responsiveness & Safe Area Bottom Insets */
+@media (max-width: 768px) {
+  .command-palette-overlay {
+    padding-top: max(20px, 8vh) !important;
+  }
+  .command-palette-card {
+    width: 95% !important;
+  }
+  .command-palette-footer {
+    display: none;
+  }
+  .batch-action-bar {
+    padding-bottom: max(14px, env(safe-area-inset-bottom)) !important;
+  }
+  .tabs-control-bar {
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+  .modal-card {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  
+  /* Mobile Deliverables Table Touch Improvements */
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    margin-bottom: 12px;
+  }
+  .data-table th, .data-table td {
+    white-space: nowrap;
+    padding: 10px 12px;
+  }
+  .target-row-checkbox {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  .btn-outline-sm {
+    min-height: 34px !important;
+    min-width: 34px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
