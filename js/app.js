@@ -239,6 +239,10 @@ document.addEventListener('DOMContentLoaded', () => {
     targetProgram: document.getElementById('target-program'),
     targetQty: document.getElementById('target-qty'),
     targetDeadline: document.getElementById('target-deadline'),
+    targetDeadlineTimeGroup: document.getElementById('target-deadline-time-group'),
+    targetDeadlineTime: document.getElementById('target-deadline-time'),
+    targetDeadlineTimePresets: document.getElementById('target-deadline-time-presets'),
+    btnClearTargetTime: document.getElementById('btn-clear-target-time'),
     targetDeadlinePresets: document.getElementById('target-deadline-presets'),
     targetDeadlineQuickPreview: document.getElementById('target-deadline-quick-preview'),
     targetNotes: document.getElementById('target-notes'),
@@ -301,6 +305,10 @@ document.addEventListener('DOMContentLoaded', () => {
     logExtraProgram: document.getElementById('log-extra-program'),
     logExtraFormat: document.getElementById('log-extra-format'),
     logExtraDeadline: document.getElementById('log-extra-deadline'),
+    logExtraDeadlineTimeGroup: document.getElementById('log-extra-deadline-time-group'),
+    logExtraDeadlineTime: document.getElementById('log-extra-deadline-time'),
+    logExtraDeadlineTimePresets: document.getElementById('log-extra-deadline-time-presets'),
+    btnClearExtraTime: document.getElementById('btn-clear-extra-time'),
     logExtraDeadlinePresets: document.getElementById('log-extra-deadline-presets'),
     logExtraDeadlinePreview: document.getElementById('log-extra-deadline-preview'),
     logWorkModalHeading: document.getElementById('log-work-modal-heading'),
@@ -467,36 +475,97 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function parseDeadline(deadlineStr) {
+    if (!deadlineStr || typeof deadlineStr !== 'string') return null;
+    const str = deadlineStr.trim();
+    if (!str) return null;
+
+    let datePart = str;
+    let timePart = '';
+
+    if (str.includes('T')) {
+      const split = str.split('T');
+      datePart = split[0];
+      timePart = split[1] || '';
+    } else if (str.includes(' ')) {
+      const split = str.split(' ');
+      datePart = split[0];
+      timePart = split[1] || '';
+    }
+
+    const dParts = datePart.split('-');
+    if (dParts.length < 3) return null;
+
+    const year = parseInt(dParts[0], 10);
+    const month = parseInt(dParts[1], 10) - 1;
+    const day = parseInt(dParts[2], 10);
+
+    let hours = 23;
+    let minutes = 59;
+    let hasTime = false;
+
+    if (timePart) {
+      const tParts = timePart.split(':');
+      if (tParts.length >= 2) {
+        hours = parseInt(tParts[0], 10) || 0;
+        minutes = parseInt(tParts[1], 10) || 0;
+        hasTime = true;
+      }
+    }
+
+    const dueDate = new Date(year, month, day, hours, minutes, 0);
+    return {
+      dateObj: dueDate,
+      datePart,
+      timePart,
+      hasTime,
+      year,
+      month,
+      day,
+      hours,
+      minutes
+    };
+  }
+
+  function formatTime12h(hours, minutes) {
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const h12 = hours % 12 || 12;
+    const mStr = String(minutes).padStart(2, '0');
+    return `${h12}:${mStr} ${period}`;
+  }
+
   function formatDeadlineBadge(deadlineStr, isCompleted = false) {
     if (!deadlineStr) return '';
     try {
-      const parts = deadlineStr.split('-');
-      if (parts.length < 3) return `<span class="badge-deadline"><i data-lucide="calendar"></i> Due ${escapeHtml(deadlineStr)}</span>`;
-      const dueYear = parseInt(parts[0], 10);
-      const dueMonth = parseInt(parts[1], 10) - 1;
-      const dueDay = parseInt(parts[2], 10);
-      const dueDate = new Date(dueYear, dueMonth, dueDay, 23, 59, 59);
+      const parsed = parseDeadline(deadlineStr);
+      if (!parsed) return `<span class="badge-deadline"><i data-lucide="calendar"></i> Due ${escapeHtml(deadlineStr)}</span>`;
 
       const now = new Date();
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const dueStart = new Date(dueYear, dueMonth, dueDay);
+      const dueStart = new Date(parsed.year, parsed.month, parsed.day);
       const diffMs = dueStart - todayStart;
       const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
 
-      const formattedDate = dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const formattedDate = parsed.dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const timeStr = parsed.hasTime ? ` at ${formatTime12h(parsed.hours, parsed.minutes)}` : '';
 
       if (isCompleted) {
-        return `<span class="badge-deadline completed" title="Due on ${formattedDate} (Task Completed)"><i data-lucide="calendar-check"></i> Due ${formattedDate}</span>`;
+        return `<span class="badge-deadline completed" title="Due on ${formattedDate}${timeStr} (Task Completed)"><i data-lucide="calendar-check"></i> Due ${formattedDate}${timeStr}</span>`;
       }
 
       if (diffDays < 0) {
-        return `<span class="badge-deadline overdue" title="Overdue by ${Math.abs(diffDays)} day(s)"><i data-lucide="alert-circle"></i> Overdue (${formattedDate})</span>`;
+        return `<span class="badge-deadline overdue" title="Overdue by ${Math.abs(diffDays)} day(s)"><i data-lucide="alert-circle"></i> Overdue (${formattedDate}${timeStr})</span>`;
       } else if (diffDays === 0) {
-        return `<span class="badge-deadline today" title="Due Today!"><i data-lucide="clock"></i> Due Today</span>`;
+        // If due today and specific time has passed
+        const isTimeOverdue = parsed.hasTime && now > parsed.dateObj;
+        if (isTimeOverdue) {
+          return `<span class="badge-deadline overdue" title="Overdue! Deadline was today at ${formatTime12h(parsed.hours, parsed.minutes)}"><i data-lucide="alert-circle"></i> Overdue (${formatTime12h(parsed.hours, parsed.minutes)})</span>`;
+        }
+        return `<span class="badge-deadline today" title="Due Today!"><i data-lucide="clock"></i> Due Today${timeStr}</span>`;
       } else if (diffDays === 1) {
-        return `<span class="badge-deadline soon" title="Due Tomorrow"><i data-lucide="calendar"></i> Due Tomorrow</span>`;
+        return `<span class="badge-deadline soon" title="Due Tomorrow"><i data-lucide="calendar"></i> Due Tomorrow${timeStr}</span>`;
       } else {
-        return `<span class="badge-deadline" title="Due on ${formattedDate}"><i data-lucide="calendar"></i> Due ${formattedDate}</span>`;
+        return `<span class="badge-deadline" title="Due on ${formattedDate}${timeStr}"><i data-lucide="calendar"></i> Due ${formattedDate}${timeStr}</span>`;
       }
     } catch (e) {
       return `<span class="badge-deadline"><i data-lucide="calendar"></i> Due ${escapeHtml(deadlineStr)}</span>`;
@@ -506,31 +575,28 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderTaskDeadlineStrip(deadlineStr, isCompleted = false) {
     if (!deadlineStr) return '';
     try {
-      const parts = deadlineStr.split('-');
-      if (parts.length < 3) {
+      const parsed = parseDeadline(deadlineStr);
+      if (!parsed) {
         return `
           <div class="task-deadline-strip upcoming">
             <span class="deadline-content"><i data-lucide="calendar"></i> Due: <strong>${escapeHtml(deadlineStr)}</strong></span>
             <span class="deadline-tag">Scheduled</span>
           </div>`;
       }
-      const dueYear = parseInt(parts[0], 10);
-      const dueMonth = parseInt(parts[1], 10) - 1;
-      const dueDay = parseInt(parts[2], 10);
-      const dueDate = new Date(dueYear, dueMonth, dueDay, 23, 59, 59);
 
       const now = new Date();
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const dueStart = new Date(dueYear, dueMonth, dueDay);
+      const dueStart = new Date(parsed.year, parsed.month, parsed.day);
       const diffMs = dueStart - todayStart;
       const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
 
-      const formattedDate = dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const formattedDate = parsed.dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const timeStr = parsed.hasTime ? ` at ${formatTime12h(parsed.hours, parsed.minutes)}` : '';
 
       if (isCompleted) {
         return `
           <div class="task-deadline-strip completed" title="Task Completed">
-            <span class="deadline-content"><i data-lucide="calendar-check"></i> Due: <strong>${formattedDate}</strong></span>
+            <span class="deadline-content"><i data-lucide="calendar-check"></i> Due: <strong>${formattedDate}${timeStr}</strong></span>
             <span class="deadline-tag">Completed</span>
           </div>`;
       }
@@ -539,25 +605,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const absDays = Math.abs(diffDays);
         return `
           <div class="task-deadline-strip overdue" title="Overdue by ${absDays} day(s)">
-            <span class="deadline-content"><i data-lucide="alert-circle"></i> Due: <strong>${formattedDate}</strong></span>
+            <span class="deadline-content"><i data-lucide="alert-circle"></i> Due: <strong>${formattedDate}${timeStr}</strong></span>
             <span class="deadline-tag">⚠️ ${absDays}d Overdue</span>
           </div>`;
       } else if (diffDays === 0) {
+        const isTimeOverdue = parsed.hasTime && now > parsed.dateObj;
+        if (isTimeOverdue) {
+          return `
+            <div class="task-deadline-strip overdue" title="Overdue today!">
+              <span class="deadline-content"><i data-lucide="alert-circle"></i> Due Today: <strong>${formattedDate}${timeStr}</strong></span>
+              <span class="deadline-tag">⚠️ Overdue Today</span>
+            </div>`;
+        }
         return `
           <div class="task-deadline-strip today" title="Due Today!">
-            <span class="deadline-content"><i data-lucide="clock"></i> Due: <strong>${formattedDate}</strong></span>
+            <span class="deadline-content"><i data-lucide="clock"></i> Due: <strong>${formattedDate}${timeStr}</strong></span>
             <span class="deadline-tag">⏰ Due Today</span>
           </div>`;
       } else if (diffDays === 1) {
         return `
           <div class="task-deadline-strip soon" title="Due Tomorrow">
-            <span class="deadline-content"><i data-lucide="calendar"></i> Due: <strong>${formattedDate}</strong></span>
+            <span class="deadline-content"><i data-lucide="calendar"></i> Due: <strong>${formattedDate}${timeStr}</strong></span>
             <span class="deadline-tag">Due Tomorrow</span>
           </div>`;
       } else {
         return `
           <div class="task-deadline-strip upcoming" title="Due in ${diffDays} days">
-            <span class="deadline-content"><i data-lucide="calendar"></i> Due: <strong>${formattedDate}</strong></span>
+            <span class="deadline-content"><i data-lucide="calendar"></i> Due: <strong>${formattedDate}${timeStr}</strong></span>
             <span class="deadline-tag">${diffDays} days left</span>
           </div>`;
       }
@@ -598,28 +672,33 @@ document.addEventListener('DOMContentLoaded', () => {
     return (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr(d) : d.toISOString().split('T')[0];
   }
 
-  function updateDeadlineQuickPreview(inputEl, previewEl) {
+  function updateDeadlineQuickPreview(dateInputEl, previewEl, timeInputEl = null) {
     if (!previewEl) return;
-    const val = inputEl ? inputEl.value : '';
-    if (!val) {
+    const dateVal = dateInputEl ? dateInputEl.value : '';
+    if (!dateVal) {
       previewEl.innerHTML = '';
       return;
     }
+
+    const timeVal = (timeInputEl && timeInputEl.value) ? timeInputEl.value : '';
+    const timeDisplay = timeVal ? ` at ${formatTime12h(parseInt(timeVal.split(':')[0], 10), parseInt(timeVal.split(':')[1] || 0, 10))}` : '';
+
     const today = new Date();
     const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr(today) : today.toISOString().split('T')[0];
 
-    if (val === todayStr) {
-      previewEl.innerHTML = `<span style="color: #FDE68A;">⏰ Due Today!</span>`;
-    } else if (val < todayStr) {
-      previewEl.innerHTML = `<span style="color: #FDA4AF;">⚠️ Past Date</span>`;
+    if (dateVal === todayStr) {
+      previewEl.innerHTML = `<span style="color: #FDE68A;">⏰ Due Today${timeDisplay}!</span>`;
+    } else if (dateVal < todayStr) {
+      previewEl.innerHTML = `<span style="color: #FDA4AF;">⚠️ Past Date (${dateVal}${timeDisplay})</span>`;
     } else {
-      const targetD = new Date(val);
-      const diffTime = targetD.getTime() - today.getTime();
+      const parts = dateVal.split('-').map(Number);
+      const targetD = new Date(parts[0], parts[1] - 1, parts[2]);
+      const diffTime = targetD.getTime() - new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24));
       if (diffDays === 1) {
-        previewEl.innerHTML = `<span style="color: #FEF08A;">⚡ Due Tomorrow</span>`;
+        previewEl.innerHTML = `<span style="color: #FEF08A;">⚡ Due Tomorrow${timeDisplay}</span>`;
       } else {
-        previewEl.innerHTML = `<span style="color: var(--teal-light);">📅 In ${diffDays} days</span>`;
+        previewEl.innerHTML = `<span style="color: var(--teal-light);">📅 In ${diffDays} days${timeDisplay}</span>`;
       }
     }
   }
@@ -3761,22 +3840,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
           let deadlineBanner = '';
           if (target.deadline) {
-            const today = new Date();
-            const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : today.toISOString().split('T')[0];
-            if (isDone) {
-              deadlineBanner = `<div class="mkt-instant-deadline-banner completed"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="check-circle" style="width:13px;height:13px;"></i> Delivered</span></div>`;
-            } else if (target.deadline === todayStr) {
-              deadlineBanner = `<div class="mkt-instant-deadline-banner due-today"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="clock" style="width:13px;height:13px;"></i> Due Today (6 PM)</span><span>Urgent</span></div>`;
-            } else if (target.deadline < todayStr) {
-              deadlineBanner = `<div class="mkt-instant-deadline-banner overdue"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="alert-circle" style="width:13px;height:13px;"></i> Overdue (${target.deadline})</span><span>Action</span></div>`;
-            } else {
-              const targetD = new Date(target.deadline);
-              const diffTime = targetD.getTime() - today.getTime();
-              const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24));
-              if (diffDays === 1) {
-                deadlineBanner = `<div class="mkt-instant-deadline-banner due-tomorrow"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="calendar" style="width:13px;height:13px;"></i> Due Tomorrow</span><span>Priority</span></div>`;
+            const parsed = parseDeadline(target.deadline);
+            if (parsed) {
+              const now = new Date();
+              const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+              const dueStart = new Date(parsed.year, parsed.month, parsed.day);
+              const diffMs = dueStart - todayStart;
+              const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+              const timeStr = parsed.hasTime ? ` at ${formatTime12h(parsed.hours, parsed.minutes)}` : '';
+              const timeShort = parsed.hasTime ? ` (${formatTime12h(parsed.hours, parsed.minutes)})` : '';
+
+              if (isDone) {
+                deadlineBanner = `<div class="mkt-instant-deadline-banner completed"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="check-circle" style="width:13px;height:13px;"></i> Delivered</span></div>`;
+              } else if (diffDays < 0 || (diffDays === 0 && parsed.hasTime && now > parsed.dateObj)) {
+                deadlineBanner = `<div class="mkt-instant-deadline-banner overdue"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="alert-circle" style="width:13px;height:13px;"></i> Overdue${timeShort}</span><span>Action Required</span></div>`;
+              } else if (diffDays === 0) {
+                deadlineBanner = `<div class="mkt-instant-deadline-banner due-today"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="clock" style="width:13px;height:13px;"></i> Due Today${timeStr}</span><span>Urgent</span></div>`;
+              } else if (diffDays === 1) {
+                deadlineBanner = `<div class="mkt-instant-deadline-banner due-tomorrow"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="calendar" style="width:13px;height:13px;"></i> Due Tomorrow${timeStr}</span><span>Priority</span></div>`;
               } else {
-                deadlineBanner = `<div class="mkt-instant-deadline-banner upcoming"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="calendar" style="width:13px;height:13px;"></i> Due in ${diffDays}d</span><span>Scheduled</span></div>`;
+                deadlineBanner = `<div class="mkt-instant-deadline-banner upcoming"><span style="display:flex;align-items:center;gap:5px;"><i data-lucide="calendar" style="width:13px;height:13px;"></i> Due in ${diffDays}d${timeStr}</span><span>Scheduled</span></div>`;
               }
             }
           }
@@ -4345,6 +4428,11 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.assignTargetForm.reset();
     elements.editTargetId.value = '';
     if (elements.targetDeadline) elements.targetDeadline.value = '';
+    if (elements.targetDeadlineTime) elements.targetDeadlineTime.value = '';
+    if (elements.targetDeadlineTimeGroup) elements.targetDeadlineTimeGroup.classList.add('hidden');
+    if (elements.targetDeadlineTimePresets) {
+      elements.targetDeadlineTimePresets.querySelectorAll('.btn-preset-pill').forEach(b => b.classList.remove('active'));
+    }
     if (elements.targetDeadlineQuickPreview) elements.targetDeadlineQuickPreview.innerHTML = '';
     if (elements.targetDeadlinePresets) {
       elements.targetDeadlinePresets.querySelectorAll('.btn-preset-pill').forEach(b => b.classList.remove('active'));
@@ -4781,7 +4869,12 @@ document.addEventListener('DOMContentLoaded', () => {
       format: (elements.targetFormat && elements.targetFormat.value.trim()) || elements.targetBrand.value || 'Deliverable',
       program: elements.targetProgram.value.trim(),
       targetQty: parseInt(elements.targetQty.value, 10) || 1,
-      deadline: (elements.targetDeadline && elements.targetDeadline.value) ? elements.targetDeadline.value.trim() : '',
+      deadline: (() => {
+        if (!elements.targetDeadline || !elements.targetDeadline.value) return '';
+        const d = elements.targetDeadline.value.trim();
+        const t = (elements.targetDeadlineTime && elements.targetDeadlineTime.value) ? elements.targetDeadlineTime.value.trim() : '';
+        return t ? `${d}T${t}` : d;
+      })(),
       notes: elements.targetNotes.value.trim()
     };
     if (elements.editTargetId.value) {
@@ -4957,7 +5050,11 @@ document.addEventListener('DOMContentLoaded', () => {
         format,
         url,
         notes,
-        deadline: extraDeadline,
+        deadline: (() => {
+          if (!extraDeadline) return '';
+          const t = (elements.logExtraDeadlineTime && elements.logExtraDeadlineTime.value) ? elements.logExtraDeadlineTime.value.trim() : '';
+          return t ? `${extraDeadline}T${t}` : extraDeadline;
+        })(),
         month: window.dataStore.getActiveMonth()
       };
     } else {
@@ -5234,7 +5331,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (elements.targetFormat) elements.targetFormat.value = target.format || '';
         elements.targetProgram.value = target.program;
         elements.targetQty.value = target.targetQty;
-        if (elements.targetDeadline) elements.targetDeadline.value = target.deadline || '';
+        if (elements.targetDeadline) {
+          if (target.deadline && target.deadline.includes('T')) {
+            const [dPart, tPart] = target.deadline.split('T');
+            elements.targetDeadline.value = dPart;
+            if (elements.targetDeadlineTime) elements.targetDeadlineTime.value = tPart.slice(0, 5);
+            if (elements.targetDeadlineTimeGroup) elements.targetDeadlineTimeGroup.classList.remove('hidden');
+          } else if (target.deadline) {
+            elements.targetDeadline.value = target.deadline;
+            if (elements.targetDeadlineTime) elements.targetDeadlineTime.value = '';
+            if (elements.targetDeadlineTimeGroup) elements.targetDeadlineTimeGroup.classList.remove('hidden');
+          } else {
+            elements.targetDeadline.value = '';
+            if (elements.targetDeadlineTime) elements.targetDeadlineTime.value = '';
+            if (elements.targetDeadlineTimeGroup) elements.targetDeadlineTimeGroup.classList.add('hidden');
+          }
+          updateDeadlineQuickPreview(elements.targetDeadline, elements.targetDeadlineQuickPreview, elements.targetDeadlineTime);
+        }
         elements.targetNotes.value = target.notes || '';
         elements.assignTargetModal.querySelector('h3').textContent = 'Edit Target Deliverable';
         if (elements.btnSubmitTargetText) elements.btnSubmitTargetText.textContent = 'Update Target';
@@ -5363,22 +5476,131 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Real-Time Input Handlers for Deadline Inputs
+  // Real-Time Input Handlers for Deadline Date & Time Progressive Disclosure
   if (elements.targetDeadline) {
-    elements.targetDeadline.addEventListener('input', () => {
-      updateDeadlineQuickPreview(elements.targetDeadline, elements.targetDeadlineQuickPreview);
-      if (elements.targetDeadlinePresets) {
-        elements.targetDeadlinePresets.querySelectorAll('.btn-preset-pill').forEach(b => b.classList.remove('active'));
+    const handleTargetDateChange = () => {
+      const hasDate = Boolean(elements.targetDeadline.value);
+      if (hasDate) {
+        if (elements.targetDeadlineTimeGroup) elements.targetDeadlineTimeGroup.classList.remove('hidden');
+        if (elements.targetDeadlineTime && !elements.targetDeadlineTime.value) {
+          elements.targetDeadlineTime.value = '18:00';
+          if (elements.targetDeadlineTimePresets) {
+            elements.targetDeadlineTimePresets.querySelectorAll('.btn-preset-pill').forEach(p => {
+              p.classList.toggle('active', p.dataset.timePreset === '18:00');
+            });
+          }
+        }
+      } else {
+        if (elements.targetDeadlineTimeGroup) elements.targetDeadlineTimeGroup.classList.add('hidden');
+        if (elements.targetDeadlineTime) elements.targetDeadlineTime.value = '';
+        if (elements.targetDeadlineTimePresets) {
+          elements.targetDeadlineTimePresets.querySelectorAll('.btn-preset-pill').forEach(p => p.classList.remove('active'));
+        }
       }
+      updateDeadlineQuickPreview(elements.targetDeadline, elements.targetDeadlineQuickPreview, elements.targetDeadlineTime);
+    };
+
+    elements.targetDeadline.addEventListener('input', handleTargetDateChange);
+    elements.targetDeadline.addEventListener('change', handleTargetDateChange);
+  }
+
+  if (elements.targetDeadlineTime) {
+    elements.targetDeadlineTime.addEventListener('input', () => {
+      if (elements.targetDeadlineTimePresets) {
+        const val = elements.targetDeadlineTime.value;
+        elements.targetDeadlineTimePresets.querySelectorAll('.btn-preset-pill').forEach(p => {
+          p.classList.toggle('active', p.dataset.timePreset === val);
+        });
+      }
+      updateDeadlineQuickPreview(elements.targetDeadline, elements.targetDeadlineQuickPreview, elements.targetDeadlineTime);
     });
   }
 
-  if (elements.logExtraDeadline) {
-    elements.logExtraDeadline.addEventListener('input', () => {
-      updateDeadlineQuickPreview(elements.logExtraDeadline, elements.logExtraDeadlinePreview);
-      if (elements.logExtraDeadlinePresets) {
-        elements.logExtraDeadlinePresets.querySelectorAll('.btn-preset-pill').forEach(b => b.classList.remove('active'));
+  if (elements.targetDeadlineTimePresets) {
+    elements.targetDeadlineTimePresets.querySelectorAll('.btn-preset-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const preset = pill.dataset.timePreset;
+        if (elements.targetDeadlineTime) {
+          elements.targetDeadlineTime.value = preset;
+        }
+        elements.targetDeadlineTimePresets.querySelectorAll('.btn-preset-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        updateDeadlineQuickPreview(elements.targetDeadline, elements.targetDeadlineQuickPreview, elements.targetDeadlineTime);
+      });
+    });
+  }
+
+  if (elements.btnClearTargetTime) {
+    elements.btnClearTargetTime.addEventListener('click', () => {
+      if (elements.targetDeadlineTime) elements.targetDeadlineTime.value = '';
+      if (elements.targetDeadlineTimePresets) {
+        elements.targetDeadlineTimePresets.querySelectorAll('.btn-preset-pill').forEach(p => p.classList.remove('active'));
       }
+      updateDeadlineQuickPreview(elements.targetDeadline, elements.targetDeadlineQuickPreview, elements.targetDeadlineTime);
+    });
+  }
+
+  // Extra Deadline in Log Work Modal
+  if (elements.logExtraDeadline) {
+    const handleExtraDateChange = () => {
+      const hasDate = Boolean(elements.logExtraDeadline.value);
+      if (hasDate) {
+        if (elements.logExtraDeadlineTimeGroup) elements.logExtraDeadlineTimeGroup.classList.remove('hidden');
+        if (elements.logExtraDeadlineTime && !elements.logExtraDeadlineTime.value) {
+          elements.logExtraDeadlineTime.value = '18:00';
+          if (elements.logExtraDeadlineTimePresets) {
+            elements.logExtraDeadlineTimePresets.querySelectorAll('.btn-preset-pill').forEach(p => {
+              p.classList.toggle('active', p.dataset.extraTimePreset === '18:00');
+            });
+          }
+        }
+      } else {
+        if (elements.logExtraDeadlineTimeGroup) elements.logExtraDeadlineTimeGroup.classList.add('hidden');
+        if (elements.logExtraDeadlineTime) elements.logExtraDeadlineTime.value = '';
+        if (elements.logExtraDeadlineTimePresets) {
+          elements.logExtraDeadlineTimePresets.querySelectorAll('.btn-preset-pill').forEach(p => p.classList.remove('active'));
+        }
+      }
+      updateDeadlineQuickPreview(elements.logExtraDeadline, elements.logExtraDeadlinePreview, elements.logExtraDeadlineTime);
+    };
+
+    elements.logExtraDeadline.addEventListener('input', handleExtraDateChange);
+    elements.logExtraDeadline.addEventListener('change', handleExtraDateChange);
+  }
+
+  if (elements.logExtraDeadlineTime) {
+    elements.logExtraDeadlineTime.addEventListener('input', () => {
+      if (elements.logExtraDeadlineTimePresets) {
+        const val = elements.logExtraDeadlineTime.value;
+        elements.logExtraDeadlineTimePresets.querySelectorAll('.btn-preset-pill').forEach(p => {
+          p.classList.toggle('active', p.dataset.extraTimePreset === val);
+        });
+      }
+      updateDeadlineQuickPreview(elements.logExtraDeadline, elements.logExtraDeadlinePreview, elements.logExtraDeadlineTime);
+    });
+  }
+
+  if (elements.logExtraDeadlineTimePresets) {
+    elements.logExtraDeadlineTimePresets.querySelectorAll('.btn-preset-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const preset = pill.dataset.extraTimePreset;
+        if (elements.logExtraDeadlineTime) {
+          elements.logExtraDeadlineTime.value = preset;
+        }
+        elements.logExtraDeadlineTimePresets.querySelectorAll('.btn-preset-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        updateDeadlineQuickPreview(elements.logExtraDeadline, elements.logExtraDeadlinePreview, elements.logExtraDeadlineTime);
+      });
+    });
+  }
+
+  if (elements.btnClearExtraTime) {
+    elements.btnClearExtraTime.addEventListener('click', () => {
+      if (elements.logExtraDeadlineTime) elements.logExtraDeadlineTime.value = '';
+      if (elements.logExtraDeadlineTimePresets) {
+        elements.logExtraDeadlineTimePresets.querySelectorAll('.btn-preset-pill').forEach(p => p.classList.remove('active'));
+      }
+      updateDeadlineQuickPreview(elements.logExtraDeadline, elements.logExtraDeadlinePreview, elements.logExtraDeadlineTime);
     });
   }
 
