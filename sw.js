@@ -1,9 +1,9 @@
 /**
  * Nexcrest Insights - Service Worker for Offline PWA Capabilities
- * Version: v98
+ * Version: v99
  */
 
-const CACHE_NAME = 'nexcrest-insights-shell-v98';
+const CACHE_NAME = 'nexcrest-insights-shell-v99';
 const CORE_ASSETS = [
   './',
   './index.html',

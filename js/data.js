@@ -658,7 +658,7 @@ class DataStore {
   getTargets(filters = {}) {
     const activeM = filters.month || this.activeMonth || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     return this.targets.filter(t => {
-      const tMonth = t.month || '2026-10';
+      const tMonth = t.month || this.activeMonth || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
       if (tMonth !== activeM) return false;
       if (filters.assignee && filters.assignee !== 'all') {
         const a = filters.assignee.toLowerCase();
@@ -695,7 +695,7 @@ class DataStore {
     const uName = (user.name || '').toLowerCase();
 
     return this.targets.filter(t => {
-      const tMonth = t.month || '2026-10';
+      const tMonth = t.month || this.activeMonth || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
       if (tMonth !== activeM) return false;
       const tAssignee = (t.assignee || '').toLowerCase();
       const tEmail = (t.assigneeEmail || '').toLowerCase();
@@ -716,6 +716,11 @@ class DataStore {
   getEmployeeStats(user, customMonth = null) {
     if (!user) return { totalTarget: 0, totalCompleted: 0, totalPending: 0, pct: 0, extraCompleted: 0, remaining: 0, targetsCount: 0 };
     const targets = this.getTargetsForUser(user, customMonth);
+    const activeM = customMonth || this.activeMonth || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
+    const uEmail = (user.email || '').toLowerCase();
+    const uRole = (user.role || '').toLowerCase();
+    const uName = (user.name || '').toLowerCase();
+
     let totalTarget = 0;
     let totalCompleted = 0;
     let totalPending = 0;
@@ -729,6 +734,28 @@ class DataStore {
       totalPending += prog.pending;
     });
 
+    // Also include any approved/pending extra submissions that were unassigned or not linked to targets
+    const targetIdSet = new Set(targets.map(t => String(t.id)));
+    if (Array.isArray(this.submissions)) {
+      this.submissions.forEach(s => {
+        if (!s) return;
+        const subMonth = s.month || (s.submittedAt ? s.submittedAt.slice(0, 7) : activeM);
+        if (subMonth !== activeM) return;
+        const sAssignee = (s.assignee || '').toLowerCase();
+        const sAuthorEmail = (s.authorEmail || '').toLowerCase();
+        const sAuthorName = (s.authorName || '').toLowerCase();
+        const matchesUser = sAssignee === uRole || sAuthorEmail === uEmail || sAuthorName === uName;
+        if (!matchesUser) return;
+
+        if (!s.targetId || s.targetId === 'unassigned' || !targetIdSet.has(String(s.targetId))) {
+          if (s.isExtra) {
+            if (s.status === 'approved') totalCompleted++;
+            else if (s.status === 'pending') totalPending++;
+          }
+        }
+      });
+    }
+
     const pct = totalTarget > 0 ? Math.round((totalCompleted / totalTarget) * 100) : (totalCompleted > 0 ? 100 : 0);
     const extraCompleted = Math.max(0, totalCompleted - totalTarget);
     const remaining = Math.max(0, totalTarget - totalCompleted);
@@ -737,7 +764,8 @@ class DataStore {
   }
 
   getTargetById(id) {
-    return this.targets.find(t => t.id === id);
+    if (id === null || id === undefined) return null;
+    return this.targets.find(t => String(t.id) === String(id));
   }
 
   saveOrUpdateTarget(targetData) {
@@ -747,7 +775,7 @@ class DataStore {
     }
     let targetToSave = cleanTarget;
     if (cleanTarget.id) {
-      const idx = this.targets.findIndex(t => t.id === cleanTarget.id);
+      const idx = this.targets.findIndex(t => String(t.id) === String(cleanTarget.id));
       if (idx !== -1) {
         this.targets[idx] = { ...this.targets[idx], ...cleanTarget };
         targetToSave = this.targets[idx];
@@ -756,7 +784,7 @@ class DataStore {
       const newTarget = {
         ...cleanTarget,
         id: 'target-' + Date.now(),
-        month: this.activeMonth
+        month: cleanTarget.month || this.activeMonth || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11')
       };
       this.targets.push(newTarget);
       targetToSave = newTarget;
@@ -783,11 +811,11 @@ class DataStore {
       console.warn('Unauthorized deleteTarget blocked: only the Marketing Manager (Admin) can delete assigned tasks.');
       return false;
     }
-    this.targets = this.targets.filter(t => t.id !== id);
+    this.targets = this.targets.filter(t => String(t.id) !== String(id));
     this.saveTargets(this.targets);
     // Also remove associated submissions for this target
     if (Array.isArray(this.submissions)) {
-      this.submissions = this.submissions.filter(s => s.targetId !== id);
+      this.submissions = this.submissions.filter(s => String(s.targetId) !== String(id));
       this.saveSubmissions(this.submissions);
     }
     // Delete from Cloud Firestore
@@ -808,6 +836,10 @@ class DataStore {
     this.targets = this.targets.filter(t => !idSet.has(String(t.id)));
     const deletedCount = initialLen - this.targets.length;
     this.saveTargets(this.targets);
+    if (Array.isArray(this.submissions)) {
+      this.submissions = this.submissions.filter(s => !idSet.has(String(s.targetId)));
+      this.saveSubmissions(this.submissions);
+    }
 
     // Also remove associated submissions
     if (Array.isArray(this.submissions)) {
@@ -823,9 +855,27 @@ class DataStore {
     return deletedCount;
   }
 
-  cloneMonthTargets(sourceMonth = '2026-10', destMonth = null) {
-    const targetMonth = destMonth || this.activeMonth;
-    const sourceTargets = this.targets.filter(t => t.month === sourceMonth);
+  cloneMonthTargets(sourceMonth = null, destMonth = null) {
+    const targetMonth = destMonth || this.activeMonth || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
+    let srcMonth = sourceMonth;
+    if (!srcMonth) {
+      const parts = targetMonth.split('-');
+      if (parts.length === 2) {
+        let y = parseInt(parts[0], 10);
+        let m = parseInt(parts[1], 10) - 1;
+        if (m < 1) { m = 12; y--; }
+        srcMonth = `${y}-${String(m).padStart(2, '0')}`;
+      }
+    }
+    let sourceTargets = this.targets.filter(t => t.month === srcMonth);
+    if (sourceTargets.length === 0) {
+      const distinctMonths = [...new Set(this.targets.map(t => t.month).filter(Boolean))].sort();
+      const prevMonths = distinctMonths.filter(m => m < targetMonth);
+      if (prevMonths.length > 0) {
+        srcMonth = prevMonths[prevMonths.length - 1];
+        sourceTargets = this.targets.filter(t => t.month === srcMonth);
+      }
+    }
     if (sourceTargets.length === 0) return 0;
 
     const cloned = sourceTargets.map(t => ({
@@ -846,7 +896,7 @@ class DataStore {
   getSubmissions(filters = {}) {
     return this.submissions.filter(s => {
       if (!s) return false;
-      if (filters.targetId && s.targetId !== filters.targetId) return false;
+      if (filters.targetId && String(s.targetId) !== String(filters.targetId)) return false;
       if (filters.status && filters.status !== 'all' && s.status !== filters.status) return false;
 
       if (filters.assignee && filters.assignee !== 'all') {
@@ -920,7 +970,7 @@ class DataStore {
   }
 
   updateSubmissionStatus(id, status, feedback = '') {
-    const sub = this.submissions.find(s => s.id === id);
+    const sub = this.submissions.find(s => String(s.id) === String(id));
     if (sub) {
       sub.status = status;
       sub.feedback = feedback;
@@ -943,7 +993,7 @@ class DataStore {
   deleteSubmission(id) {
     if (!id) return false;
     const initialLen = this.submissions.length;
-    this.submissions = this.submissions.filter(s => s.id !== id);
+    this.submissions = this.submissions.filter(s => String(s.id) !== String(id));
     if (this.submissions.length !== initialLen) {
       try {
         localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(this.submissions));
@@ -988,23 +1038,24 @@ class DataStore {
   // Calculated Progress Metrics
   getTargetProgress(targetId) {
     const target = this.getTargetById(targetId);
-    if (!target) return { completed: 0, pending: 0, target: 0, pct: 0, extra: 0 };
+    if (!target) return { completed: 0, pending: 0, revision: 0, target: 0, pct: 0, extra: 0 };
 
-    const subs = this.submissions.filter(s => s.targetId === targetId);
+    const subs = this.submissions.filter(s => String(s.targetId) === String(targetId));
     const completed = subs.filter(s => s.status === 'approved').length;
     const pending = subs.filter(s => s.status === 'pending').length;
+    const revision = subs.filter(s => s.status === 'revision').length;
     const targetQty = Number(target.targetQty) || 1;
     const pct = targetQty > 0 ? Math.round((completed / targetQty) * 100) : (completed > 0 ? 100 : 0);
     const extra = Math.max(0, completed - targetQty);
 
-    return { completed, pending, target: targetQty, pct, extra };
+    return { completed, pending, revision, target: targetQty, pct, extra };
   }
 
   getRoleStats(assignee, customMonth = null) {
     const a = (assignee || '').toLowerCase();
     const activeM = customMonth || this.activeMonth || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     const targets = this.targets.filter(t => {
-      const tMonth = t.month || '2026-10';
+      const tMonth = t.month || this.activeMonth || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
       if (tMonth !== activeM) return false;
       return (t.assignee && t.assignee.toLowerCase() === a) ||
              (t.assigneeRole && t.assigneeRole.toLowerCase() === a) ||
@@ -1023,6 +1074,22 @@ class DataStore {
       totalPending += prog.pending;
     });
 
+    const targetIdSet = new Set(targets.map(t => String(t.id)));
+    if (Array.isArray(this.submissions)) {
+      this.submissions.forEach(s => {
+        if (!s) return;
+        const subMonth = s.month || (s.submittedAt ? s.submittedAt.slice(0, 7) : activeM);
+        if (subMonth !== activeM) return;
+        const sAssignee = (s.assignee || '').toLowerCase();
+        if (sAssignee === a && (!s.targetId || s.targetId === 'unassigned' || !targetIdSet.has(String(s.targetId)))) {
+          if (s.isExtra) {
+            if (s.status === 'approved') totalCompleted++;
+            else if (s.status === 'pending') totalPending++;
+          }
+        }
+      });
+    }
+
     const pct = totalTarget > 0 ? Math.round((totalCompleted / totalTarget) * 100) : (totalCompleted > 0 ? 100 : 0);
     const extraCompleted = Math.max(0, totalCompleted - totalTarget);
     return { totalTarget, totalCompleted, totalPending, pct, extraCompleted };
@@ -1036,10 +1103,11 @@ class DataStore {
     return a === 'marketing' || r === 'marketing' || e === 'marketing@nexcrest.com' || a.includes('marketing') || e.includes('marketing');
   }
 
-  getOverallStats() {
-    const designerStats = this.getRoleStats('designer');
-    const videoStats = this.getRoleStats('videographer');
-    const marketingStats = this.getRoleStats('marketing');
+  getOverallStats(customMonth = null) {
+    const activeM = customMonth || this.activeMonth || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
+    const designerStats = this.getRoleStats('designer', activeM);
+    const videoStats = this.getRoleStats('videographer', activeM);
+    const marketingStats = this.getRoleStats('marketing', activeM);
 
     // Marketing Executive pool is strictly independent and monitored separately — excluded from creative monthly targets
     const totalTarget = designerStats.totalTarget + videoStats.totalTarget;
@@ -1179,9 +1247,9 @@ class DataStore {
     }
 
     // Role breakdowns for graphs
-    const designerStats = this.getRoleStats('designer');
-    const videoStats = this.getRoleStats('videographer');
-    const marketingStats = this.getRoleStats('marketing');
+    const designerStats = this.getRoleStats('designer', month);
+    const videoStats = this.getRoleStats('videographer', month);
+    const marketingStats = this.getRoleStats('marketing', month);
 
     return {
       month,
