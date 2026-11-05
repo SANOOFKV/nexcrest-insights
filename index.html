@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=95">
+  <link rel="stylesheet" href="css/styles.css?v=96">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -64,11 +64,7 @@
           <span class="sync-dot"></span>
           <span class="sync-label" id="cloud-sync-label">Synced</span>
         </div>
-        <!-- Quick Command Palette Trigger (Ctrl+K / Cmd+K) -->
-        <button type="button" id="btn-open-command-palette" class="cycle-calendar-btn command-palette-trigger-btn" title="Command Palette (Ctrl+K)" aria-label="Command Palette (Ctrl+K)" style="display: none;">
-          <i data-lucide="command"></i>
-          <span class="kbd-shortcut-hint">⌘K</span>
-        </button>
+
         <button type="button" id="btn-calendar-picker" class="cycle-calendar-btn" title="Cycle Calendar" aria-label="Cycle Calendar" style="display: none;">
           <i data-lucide="calendar"></i>
         </button>
@@ -2115,25 +2111,6 @@
     </div>
   </div>
 
-  <!-- Global Command Palette Modal (Ctrl+K / Cmd+K) -->
-  <div id="command-palette-modal" class="modal-overlay command-palette-overlay" style="display: none;" role="dialog" aria-modal="true" aria-label="Command Palette">
-    <div class="modal-card command-palette-card">
-      <div class="command-palette-input-wrap">
-        <i data-lucide="search" class="command-search-icon"></i>
-        <input type="text" id="command-palette-input" class="command-palette-input" placeholder="Type to search actions, switch cycles, jump views... (Esc to close)" autocomplete="off" spellcheck="false">
-        <span class="command-esc-hint">ESC</span>
-      </div>
-      <div class="command-palette-results" id="command-palette-results">
-        <!-- Injected via JavaScript -->
-      </div>
-      <div class="command-palette-footer">
-        <span><kbd>↑</kbd> <kbd>↓</kbd> Navigate</span>
-        <span><kbd>↵</kbd> Select</span>
-        <span><kbd>ESC</kbd> Close</span>
-      </div>
-    </div>
-  </div>
-
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
 
@@ -2141,10 +2118,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=95"></script>
-  <script src="js/data.js?v=95"></script>
-  <script src="js/auth.js?v=95"></script>
-  <script src="js/app.js?v=95"></script>
+  <script src="js/firebase-config.js?v=96"></script>
+  <script src="js/data.js?v=96"></script>
+  <script src="js/auth.js?v=96"></script>
+  <script src="js/app.js?v=96"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
