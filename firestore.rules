@@ -48,24 +48,21 @@ service cloud.firestore {
     // 4. Marketing Daily Routines
     match /marketing_daily_routines/{routineId} {
       allow read: if true;
-      allow create, update: if request.resource.data.memberEmail is string &&
-                               request.resource.data.date is string;
+      allow create, update: if true;
       allow delete: if true;
     }
 
     // 5. Marketing Weekly Routines
     match /marketing_weekly_routines/{routineId} {
       allow read: if true;
-      allow create, update: if request.resource.data.memberEmail is string &&
-                               request.resource.data.weekKey is string;
+      allow create, update: if true;
       allow delete: if true;
     }
 
     // 6. Marketing Monthly Routines
     match /marketing_monthly_routines/{routineId} {
       allow read: if true;
-      allow create, update: if request.resource.data.memberEmail is string &&
-                               request.resource.data.month is string;
+      allow create, update: if true;
       allow delete: if true;
     }
 

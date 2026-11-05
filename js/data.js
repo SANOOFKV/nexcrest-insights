@@ -859,10 +859,18 @@ class DataStore {
         }
       }
 
-      // Filter by active month
-      const target = this.getTargetById(s.targetId);
-      const subMonth = (target && target.month) || s.month || (s.submittedAt ? s.submittedAt.slice(0, 7) : null);
-      if (subMonth && subMonth !== this.activeMonth) return false;
+      // Never filter out pending submissions waiting for review so submitted work is never lost!
+      if (filters.status === 'pending' || (filters.assignee && s.status === 'pending')) {
+        return true;
+      }
+
+      // Filter by active month (or custom specified month in filters.month)
+      const targetMonth = filters.month || this.activeMonth;
+      if (targetMonth && targetMonth !== 'all') {
+        const target = this.getTargetById(s.targetId);
+        const subMonth = (target && target.month) || s.month || (s.submittedAt ? s.submittedAt.slice(0, 7) : null);
+        if (subMonth && subMonth !== targetMonth) return false;
+      }
 
       return true;
     }).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
@@ -1242,7 +1250,21 @@ class DataStore {
     cloudRoutines.forEach(c => {
       if (map.has(c.id)) {
         const local = map.get(c.id);
-        const mergedHistory = { ...(local.history || {}), ...(c.history || {}) };
+        const mergedHistory = {};
+        const allKeys = new Set([...Object.keys(local.history || {}), ...Object.keys(c.history || {})]);
+        allKeys.forEach(k => {
+          const l = (local.history || {})[k] || {};
+          const r = (c.history || {})[k] || {};
+          const isCompleted = Boolean(l.completed || r.completed);
+          mergedHistory[k] = {
+            ...l,
+            ...r,
+            completed: isCompleted,
+            completedAt: (isCompleted ? (l.completed ? l.completedAt : r.completedAt) : null) || l.completedAt || r.completedAt || null,
+            note: (r.note && r.note.trim()) ? r.note : (l.note || ''),
+            proofUrl: (r.proofUrl && r.proofUrl.trim()) ? r.proofUrl : (l.proofUrl || '')
+          };
+        });
         map.set(c.id, { ...local, ...c, history: mergedHistory });
       } else {
         map.set(c.id, c);
@@ -1308,6 +1330,8 @@ class DataStore {
     const current = task.history[dateStr] || { completed: true, completedAt: new Date().toISOString() };
     task.history[dateStr] = {
       ...current,
+      completed: true,
+      completedAt: current.completedAt || new Date().toISOString(),
       note: note,
       proofUrl: proofUrl
     };
@@ -1407,7 +1431,21 @@ class DataStore {
     cloudRoutines.forEach(c => {
       if (map.has(c.id)) {
         const local = map.get(c.id);
-        const mergedHistory = { ...(local.history || {}), ...(c.history || {}) };
+        const mergedHistory = {};
+        const allKeys = new Set([...Object.keys(local.history || {}), ...Object.keys(c.history || {})]);
+        allKeys.forEach(k => {
+          const l = (local.history || {})[k] || {};
+          const r = (c.history || {})[k] || {};
+          const isCompleted = Boolean(l.completed || r.completed);
+          mergedHistory[k] = {
+            ...l,
+            ...r,
+            completed: isCompleted,
+            completedAt: (isCompleted ? (l.completed ? l.completedAt : r.completedAt) : null) || l.completedAt || r.completedAt || null,
+            note: (r.note && r.note.trim()) ? r.note : (l.note || ''),
+            proofUrl: (r.proofUrl && r.proofUrl.trim()) ? r.proofUrl : (l.proofUrl || '')
+          };
+        });
         map.set(c.id, { ...local, ...c, history: mergedHistory });
       } else {
         map.set(c.id, c);
@@ -1541,7 +1579,21 @@ class DataStore {
     cloudRoutines.forEach(c => {
       if (map.has(c.id)) {
         const local = map.get(c.id);
-        const mergedHistory = { ...(local.history || {}), ...(c.history || {}) };
+        const mergedHistory = {};
+        const allKeys = new Set([...Object.keys(local.history || {}), ...Object.keys(c.history || {})]);
+        allKeys.forEach(k => {
+          const l = (local.history || {})[k] || {};
+          const r = (c.history || {})[k] || {};
+          const isCompleted = Boolean(l.completed || r.completed);
+          mergedHistory[k] = {
+            ...l,
+            ...r,
+            completed: isCompleted,
+            completedAt: (isCompleted ? (l.completed ? l.completedAt : r.completedAt) : null) || l.completedAt || r.completedAt || null,
+            note: (r.note && r.note.trim()) ? r.note : (l.note || ''),
+            proofUrl: (r.proofUrl && r.proofUrl.trim()) ? r.proofUrl : (l.proofUrl || '')
+          };
+        });
         map.set(c.id, { ...local, ...c, history: mergedHistory });
       } else {
         map.set(c.id, c);

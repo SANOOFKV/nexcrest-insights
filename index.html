@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=97">
+  <link rel="stylesheet" href="css/styles.css?v=98">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -919,9 +919,22 @@
         <!-- TAB 1: DAILY ROUTINES -->
         <div id="mkt-tab-content-daily" class="mkt-tab-content">
           <div class="mkt-section-banner">
-            <div class="mkt-banner-left">
-              <i data-lucide="calendar-check" style="color: var(--teal-light);"></i>
-              <span id="mkt-daily-date-label">Today: <strong>...</strong></span>
+            <div class="mkt-banner-left" style="display: flex; align-items: center; gap: 8px;">
+              <div class="date-navigator" style="margin: 0;">
+                <button type="button" class="date-nav-btn" id="btn-member-mkt-prev-day" title="Previous Day">
+                  <i data-lucide="chevron-left"></i>
+                </button>
+                <div class="date-display-badge" style="padding: 3px 8px;">
+                  <i data-lucide="calendar-check" style="color: var(--teal-light);"></i>
+                  <span id="mkt-daily-date-label">Today: <strong>...</strong></span>
+                </div>
+                <button type="button" class="date-nav-btn" id="btn-member-mkt-next-day" title="Next Day">
+                  <i data-lucide="chevron-right"></i>
+                </button>
+                <button type="button" class="btn btn-secondary" id="btn-member-mkt-today" style="padding: 2px 7px; font-size: 11px; height: 26px; display: none;">
+                  <i data-lucide="rotate-ccw" style="width: 11px; height: 11px;"></i> Today
+                </button>
+              </div>
             </div>
             <div class="mkt-reset-pill">
               <i data-lucide="rotate-ccw"></i> Resets Daily
@@ -951,9 +964,19 @@
         <!-- TAB 3: MONTHLY TASKS -->
         <div id="mkt-tab-content-monthly" class="mkt-tab-content hidden">
           <div class="mkt-section-banner">
-            <div class="mkt-banner-left">
-              <i data-lucide="calendar-days" style="color: #10B981;"></i>
-              <span id="mkt-monthly-cadence-label">Month: <strong>...</strong></span>
+            <div class="mkt-banner-left" style="display: flex; align-items: center; gap: 8px;">
+              <div class="date-navigator" style="margin: 0;">
+                <button type="button" class="date-nav-btn" id="btn-member-mkt-prev-month" title="Previous Month">
+                  <i data-lucide="chevron-left"></i>
+                </button>
+                <div class="date-display-badge" style="padding: 3px 8px;">
+                  <i data-lucide="calendar-days" style="color: #10B981;"></i>
+                  <span id="mkt-monthly-cadence-label">Month: <strong>...</strong></span>
+                </div>
+                <button type="button" class="date-nav-btn" id="btn-member-mkt-next-month" title="Next Month">
+                  <i data-lucide="chevron-right"></i>
+                </button>
+              </div>
             </div>
             <div class="mkt-reset-pill" style="background: rgba(16, 185, 129, 0.12); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.25);">
               <i data-lucide="calendar-check"></i> Monthly Cadence
@@ -2113,10 +2136,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=97"></script>
-  <script src="js/data.js?v=97"></script>
-  <script src="js/auth.js?v=97"></script>
-  <script src="js/app.js?v=97"></script>
+  <script src="js/firebase-config.js?v=98"></script>
+  <script src="js/data.js?v=98"></script>
+  <script src="js/auth.js?v=98"></script>
+  <script src="js/app.js?v=98"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

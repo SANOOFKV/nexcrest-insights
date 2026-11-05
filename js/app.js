@@ -44,6 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
     adminMarketingSelectedDate: (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0],
     adminMarketingSelectedWeek: (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W45',
     adminMarketingSelectedMonth: (typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11',
+    memberMarketingSelectedDate: (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0],
+    memberMarketingSelectedWeek: (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W45',
+    memberMarketingSelectedMonth: (typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11',
     memberReportSelectedMonth: (typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11',
     memberReportActiveUser: null
   };
@@ -2163,6 +2166,39 @@ document.addEventListener('DOMContentLoaded', () => {
   // ADMIN PERSONALIZED MEMBER OPERATIONS HUB & MARKETING LIVE TRACKER
   // =========================================================================
 
+  function memberMktShiftDate(days) {
+    const current = state.memberMarketingSelectedDate || ((typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0]);
+    const [y, m, d] = current.split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    dateObj.setDate(dateObj.getDate() + days);
+    const yStr = dateObj.getFullYear();
+    const mStr = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const dStr = String(dateObj.getDate()).padStart(2, '0');
+    state.memberMarketingSelectedDate = `${yStr}-${mStr}-${dStr}`;
+    renderMarketingWorkspace(state.user);
+  }
+
+  function memberMktJumpToday() {
+    state.memberMarketingSelectedDate = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
+    renderMarketingWorkspace(state.user);
+  }
+
+  function memberMktShiftMonth(delta) {
+    const current = state.memberMarketingSelectedMonth || ((window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11'));
+    const [yStr, mStr] = current.split('-');
+    let y = parseInt(yStr, 10);
+    let m = parseInt(mStr, 10) + delta;
+    if (m < 1) {
+      m = 12;
+      y -= 1;
+    } else if (m > 12) {
+      m = 1;
+      y += 1;
+    }
+    state.memberMarketingSelectedMonth = `${y}-${String(m).padStart(2, '0')}`;
+    renderMarketingWorkspace(state.user);
+  }
+
   function adminMktShiftDate(days) {
     const current = state.adminMarketingSelectedDate || ((typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0]);
     const [y, m, d] = current.split('-').map(Number);
@@ -3594,7 +3630,22 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderMemberSubmissionsTable() {
     const user = state.user;
     if (!user || !elements.memberSubmissionsTableBody) return;
-    const userSubs = window.dataStore.getSubmissions({ assignee: user.role });
+    const activeM = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : '2026-11';
+    // Show submissions for active month + any pending review items so recently submitted deliverables are never hidden
+    const userSubs = window.dataStore.submissions.filter(s => {
+      if (!s) return false;
+      const sAssignee = (s.assignee || '').toLowerCase();
+      const sAuthorEmail = (s.authorEmail || '').toLowerCase();
+      const sAuthorName = (s.authorName || '').toLowerCase();
+      const uRole = (user.role || '').toLowerCase();
+      const uEmail = (user.email || '').toLowerCase();
+      const uName = (user.name || '').toLowerCase();
+      const matches = sAssignee === uRole || sAuthorEmail === uEmail || sAuthorName === uName;
+      if (!matches) return false;
+      const target = window.dataStore.getTargetById(s.targetId);
+      const subMonth = (target && target.month) || s.month || (s.submittedAt ? s.submittedAt.slice(0, 7) : null);
+      return subMonth === activeM || s.status === 'pending';
+    }).sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
     const btnClearSubs = document.getElementById('btn-clear-recent-subs');
     if (btnClearSubs) {
       btnClearSubs.style.display = userSubs.length > 0 ? 'inline-flex' : 'none';
@@ -3676,8 +3727,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     state.mktActiveTab = state.mktActiveTab || 'daily';
 
-    const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
-    const weekStr = (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W44';
+    const todayStr = state.memberMarketingSelectedDate || ((typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0]);
+    const weekStr = state.memberMarketingSelectedWeek || ((typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W45');
+    const activeMonth = state.memberMarketingSelectedMonth || ((window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11'));
 
     const dailyTasks = window.dataStore.getMarketingDailyTasks(todayStr);
     const dailyStats = window.dataStore.getMarketingDailyStats(todayStr);
@@ -3685,7 +3737,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const weeklyTasks = window.dataStore.getMarketingWeeklyTasks(weekStr);
     const weeklyStats = window.dataStore.getMarketingWeeklyStats(weekStr);
 
-    const activeMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     const monthlyTasks = window.dataStore.getMarketingMonthlyTasks(activeMonth);
     const monthlyStats = window.dataStore.getMarketingMonthlyStats(activeMonth);
 
@@ -3733,11 +3784,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tabMonthly) tabMonthly.classList.toggle('hidden', state.mktActiveTab !== 'monthly');
     if (tabInstant) tabInstant.classList.toggle('hidden', state.mktActiveTab !== 'instant');
 
-    // Date / Cadence Labels
+    // Date / Cadence Labels with Interactive Navigation
     const dailyDateLabel = document.getElementById('mkt-daily-date-label');
     if (dailyDateLabel) {
-      const todayFormatted = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date());
-      dailyDateLabel.innerHTML = `Today: <strong>${todayFormatted}</strong>`;
+      const sysToday = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
+      const isToday = todayStr === sysToday;
+      const [y, m, d] = todayStr.split('-').map(Number);
+      const dObj = new Date(y, m - 1, d);
+      const todayFormatted = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(dObj);
+      dailyDateLabel.innerHTML = `${isToday ? 'Today: ' : ''}<strong>${todayFormatted}</strong>`;
+
+      const btnToday = document.getElementById('btn-member-mkt-today');
+      if (btnToday) btnToday.style.display = isToday ? 'none' : 'inline-flex';
     }
 
     const weeklyCadenceLabel = document.getElementById('mkt-weekly-cadence-label');
@@ -3879,6 +3937,7 @@ document.addEventListener('DOMContentLoaded', () => {
         instantGridEl.innerHTML = instantTasks.map(target => {
           const prog = window.dataStore.getTargetProgress(target.id);
           const isDone = prog.completed >= (Number(target.targetQty) || 1);
+          const isPendingReview = prog.pending > 0;
 
           let deadlineBanner = '';
           if (target.deadline) {
@@ -3915,18 +3974,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="badge-category">${escapeHtml(target.category)}</span>
                     ${resolveTargetFormat(target) ? `<span class="badge-format">${escapeHtml(resolveTargetFormat(target))}</span>` : ''}
                   </div>
-                  <span class="status-pill ${isDone ? 'completed' : 'in-progress'}">${isDone ? 'Completed' : 'Pending'}</span>
+                  ${isDone
+                    ? '<span class="status-pill completed"><i data-lucide="check-circle-2"></i> Delivered</span>'
+                    : isPendingReview
+                      ? '<span class="status-pill in-review"><i data-lucide="clock"></i> Under Review</span>'
+                      : '<span class="status-pill not-started">Pending</span>'
+                  }
                 </div>
                 <h3 class="del-card-title">${escapeHtml(target.program)}</h3>
                 ${target.notes ? `<p class="del-card-desc">${escapeHtml(target.notes)}</p>` : ''}
                 ${deadlineBanner}
+                ${isPendingReview ? `<div style="font-size: 11px; color: var(--amber-light); margin-top: 5px; font-weight: 500;">⏳ Deliverable submitted — awaiting manager review</div>` : ''}
               </div>
 
               <div style="margin-top: 12px;">
                 <div class="del-card-actions">
                   ${isDone
                     ? `<button type="button" class="btn btn-outline-sm btn-block" style="color: #059669; border-color: #10B981; background: #DCFCE7; font-weight: 600;"><i data-lucide="check"></i> Delivered</button>`
-                    : `<button type="button" class="btn btn-primary btn-sm btn-block btn-open-log-modal" data-target-id="${target.id}"><i data-lucide="upload-cloud"></i> Submit Deliverable</button>`
+                    : isPendingReview
+                      ? `<button type="button" class="btn btn-outline-sm btn-block btn-open-log-modal" data-target-id="${target.id}" style="color: var(--amber-light); border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.08); font-size: 12px; font-weight: 600;"><i data-lucide="clock"></i> Submitted (In Review)</button>`
+                      : `<button type="button" class="btn btn-primary btn-sm btn-block btn-open-log-modal" data-target-id="${target.id}"><i data-lucide="upload-cloud"></i> Submit Deliverable</button>`
                   }
                 </div>
               </div>
@@ -5460,6 +5527,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // MARKETING EXECUTIVE WORKSPACE & DEADLINE PRESET DELEGATION
     // =========================================================================
 
+    // Member Marketing Cadence Date Navigation
+    if (e.target.closest('#btn-member-mkt-prev-day')) {
+      memberMktShiftDate(-1);
+      return;
+    }
+    if (e.target.closest('#btn-member-mkt-next-day')) {
+      memberMktShiftDate(1);
+      return;
+    }
+    if (e.target.closest('#btn-member-mkt-today')) {
+      memberMktJumpToday();
+      return;
+    }
+    if (e.target.closest('#btn-member-mkt-prev-month')) {
+      memberMktShiftMonth(-1);
+      return;
+    }
+    if (e.target.closest('#btn-member-mkt-next-month')) {
+      memberMktShiftMonth(1);
+      return;
+    }
+
     // Marketing Cadence Navigation Tabs
     const mktTabBtn = e.target.closest('.mkt-cadence-btn');
     if (mktTabBtn && mktTabBtn.dataset.mktTab) {
@@ -5471,12 +5560,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Marketing Daily Checkbox Toggle
     const dailyCheck = e.target.closest('.mkt-checkbox-wrap[data-action="toggle-daily"]');
     if (dailyCheck && dailyCheck.dataset.taskId) {
-      const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
+      const todayStr = state.memberMarketingSelectedDate || ((typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0]);
       const updated = window.dataStore.toggleMarketingDailyTask(dailyCheck.dataset.taskId, todayStr);
       if (updated && updated.history && updated.history[todayStr] && updated.history[todayStr].completed) {
-        showToast(`✅ Completed "${updated.title}" for today!`, 'success');
+        showToast(`✅ Completed "${updated.title}"!`, 'success');
       } else {
-        showToast(`Marked "${updated ? updated.title : 'Task'}" pending for today.`, 'info');
+        showToast(`Marked "${updated ? updated.title : 'Task'}" pending.`, 'info');
       }
       renderMarketingWorkspace(state.user);
       return;
@@ -5485,7 +5574,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Marketing Weekly Checkbox Toggle
     const weeklyCheck = e.target.closest('.mkt-checkbox-wrap[data-action="toggle-weekly"]');
     if (weeklyCheck && weeklyCheck.dataset.taskId) {
-      const weekStr = (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W44';
+      const weekStr = state.memberMarketingSelectedWeek || ((typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W45');
       const updated = window.dataStore.toggleMarketingWeeklyTask(weeklyCheck.dataset.taskId, weekStr);
       if (updated && updated.history && updated.history[weekStr] && updated.history[weekStr].completed) {
         showToast(`✅ Delivered "${updated.title}" for ${weekStr}!`, 'success');
@@ -5499,7 +5588,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Marketing Monthly Checkbox Toggle
     const monthlyCheck = e.target.closest('.mkt-checkbox-wrap[data-action="toggle-monthly"]');
     if (monthlyCheck && monthlyCheck.dataset.taskId) {
-      const activeMonth = window.dataStore.getActiveMonth() || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
+      const activeMonth = state.memberMarketingSelectedMonth || ((window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : '2026-11');
       const updated = window.dataStore.toggleMarketingMonthlyTask(monthlyCheck.dataset.taskId, activeMonth);
       if (updated && updated.history && updated.history[activeMonth] && updated.history[activeMonth].completed) {
         showToast(`✅ Delivered "${updated.title}" for ${getMonthFullName(activeMonth)}!`, 'success');
@@ -5674,17 +5763,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const noteText = elements.routineModalNoteText ? elements.routineModalNoteText.value.trim() : '';
 
       if (taskType === 'daily') {
-        const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
-        window.dataStore.updateMarketingDailyTaskNote(taskId, todayStr, noteText, proofUrl);
-        showToast('Saved note & link for today’s routine.', 'success');
+        const targetDate = state.memberMarketingSelectedDate || ((typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0]);
+        window.dataStore.updateMarketingDailyTaskNote(taskId, targetDate, noteText, proofUrl);
+        showToast('Saved note & proof for daily routine.', 'success');
       } else if (taskType === 'monthly') {
-        const activeMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
-        window.dataStore.updateMarketingMonthlyTaskNote(taskId, activeMonth, noteText, proofUrl);
-        showToast(`Saved monthly report & proof for ${getMonthFullName(activeMonth)}.`, 'success');
+        const targetMonth = state.memberMarketingSelectedMonth || ((window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11'));
+        window.dataStore.updateMarketingMonthlyTaskNote(taskId, targetMonth, noteText, proofUrl);
+        showToast(`Saved monthly report & proof for ${getMonthFullName(targetMonth)}.`, 'success');
       } else {
-        const weekStr = (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W44';
-        window.dataStore.toggleMarketingWeeklyTask(taskId, weekStr, noteText, proofUrl);
-        showToast(`Saved weekly report & proof for ${weekStr}.`, 'success');
+        const targetWeek = state.memberMarketingSelectedWeek || ((typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W45');
+        window.dataStore.updateMarketingWeeklyTaskNote(taskId, targetWeek, noteText, proofUrl);
+        showToast(`Saved weekly report & proof for ${targetWeek}.`, 'success');
       }
 
       if (elements.routineNoteModal) {
