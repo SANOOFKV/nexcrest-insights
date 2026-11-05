@@ -128,6 +128,12 @@ function getCurrentWeekStr(d = new Date()) {
   return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
 }
 
+function getCurrentMonthStr(d = new Date()) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  return `${y}-${m}`;
+}
+
 // Seed Targets based on exact user specification & chart + September 2026 Archive
 const SEED_TARGETS = [
   // ================= GRAPHIC DESIGNER (15 Deliverables assigned by Manager) =================
@@ -402,7 +408,12 @@ class DataStore {
     this.marketingDaily = this.loadMarketingDaily();
     this.marketingWeekly = this.loadMarketingWeekly();
     this.marketingMonthly = this.loadMarketingMonthly();
-    this.activeMonth = localStorage.getItem(STORAGE_KEYS.SELECTED_MONTH) || '2026-10';
+    const curMonth = getCurrentMonthStr();
+    this.activeMonth = localStorage.getItem(STORAGE_KEYS.SELECTED_MONTH) || curMonth;
+    if (!this.activeMonth || !/^\d{4}-\d{2}$/.test(this.activeMonth)) {
+      this.activeMonth = curMonth;
+    }
+    this.ensureTargetsForMonth(this.activeMonth);
     this.initCloudSync();
   }
 
@@ -576,12 +587,34 @@ class DataStore {
   }
 
   setActiveMonth(month) {
+    if (!month || typeof month !== 'string') return this.activeMonth;
     this.activeMonth = month;
     try {
       localStorage.setItem(STORAGE_KEYS.SELECTED_MONTH, month);
     } catch (e) {
       console.error('Storage error while saving active month', e);
     }
+    this.ensureTargetsForMonth(month);
+    this.notify();
+    return this.activeMonth;
+  }
+
+  ensureTargetsForMonth(month) {
+    if (!month) return 0;
+    const existing = this.targets.filter(t => t && t.month === month);
+    if (existing.length > 0) return existing.length;
+
+    // Standard baseline month to clone standard deliverables from
+    let sourceMonth = '2026-10';
+    const sourceExists = this.targets.some(t => t && t.month === sourceMonth);
+    if (!sourceExists) {
+      const anyTarget = this.targets.find(t => t && t.month && t.month !== month);
+      if (anyTarget) sourceMonth = anyTarget.month;
+      else return 0;
+    }
+
+    const count = this.cloneMonthTargets(sourceMonth, month);
+    return count;
   }
 
   getActiveMonth() {
@@ -768,6 +801,9 @@ class DataStore {
 
     this.targets.push(...cloned);
     this.saveTargets(this.targets);
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      cloned.forEach(t => window.firebaseSync.saveTarget(t));
+    }
     return cloned.length;
   }
 
@@ -868,7 +904,7 @@ class DataStore {
   }
 
   clearAllRecentSubmissions(month = null) {
-    const targetMonth = month || this.activeMonth || '2026-10';
+    const targetMonth = month || this.activeMonth || getCurrentMonthStr();
     const toRemove = [];
     this.submissions = this.submissions.filter(s => {
       if (!s) return false;
@@ -970,7 +1006,7 @@ class DataStore {
 
   // Comprehensive Dashboard Overview Calculation (Matching user photo + Graphs)
   getDashboardOverview(customMonth = null) {
-    const month = customMonth || this.activeMonth;
+    const month = customMonth || this.activeMonth || getCurrentMonthStr();
     // Marketing Executive pool is strictly independent and monitored separately — excluded from creative monthly target counts
     const targets = this.targets.filter(t => t.month === month && !this.isMarketingTarget(t));
 
@@ -1467,7 +1503,7 @@ class DataStore {
   }
 
   getMarketingMonthlyTasks(monthStr = null) {
-    const targetMonth = monthStr || this.activeMonth || '2026-10';
+    const targetMonth = monthStr || this.activeMonth || getCurrentMonthStr();
     if (!Array.isArray(this.marketingMonthly)) {
       this.marketingMonthly = this.loadMarketingMonthly();
     }
@@ -1484,7 +1520,7 @@ class DataStore {
   }
 
   toggleMarketingMonthlyTask(taskId, monthStr = null, note = '', proofUrl = '') {
-    const targetMonth = monthStr || this.activeMonth || '2026-10';
+    const targetMonth = monthStr || this.activeMonth || getCurrentMonthStr();
     if (!Array.isArray(this.marketingMonthly)) {
       this.marketingMonthly = this.loadMarketingMonthly();
     }
@@ -1513,7 +1549,7 @@ class DataStore {
   }
 
   updateMarketingMonthlyTaskNote(taskId, monthStr = null, note = '', proofUrl = '') {
-    const targetMonth = monthStr || this.activeMonth || '2026-10';
+    const targetMonth = monthStr || this.activeMonth || getCurrentMonthStr();
     if (!Array.isArray(this.marketingMonthly)) {
       this.marketingMonthly = this.loadMarketingMonthly();
     }
@@ -1541,7 +1577,7 @@ class DataStore {
   }
 
   getMarketingMonthlyStats(monthStr = null) {
-    const targetMonth = monthStr || this.activeMonth || '2026-10';
+    const targetMonth = monthStr || this.activeMonth || getCurrentMonthStr();
     const tasks = this.getMarketingMonthlyTasks(targetMonth).filter(t => t.active !== false);
     const total = tasks.length;
     const completed = tasks.filter(t => t.completed).length;
@@ -1720,3 +1756,4 @@ class DataStore {
 window.dataStore = new DataStore();
 window.getTodayDateStr = getTodayDateStr;
 window.getCurrentWeekStr = getCurrentWeekStr;
+window.getCurrentMonthStr = getCurrentMonthStr;

@@ -10246,3 +10246,32 @@ body.dark-theme .admin-task-item.completed {
     display: none !important;
   }
 }
+
+/* Member Active Cycle Pill */
+.cycle-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  color: var(--teal-primary);
+  background: rgba(0, 139, 165, 0.08);
+  border: 1px solid rgba(0, 139, 165, 0.28);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.cycle-pill-btn:hover {
+  background: rgba(0, 139, 165, 0.16);
+  border-color: var(--teal-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 139, 165, 0.18);
+}
+.cycle-pill-btn svg {
+  width: 13px;
+  height: 13px;
+  color: var(--teal-primary);
+}

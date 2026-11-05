@@ -43,8 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
     activeAdminMemberEmail: 'marketing@nexcrest.com',
     adminMarketingSelectedDate: (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0],
     adminMarketingSelectedWeek: (typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W45',
-    adminMarketingSelectedMonth: '2026-10',
-    memberReportSelectedMonth: '2026-10',
+    adminMarketingSelectedMonth: (typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11',
+    memberReportSelectedMonth: (typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11',
     memberReportActiveUser: null
   };
 
@@ -61,6 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
     headerRoleBadge: document.getElementById('header-role-badge'),
     logoutBtn: document.getElementById('logout-btn'),
     btnMemberOpenProfile: document.getElementById('btn-member-open-profile'),
+
+    memberCycleBadge: document.getElementById('member-cycle-badge'),
+    memberCycleText: document.getElementById('member-cycle-text'),
 
     // Views
     managerView: document.getElementById('manager-view'),
@@ -2160,7 +2163,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function adminMktShiftMonth(delta) {
-    const current = state.adminMarketingSelectedMonth || ((window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : '2026-10');
+    const current = state.adminMarketingSelectedMonth || ((window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11'));
     const [yStr, mStr] = current.split('-');
     let y = parseInt(yStr, 10);
     let m = parseInt(mStr, 10) + delta;
@@ -2230,7 +2233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const todayStr = (typeof window.getTodayDateStr === 'function') ? window.getTodayDateStr() : new Date().toISOString().split('T')[0];
     const selectedDateStr = state.adminMarketingSelectedDate || todayStr;
     const selectedWeekStr = state.adminMarketingSelectedWeek || ((typeof window.getCurrentWeekStr === 'function') ? window.getCurrentWeekStr() : '2026-W45');
-    const defaultMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : '2026-10';
+    const defaultMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     const selectedMonthStr = state.adminMarketingSelectedMonth || defaultMonth;
 
     // 1. Render Member Switcher Cards Grid
@@ -2905,7 +2908,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.memberReportActiveUser = targetUser || state.user;
     if (!state.memberReportActiveUser) return;
 
-    const defaultMonth = window.dataStore.getActiveMonth() || '2026-10';
+    const defaultMonth = window.dataStore.getActiveMonth() || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     state.memberReportSelectedMonth = preselectedMonth || state.memberReportSelectedMonth || defaultMonth;
 
     renderMemberReportModal();
@@ -2926,7 +2929,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const user = state.memberReportActiveUser || state.user;
     if (!user) return;
 
-    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || '2026-10';
+    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     const monthName = getMonthFullName(selectedMonth);
 
     // Update Quick Buttons and Select
@@ -3166,7 +3169,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function autoGenerateReportHighlights(showToastNotice = true) {
     const user = state.memberReportActiveUser || state.user;
     if (!user) return;
-    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || '2026-10';
+    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     const monthName = getMonthFullName(selectedMonth);
     const data = window.dataStore.getMemberMonthlyData(user, selectedMonth);
     if (!data) return;
@@ -3189,7 +3192,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function copyReportBriefing() {
     const user = state.memberReportActiveUser || state.user;
     if (!user) return;
-    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || '2026-10';
+    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     const monthName = getMonthFullName(selectedMonth);
     const data = window.dataStore.getMemberMonthlyData(user, selectedMonth);
     const highlights = elements.reportHighlightsText ? elements.reportHighlightsText.value.trim() : '';
@@ -3211,7 +3214,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function exportMemberReportCSV() {
     const user = state.memberReportActiveUser || state.user;
     if (!user) return;
-    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || '2026-10';
+    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     const data = window.dataStore.getMemberMonthlyData(user, selectedMonth);
     if (!data) return;
 
@@ -3250,7 +3253,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function saveMemberReport() {
     const user = state.memberReportActiveUser || state.user;
     if (!user) return;
-    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || '2026-10';
+    const selectedMonth = state.memberReportSelectedMonth || window.dataStore.getActiveMonth() || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     const data = window.dataStore.getMemberMonthlyData(user, selectedMonth);
     const highlights = elements.reportHighlightsText ? elements.reportHighlightsText.value.trim() : '';
 
@@ -3306,6 +3309,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Creative Roles (Graphic Designer / Videographer) - 100% Isolated Deliverables Grid
     if (elements.memberCreativeWorkspace) elements.memberCreativeWorkspace.classList.remove('hidden');
     if (elements.memberMarketingWorkspace) elements.memberMarketingWorkspace.classList.add('hidden');
+
+    const activeMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
+    const curMonth = (typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11';
+    const isCur = activeMonth === curMonth;
+    const memberCycleText = document.getElementById('member-cycle-text');
+    if (memberCycleText) {
+      memberCycleText.textContent = `${getMonthFullName(activeMonth)} Cycle${isCur ? ' (Current)' : ''}`;
+    }
 
     // Load Stats for this user (Kinetic Number Rollers)
     const stats = window.dataStore.getEmployeeStats(user);
@@ -3643,7 +3654,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const weeklyTasks = window.dataStore.getMarketingWeeklyTasks(weekStr);
     const weeklyStats = window.dataStore.getMarketingWeeklyStats(weekStr);
 
-    const activeMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : '2026-10';
+    const activeMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     const monthlyTasks = window.dataStore.getMarketingMonthlyTasks(activeMonth);
     const monthlyStats = window.dataStore.getMarketingMonthlyStats(activeMonth);
 
@@ -3919,7 +3930,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.routineModalTitle.innerHTML = `<i data-lucide="file-text"></i> Today's Daily Note & Proof`;
       }
     } else if (taskType === 'monthly') {
-      const activeMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : '2026-10';
+      const activeMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
       const tasks = window.dataStore.getMarketingMonthlyTasks(activeMonth);
       const task = tasks.find(t => t.id === taskId);
       if (task) {
@@ -4110,7 +4121,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // HISTORICAL ARCHIVE & CYCLE CALENDAR MODAL CONTROLLERS
   // =========================================================================
   function openHistoricalCalendarModal() {
-    const activeMonth = window.dataStore.getActiveMonth() || '2026-10';
+    const activeMonth = window.dataStore.getActiveMonth() || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     const parts = activeMonth.split('-');
     state.calendarModalYear = parseInt(parts[0], 10) || new Date().getFullYear();
 
@@ -4205,6 +4216,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Hook up Calendar Modal Buttons
   if (elements.btnCalendarPicker) {
     elements.btnCalendarPicker.addEventListener('click', openHistoricalCalendarModal);
+  }
+  const memberCycleBadge = document.getElementById('member-cycle-badge');
+  if (memberCycleBadge) {
+    memberCycleBadge.addEventListener('click', openHistoricalCalendarModal);
   }
   if (elements.btnCloseCalendarModal) {
     elements.btnCloseCalendarModal.addEventListener('click', closeHistoricalCalendarModal);
@@ -5439,7 +5454,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Marketing Monthly Checkbox Toggle
     const monthlyCheck = e.target.closest('.mkt-checkbox-wrap[data-action="toggle-monthly"]');
     if (monthlyCheck && monthlyCheck.dataset.taskId) {
-      const activeMonth = window.dataStore.getActiveMonth() || '2026-10';
+      const activeMonth = window.dataStore.getActiveMonth() || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
       const updated = window.dataStore.toggleMarketingMonthlyTask(monthlyCheck.dataset.taskId, activeMonth);
       if (updated && updated.history && updated.history[activeMonth] && updated.history[activeMonth].completed) {
         showToast(`✅ Delivered "${updated.title}" for ${getMonthFullName(activeMonth)}!`, 'success');
@@ -5618,7 +5633,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.dataStore.updateMarketingDailyTaskNote(taskId, todayStr, noteText, proofUrl);
         showToast('Saved note & link for today’s routine.', 'success');
       } else if (taskType === 'monthly') {
-        const activeMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : '2026-10';
+        const activeMonth = (window.dataStore && typeof window.dataStore.getActiveMonth === 'function') ? window.dataStore.getActiveMonth() : ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
         window.dataStore.updateMarketingMonthlyTaskNote(taskId, activeMonth, noteText, proofUrl);
         showToast(`Saved monthly report & proof for ${getMonthFullName(activeMonth)}.`, 'success');
       } else {
@@ -6223,6 +6238,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = window.authService.login(email, pass);
       if (res && res.success) {
         state.user = res.user;
+        const curMonth = (typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11';
+        window.dataStore.setActiveMonth(curMonth);
+        state.adminMarketingSelectedMonth = curMonth;
+        state.memberReportSelectedMonth = curMonth;
+        if (res.user.role === 'marketing') {
+          state.mktActiveTab = 'monthly';
+        }
         clearAuthError();
         showToast(`Welcome back, ${res.user.name}!`, 'success');
         renderApp();
@@ -6279,6 +6301,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Reactive Auth Sync
   window.authService.onChange((user) => {
     state.user = user;
+    if (user) {
+      const curMonth = (typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11';
+      window.dataStore.setActiveMonth(curMonth);
+      state.adminMarketingSelectedMonth = curMonth;
+      state.memberReportSelectedMonth = curMonth;
+      if (user.role === 'marketing') {
+        state.mktActiveTab = 'monthly';
+      }
+    }
     renderApp();
   });
 
@@ -6319,6 +6350,13 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('URL params / sync check failed', e);
   }
 
+  const curBootMonth = (typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11';
+  window.dataStore.setActiveMonth(curBootMonth);
+  state.adminMarketingSelectedMonth = curBootMonth;
+  state.memberReportSelectedMonth = curBootMonth;
+  if (state.user && state.user.role === 'marketing') {
+    state.mktActiveTab = 'monthly';
+  }
   initTheme();
   renderApp();
   refreshFuturisticEffects();
