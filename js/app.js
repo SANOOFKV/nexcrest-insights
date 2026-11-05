@@ -714,6 +714,24 @@ document.addEventListener('DOMContentLoaded', () => {
     return 'Techschool';
   }
 
+  function resolveTargetFormat(target) {
+    if (!target) return '';
+    let fmt = (target.format || '').trim();
+    const brand = (target.brand || '').toLowerCase().trim();
+    const prog = (target.program || '').toLowerCase();
+
+    // If format was accidentally saved as the brand name ("Techschool", "IT", "Both") or is empty
+    if (!fmt || fmt.toLowerCase() === brand || ['techschool', 'it', 'both', 'nexcrest'].includes(fmt.toLowerCase())) {
+      if (prog.includes('reel') || prog.includes('short') || prog.includes('clip')) return 'Reel';
+      if (prog.includes('carousel') || prog.includes('carousal')) return 'Carousel';
+      if (prog.includes('video') || prog.includes('aftermovie') || prog.includes('podcast')) return 'Video';
+      if (prog.includes('poster') || prog.includes('flyer') || prog.includes('banner')) return 'Poster';
+      if (prog.includes('story')) return 'Story';
+      return ''; // Never return duplicate brand name as format!
+    }
+    return fmt;
+  }
+
   // Hardened Safe URL sanitizer against XSS, data: URIs, javascript: and malicious protocols
   function safeUrl(url) {
     if (!url) return '#';
@@ -1760,7 +1778,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             ${target.notes ? `<div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">${escapeHtml(target.notes)}</div>` : ''}
           </td>
-          <td><span class="badge-format">${escapeHtml(target.format)}</span></td>
+          <td><span class="badge-format">${escapeHtml(resolveTargetFormat(target) || 'Deliverable')}</span></td>
           <td class="text-center"><strong>${target.targetQty}</strong></td>
           <td class="text-center"><span style="color: var(--mint-light); font-weight: 700;">${prog.completed}</span></td>
           <td class="text-center">
@@ -3444,7 +3462,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="del-badges-row">
                 <span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span>
                 <span class="badge-category">${escapeHtml(target.category)}</span>
-                <span class="badge-format">${escapeHtml(target.format)}</span>
+                ${resolveTargetFormat(target) ? `<span class="badge-format">${escapeHtml(resolveTargetFormat(target))}</span>` : ''}
                 ${target.deadline ? formatDeadlineBadge(target.deadline, isDone) : ''}
                 ${target.isExtra ? '<span class="badge-extra-work" style="font-size: 10px; padding: 1px 6px;">⭐ Extra</span>' : ''}
               </div>
@@ -3882,7 +3900,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   <div class="del-badges-row">
                     <span class="badge-brand ${escapeHtml(target.brand)}">${formatBrandName(target.brand)}</span>
                     <span class="badge-category">${escapeHtml(target.category)}</span>
-                    <span class="badge-format">${escapeHtml(target.format)}</span>
+                    ${resolveTargetFormat(target) ? `<span class="badge-format">${escapeHtml(resolveTargetFormat(target))}</span>` : ''}
                   </div>
                   <span class="status-pill ${isDone ? 'completed' : 'in-progress'}">${isDone ? 'Completed' : 'Pending'}</span>
                 </div>
@@ -4881,7 +4899,21 @@ document.addEventListener('DOMContentLoaded', () => {
       assigneeEmail: userMatch ? userMatch.email : '',
       brand: elements.targetBrand.value,
       category: elements.targetCategory.value,
-      format: (elements.targetFormat && elements.targetFormat.value.trim()) || elements.targetBrand.value || 'Deliverable',
+      format: (() => {
+        if (elements.targetFormat && elements.targetFormat.value.trim()) {
+          const val = elements.targetFormat.value.trim();
+          if (!['techschool', 'it', 'both'].includes(val.toLowerCase())) {
+            return val;
+          }
+        }
+        const prog = elements.targetProgram.value.trim().toLowerCase();
+        if (prog.includes('reel') || prog.includes('short') || prog.includes('clip')) return 'Reel';
+        if (prog.includes('carousel') || prog.includes('carousal')) return 'Carousel';
+        if (prog.includes('video') || prog.includes('aftermovie') || prog.includes('podcast')) return 'Video';
+        if (prog.includes('poster') || prog.includes('banner') || prog.includes('flyer')) return 'Poster';
+        if (prog.includes('story')) return 'Story';
+        return 'Reel';
+      })(),
       program: elements.targetProgram.value.trim(),
       targetQty: parseInt(elements.targetQty.value, 10) || 1,
       deadline: (() => {
@@ -5343,7 +5375,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.targetAssignee.value = target.assignee;
         elements.targetBrand.value = target.brand;
         elements.targetCategory.value = target.category;
-        if (elements.targetFormat) elements.targetFormat.value = target.format || '';
+        if (elements.targetFormat) elements.targetFormat.value = resolveTargetFormat(target) || 'Reel';
         elements.targetProgram.value = target.program;
         elements.targetQty.value = target.targetQty;
         if (elements.targetDeadline) {
@@ -5883,7 +5915,7 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="user-task-meta">
                 <span class="badge-brand ${escapeHtml(t.brand)}">${formatBrandName(t.brand)}</span>
                 <span class="badge-category">${escapeHtml(t.category)}</span>
-                <span class="badge-format">${escapeHtml(t.format)}</span>
+                ${resolveTargetFormat(t) ? `<span class="badge-format">${escapeHtml(resolveTargetFormat(t))}</span>` : ''}
                 ${t.deadline ? formatDeadlineBadge(t.deadline, prog.completed >= (Number(t.targetQty) || 1)) : ''}
                 <span>• Target: <strong>${t.targetQty}</strong></span>
                 <span style="color: var(--mint-light); font-weight: 600;">• Done: ${prog.completed}</span>

@@ -371,7 +371,7 @@ const SEED_TARGETS = [
     brand: 'IT',
     category: 'Branding',
     program: '2 Anniversary Carousal',
-    format: 'IT',
+    format: 'Carousel',
     targetQty: 1,
     month: '2026-10',
     notes: '',
@@ -511,6 +511,20 @@ class DataStore {
           migrated = true;
         } else if (t.brand === 'Both Brands') {
           t.brand = 'Both';
+          migrated = true;
+        }
+
+        // Auto-repair any targets where format was accidentally saved as the brand name
+        const normFmt = (t.format || '').toLowerCase().trim();
+        const normBrand = (t.brand || '').toLowerCase().trim();
+        if (!normFmt || normFmt === normBrand || ['techschool', 'it', 'both'].includes(normFmt)) {
+          const prog = (t.program || '').toLowerCase();
+          if (prog.includes('reel') || prog.includes('short') || prog.includes('clip')) t.format = 'Reel';
+          else if (prog.includes('carousel') || prog.includes('carousal')) t.format = 'Carousel';
+          else if (prog.includes('video') || prog.includes('aftermovie') || prog.includes('podcast')) t.format = 'Video';
+          else if (prog.includes('poster') || prog.includes('flyer') || prog.includes('banner')) t.format = 'Poster';
+          else if (prog.includes('story')) t.format = 'Story';
+          else t.format = 'Deliverable';
           migrated = true;
         }
       });

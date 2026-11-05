@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=91">
+  <link rel="stylesheet" href="css/styles.css?v=92">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -1064,11 +1064,27 @@
             </div>
           </div>
           <div class="form-group">
-            <label for="target-program">Title *</label>
+            <label for="target-format">Format *</label>
             <div class="input-with-icon">
-              <i data-lucide="file-text"></i>
-              <input type="text" id="target-program" placeholder="e.g. NexTalk Series" required>
+              <i data-lucide="layout"></i>
+              <select id="target-format" required>
+                <option value="Reel" selected>Reel (9:16 Video)</option>
+                <option value="Poster">Poster (Static)</option>
+                <option value="Carousel">Carousel (Multi-Slide)</option>
+                <option value="Video">Video (Landscape / Long-form)</option>
+                <option value="Story">Story</option>
+                <option value="Banner">Banner</option>
+                <option value="Other">Other Deliverable</option>
+              </select>
             </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="target-program">Deliverable Title / Program *</label>
+          <div class="input-with-icon">
+            <i data-lucide="file-text"></i>
+            <input type="text" id="target-program" placeholder="e.g. NexTalk Series, Informative Reels" required>
           </div>
         </div>
 
@@ -2094,10 +2110,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=91"></script>
-  <script src="js/data.js?v=91"></script>
-  <script src="js/auth.js?v=91"></script>
-  <script src="js/app.js?v=91"></script>
+  <script src="js/firebase-config.js?v=92"></script>
+  <script src="js/data.js?v=92"></script>
+  <script src="js/auth.js?v=92"></script>
+  <script src="js/app.js?v=92"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
