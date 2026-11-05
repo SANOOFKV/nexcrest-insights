@@ -2712,7 +2712,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderAdminCreativeMemberSection(activeEmp) {
     const stats = window.dataStore.getEmployeeStats(activeEmp);
-    const userTargets = (window.dataStore.getTargets() || []).filter(t => t.assignee === activeEmp.role || t.assigneeEmail === activeEmp.email);
+    const userTargets = window.dataStore.getTargetsForUser(activeEmp);
     const userPendingSubmissions = (window.dataStore.getSubmissions({ status: 'pending' }) || []).filter(s => s.assignee === activeEmp.role || s.authorEmail === activeEmp.email);
 
     elements.adminMemberPersonalizedPane.innerHTML = `
@@ -3504,7 +3504,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Render Pending Deliverables Grid
     if (elements.gridPendingDeliverables) {
-      if (pendingTargets.length === 0) {
+      if (filteredTargets.length === 0) {
+        elements.gridPendingDeliverables.innerHTML = `
+          <div class="deliverables-section-empty" style="grid-column: 1 / -1;">
+            <div style="font-size: 32px; margin-bottom: 6px;">📋</div>
+            <h4>No Deliverables Assigned for ${escapeHtml(getMonthFullName(activeMonth))}</h4>
+            <p>No monthly target deliverables have been assigned yet for this cycle. New targets assigned by the Marketing Manager will appear here.</p>
+            <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 10px;">
+              <button type="button" class="btn btn-primary btn-sm btn-log-extra-now">
+                <i data-lucide="plus-circle"></i> + Submit Deliverable
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (pendingTargets.length === 0) {
         elements.gridPendingDeliverables.innerHTML = `
           <div class="deliverables-section-empty celebration" style="grid-column: 1 / -1;">
             <div style="font-size: 32px; margin-bottom: 6px;">🎉</div>

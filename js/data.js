@@ -441,9 +441,17 @@ class DataStore {
 
       const legacyTargetSet = new Set(LEGACY_DEMO_TARGET_IDS);
 
+      const octSeedPrograms = new Set(SEED_TARGETS.filter(t => (t.month || '2026-10') === '2026-10').map(t => (t.program || '').toLowerCase().trim()));
       window.firebaseSync.subscribeTargets((cloudTargets) => {
         if (Array.isArray(cloudTargets)) {
-          this.targets = cloudTargets.filter(t => t && t.id && !legacyTargetSet.has(String(t.id)));
+          this.targets = cloudTargets.filter(t => {
+            if (!t || !t.id || legacyTargetSet.has(String(t.id))) return false;
+            // Prevent resurrected cloned previous month tasks in 2026-11
+            if (t.month === '2026-11' && octSeedPrograms.has((t.program || '').toLowerCase().trim()) && String(t.id).includes('-')) {
+              return false;
+            }
+            return true;
+          });
           try { localStorage.setItem(STORAGE_KEYS.TARGETS, JSON.stringify(this.targets)); } catch (e) {}
           this.notify();
         }
@@ -528,6 +536,19 @@ class DataStore {
           migrated = true;
         }
       });
+      // Auto-purge any duplicate targets in 2026-11 that were auto-cloned from October 2026
+      const octPrograms = new Set(SEED_TARGETS.filter(t => (t.month || '2026-10') === '2026-10').map(t => (t.program || '').toLowerCase().trim()));
+      const clonedNovTargets = parsed.filter(t => t && t.month === '2026-11' && octPrograms.has((t.program || '').toLowerCase().trim()) && String(t.id).includes('-'));
+      if (clonedNovTargets.length > 0) {
+        const clonedNovIds = clonedNovTargets.map(t => String(t.id));
+        const clonedIdSet = new Set(clonedNovIds);
+        parsed = parsed.filter(t => !clonedIdSet.has(String(t.id)));
+        migrated = true;
+        if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+          window.firebaseSync.deleteMultipleTargets(clonedNovIds);
+        }
+      }
+
       if (migrated) this.saveTargets(parsed);
       return parsed;
     } catch (e) {
@@ -614,21 +635,9 @@ class DataStore {
   }
 
   ensureTargetsForMonth(month) {
-    if (!month) return 0;
-    const existing = this.targets.filter(t => t && t.month === month);
-    if (existing.length > 0) return existing.length;
-
-    // Standard baseline month to clone standard deliverables from
-    let sourceMonth = '2026-10';
-    const sourceExists = this.targets.some(t => t && t.month === sourceMonth);
-    if (!sourceExists) {
-      const anyTarget = this.targets.find(t => t && t.month && t.month !== month);
-      if (anyTarget) sourceMonth = anyTarget.month;
-      else return 0;
-    }
-
-    const count = this.cloneMonthTargets(sourceMonth, month);
-    return count;
+    // Zero auto-cloning of previous month's targets.
+    // Each month starts cleanly and only contains tasks specifically assigned to that cycle.
+    return 0;
   }
 
   getActiveMonth() {
@@ -647,8 +656,10 @@ class DataStore {
 
   // Target Methods
   getTargets(filters = {}) {
+    const activeM = filters.month || this.activeMonth || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     return this.targets.filter(t => {
-      if (t.month && t.month !== this.activeMonth) return false;
+      const tMonth = t.month || '2026-10';
+      if (tMonth !== activeM) return false;
       if (filters.assignee && filters.assignee !== 'all') {
         const a = filters.assignee.toLowerCase();
         const matchesAssignee = (t.assignee && t.assignee.toLowerCase() === a) ||
@@ -674,16 +685,18 @@ class DataStore {
     });
   }
 
-  getTargetsForUser(user) {
+  getTargetsForUser(user, targetMonth = null) {
     if (!user) return [];
-    if (user.role === 'manager') return this.getTargets();
+    const activeM = targetMonth || this.activeMonth || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
+    if (user.role === 'manager') return this.getTargets({ month: activeM });
     const uEmail = (user.email || '').toLowerCase();
     const uRole = (user.role || '').toLowerCase();
     const uId = (user.id || '').toLowerCase();
     const uName = (user.name || '').toLowerCase();
 
     return this.targets.filter(t => {
-      if (t.month && t.month !== this.activeMonth) return false;
+      const tMonth = t.month || '2026-10';
+      if (tMonth !== activeM) return false;
       const tAssignee = (t.assignee || '').toLowerCase();
       const tEmail = (t.assigneeEmail || '').toLowerCase();
       const tRole = (t.assigneeRole || '').toLowerCase();
@@ -700,9 +713,9 @@ class DataStore {
     });
   }
 
-  getEmployeeStats(user) {
+  getEmployeeStats(user, customMonth = null) {
     if (!user) return { totalTarget: 0, totalCompleted: 0, totalPending: 0, pct: 0, extraCompleted: 0, remaining: 0, targetsCount: 0 };
-    const targets = this.getTargetsForUser(user);
+    const targets = this.getTargetsForUser(user, customMonth);
     let totalTarget = 0;
     let totalCompleted = 0;
     let totalPending = 0;
@@ -979,10 +992,12 @@ class DataStore {
     return { completed, pending, target: targetQty, pct, extra };
   }
 
-  getRoleStats(assignee) {
+  getRoleStats(assignee, customMonth = null) {
     const a = (assignee || '').toLowerCase();
+    const activeM = customMonth || this.activeMonth || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
     const targets = this.targets.filter(t => {
-      if (t.month && t.month !== this.activeMonth) return false;
+      const tMonth = t.month || '2026-10';
+      if (tMonth !== activeM) return false;
       return (t.assignee && t.assignee.toLowerCase() === a) ||
              (t.assigneeRole && t.assigneeRole.toLowerCase() === a) ||
              (t.assigneeEmail && t.assigneeEmail.toLowerCase() === a);
