@@ -158,7 +158,9 @@ class FirebaseSyncService {
       delete safeUser.password; // Enforce zero plaintext password leak to cloud
       await this.db.collection('users').doc(email).set({
         ...safeUser,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        updatedAt: (typeof firebase !== 'undefined' && firebase.firestore && firebase.firestore.FieldValue && typeof firebase.firestore.FieldValue.serverTimestamp === 'function')
+          ? firebase.firestore.FieldValue.serverTimestamp()
+          : new Date().toISOString()
       }, { merge: true });
       return true;
     } catch (err) {
@@ -180,7 +182,9 @@ class FirebaseSyncService {
           delete safeUser.password;
           batch.set(ref, {
             ...safeUser,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            createdAt: (typeof firebase !== 'undefined' && firebase.firestore && firebase.firestore.FieldValue && typeof firebase.firestore.FieldValue.serverTimestamp === 'function')
+              ? firebase.firestore.FieldValue.serverTimestamp()
+              : new Date().toISOString()
           });
         });
         await batch.commit();
@@ -299,9 +303,23 @@ class FirebaseSyncService {
     }
   }
 
-  // Seed default submissions to cloud (disabled permanently - no demo submissions)
+  // Seed default submissions to cloud if collection is empty
   async seedSubmissionsIfEmpty(seedSubs) {
-    return;
+    if (!this.isActive() || !Array.isArray(seedSubs) || seedSubs.length === 0) return;
+    try {
+      const snap = await this.db.collection('submissions').limit(1).get();
+      if (snap.empty) {
+        const batch = this.db.batch();
+        seedSubs.forEach(s => {
+          const ref = this.db.collection('submissions').doc(String(s.id));
+          batch.set(ref, s);
+        });
+        await batch.commit();
+        console.log('✅ Seeded October deliverable submissions into Cloud Firestore');
+      }
+    } catch (err) {
+      console.warn('Notice seeding submissions:', err);
+    }
   }
 
   // SUBMISSIONS SYNC: Listen to deliverables & proof links across devices

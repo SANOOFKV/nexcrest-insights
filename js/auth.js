@@ -7,6 +7,7 @@
 const AUTH_SESSION_KEY = 'nexcrest_active_session_v3';
 const USERS_STORAGE_KEY = 'nexcrest_users_v2';
 const CUSTOM_PROFILES_KEY = 'nexcrest_custom_profiles_v1';
+const CUSTOM_PASSWORDS_KEY = 'nexcrest_custom_passwords_v2';
 
 // Pure JavaScript SHA-256 Cryptographic Hash Utility (Zero External Dependencies)
 function hashPassword(password) {
@@ -164,6 +165,47 @@ class AuthService {
     } catch (e) {}
   }
 
+  loadCustomPasswords() {
+    try {
+      const raw = localStorage.getItem(CUSTOM_PASSWORDS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') return parsed;
+      }
+    } catch (e) {}
+    return {};
+  }
+
+  saveCustomPassword(email, passwordHash, lastChange = null) {
+    if (!email || !passwordHash) return;
+    try {
+      const norm = email.toLowerCase().trim();
+      const vault = this.loadCustomPasswords();
+      vault[norm] = {
+        passwordHash,
+        lastPasswordChange: lastChange || new Date().toISOString()
+      };
+      localStorage.setItem(CUSTOM_PASSWORDS_KEY, JSON.stringify(vault));
+    } catch (e) {
+      console.error('Failed to save custom password to vault', e);
+    }
+  }
+
+  applyCustomPasswords(usersMap) {
+    if (!usersMap || typeof usersMap !== 'object') return;
+    const vault = this.loadCustomPasswords();
+    Object.entries(vault).forEach(([email, entry]) => {
+      const norm = email.toLowerCase().trim();
+      if (usersMap[norm] && entry && entry.passwordHash) {
+        usersMap[norm].passwordHash = entry.passwordHash;
+        delete usersMap[norm].password;
+        if (entry.lastPasswordChange) {
+          usersMap[norm].lastPasswordChange = entry.lastPasswordChange;
+        }
+      }
+    });
+  }
+
   applyCustomProfiles(usersMap) {
     if (!usersMap || typeof usersMap !== 'object') return;
     const customProfiles = this.loadCustomProfiles();
@@ -198,16 +240,38 @@ class AuthService {
           }
         });
 
-        // Safely merge cloud users while preserving local credentials if cloud lacks them
+        // Safely merge cloud users while strictly protecting custom passwords from ever reverting
+        const customVault = this.loadCustomPasswords();
+        let needsPasswordCloudSync = false;
+
         Object.keys(cloudUsers).forEach(email => {
           const norm = email.toLowerCase().trim();
           const existing = this.users[norm] || {};
           const cloud = cloudUsers[email] || {};
+          const vaultEntry = customVault[norm];
+
           const merged = { ...existing, ...cloud };
-          if (!cloud.passwordHash && existing.passwordHash) {
+
+          // Custom Password Protection:
+          if (vaultEntry && vaultEntry.passwordHash) {
+            const vaultTime = new Date(vaultEntry.lastPasswordChange || 0).getTime();
+            const cloudTime = new Date(cloud.lastPasswordChange || 0).getTime();
+
+            // Only adopt cloud password if cloud has an explicitly NEWER change timestamp
+            if (cloud.lastPasswordChange && cloudTime > vaultTime && cloud.passwordHash) {
+              merged.passwordHash = cloud.passwordHash;
+              this.saveCustomPassword(norm, cloud.passwordHash, cloud.lastPasswordChange);
+            } else {
+              // Local vault password is newer or cloud doc held stale/default hash -> KEEP vault password!
+              merged.passwordHash = vaultEntry.passwordHash;
+              merged.lastPasswordChange = vaultEntry.lastPasswordChange;
+              if (cloud.passwordHash !== vaultEntry.passwordHash) {
+                needsPasswordCloudSync = true;
+              }
+            }
+          } else if (!cloud.passwordHash && existing.passwordHash) {
             merged.passwordHash = existing.passwordHash;
-          }
-          if (!cloud.passwordHash && !existing.passwordHash) {
+          } else if (!cloud.passwordHash && !existing.passwordHash) {
             merged.passwordHash = (norm === 'manager@nexcrest.com')
               ? 'ad66d6793d4dc6ddeaa846f6d6b2ba7fd3bdcbce026f652a1a1d751e9c60babb'
               : '02d1b38eaa9b63391a31b00d882dfe78776eb3ada6e4440940de95334bf8173d';
@@ -215,6 +279,7 @@ class AuthService {
           this.users[norm] = merged;
         });
         this.applyCustomProfiles(this.users);
+        this.applyCustomPasswords(this.users);
 
         try {
           localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(this.users));
@@ -227,9 +292,10 @@ class AuthService {
           } catch (e) {}
         }
 
-        // If Cloud Firestore held stale default names, push the customized names to Firestore
-        if (needsCloudResync && window.firebaseSync && window.firebaseSync.isActive()) {
-          Object.keys(customProfiles).forEach(email => {
+        // If Cloud Firestore held stale default names or older passwords, push updates to Firestore
+        if ((needsCloudResync || needsPasswordCloudSync) && window.firebaseSync && window.firebaseSync.isActive()) {
+          const emailsToPush = new Set([...Object.keys(customProfiles), ...Object.keys(customVault)]);
+          emailsToPush.forEach(email => {
             if (this.users[email]) {
               window.firebaseSync.saveUser(this.users[email]);
             }
@@ -292,8 +358,9 @@ class AuthService {
             }
           });
 
-          // Enforce customized profiles
+          // Enforce customized profiles & custom passwords vault
           this.applyCustomProfiles(parsed);
+          this.applyCustomPasswords(parsed);
 
           if (migrated) this.saveUsers(parsed);
           users = parsed;
@@ -502,10 +569,18 @@ class AuthService {
       return { success: false, error: 'New password and confirmation do not match.' };
     }
 
+    const changeIso = new Date().toISOString();
     user.passwordHash = newHash;
     delete user.password;
-    user.lastPasswordChange = new Date().toISOString();
+    user.lastPasswordChange = changeIso;
+
+    // Permanently write to Custom Passwords Vault so no commit, cache clear, or update can ever revert it
+    this.saveCustomPassword(normEmail, newHash, changeIso);
     this.saveUsers(this.users);
+
+    if (typeof window !== 'undefined' && window.firebaseSync && window.firebaseSync.isActive()) {
+      window.firebaseSync.saveUser(user);
+    }
 
     if (this.currentUser && this.currentUser.email.toLowerCase() === normEmail) {
       this.currentUser = { ...user };
@@ -668,6 +743,13 @@ class AuthService {
 
     const defaultManagerHash = 'ad66d6793d4dc6ddeaa846f6d6b2ba7fd3bdcbce026f652a1a1d751e9c60babb'; // Nexloic0131
     const defaultEmployeeHash = '02d1b38eaa9b63391a31b00d882dfe78776eb3ada6e4440940de95334bf8173d'; // password123
+
+    const customVault = this.loadCustomPasswords();
+    const vaultUser = customVault[normalized];
+    if (vaultUser && vaultUser.passwordHash) {
+      user.passwordHash = vaultUser.passwordHash;
+      if (vaultUser.lastPasswordChange) user.lastPasswordChange = vaultUser.lastPasswordChange;
+    }
 
     const expectedHash = user.passwordHash ||
       (user.password ? hashPassword(user.password) :

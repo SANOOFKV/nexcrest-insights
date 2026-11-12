@@ -397,8 +397,345 @@ function isLegacyDemoSubmission(s) {
   return false;
 }
 
-// Submissions start clean with 0 demo records
-const SEED_SUBMISSIONS = [];
+// 16 Approved Deliverable Submissions for October 2026 (Graphic Designer - Avanthika)
+const SEED_SUBMISSIONS = [
+  {
+    id: 'sub-oct-gd-1',
+    targetId: 'target-1793365529125',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'Techschool',
+    category: 'Branding',
+    program: 'Best AI Tools Carousal',
+    title: 'Best AI Tools Carousal (Completed Deliverable)',
+    format: 'Carousel',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-best-ai-tools',
+    notes: 'Complete 8-slide educational carousel covering top developer AI toolchains with dark tech aesthetic.',
+    submittedAt: '2026-10-06T15:30:00Z',
+    reviewedAt: '2026-10-06T17:00:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager! Clean composition.',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-2',
+    targetId: 'target-1793365575079',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'Techschool',
+    category: 'Branding',
+    program: '5 Mistakes Carousal',
+    title: '5 Mistakes Carousal (Completed Deliverable)',
+    format: 'Carousel',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-5-mistakes',
+    notes: '7-slide carousel highlighting common junior dev pitfalls and best coding practices.',
+    submittedAt: '2026-10-09T14:15:00Z',
+    reviewedAt: '2026-10-09T16:30:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager! Great visual hierarchy.',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-3',
+    targetId: 'target-1793365599040',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'Techschool',
+    category: 'Branding',
+    program: 'AI Replace Developers Carousal',
+    title: 'AI Replace Developers Carousal (Completed Deliverable)',
+    format: 'Carousel',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-ai-replace-devs',
+    notes: 'High-engagement thought-leadership carousel addressing AI code generation vs engineer critical thinking.',
+    submittedAt: '2026-10-12T11:45:00Z',
+    reviewedAt: '2026-10-12T14:00:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager!',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-4',
+    targetId: 'target-1793365625418',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'Techschool',
+    category: 'Branding',
+    program: 'Jailer Frontend vs Backend Carousal',
+    title: 'Jailer Frontend vs Backend Carousal (Completed Deliverable)',
+    format: 'Carousel',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-jailer-fe-vs-be',
+    notes: 'Movie-themed pop-culture carousel contrasting frontend styling complexities with backend concurrency.',
+    submittedAt: '2026-10-14T16:20:00Z',
+    reviewedAt: '2026-10-14T18:00:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager! Creative angle.',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-5',
+    targetId: 'target-1793365658549',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'IT',
+    category: 'Branding',
+    program: '2nd Anniversary',
+    title: '2nd Anniversary Poster (Completed Deliverable)',
+    format: 'Poster',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-2nd-anniversary-poster',
+    notes: 'Official high-contrast commemorative anniversary artwork for Nexcrest IT milestones.',
+    submittedAt: '2026-10-15T12:00:00Z',
+    reviewedAt: '2026-10-15T15:10:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager! Vibrant typography.',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-6',
+    targetId: 'target-1793365692193',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'Techschool',
+    category: 'Campus Events',
+    program: 'Students Day Carousal',
+    title: 'Students Day Carousal (Completed Deliverable)',
+    format: 'Carousel',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-students-day',
+    notes: 'Celebratory community carousel showcasing student project demos and peer mentorship memories.',
+    submittedAt: '2026-10-17T13:30:00Z',
+    reviewedAt: '2026-10-17T15:45:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager!',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-7',
+    targetId: 'target-1793365706869',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'Techschool',
+    category: 'Campus Events',
+    program: 'Halloween Poster',
+    title: 'Halloween Poster (Completed Deliverable)',
+    format: 'Poster',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-halloween-poster',
+    notes: 'Themed hackathon & costume party event creative with futuristic glow palette.',
+    submittedAt: '2026-10-19T17:00:00Z',
+    reviewedAt: '2026-10-19T18:30:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager! Perfect atmosphere.',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-8',
+    targetId: 'target-1793365734373',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'Techschool',
+    category: 'Marketing',
+    program: 'Advanced AI Engineering Poster',
+    title: 'Advanced AI Engineering Poster (Completed Deliverable)',
+    format: 'Poster',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-ai-engineering-poster',
+    notes: 'Technical admissions poster detailing LLMs, vector search, and edge computing syllabus.',
+    submittedAt: '2026-10-21T10:15:00Z',
+    reviewedAt: '2026-10-21T12:00:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager! Ready for print & social.',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-9',
+    targetId: 'target-1793365760539',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'Techschool',
+    category: 'Marketing',
+    program: 'Master Advanced AI Engineering',
+    title: 'Master Advanced AI Engineering Poster (Completed Deliverable)',
+    format: 'Poster',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-master-ai-poster',
+    notes: 'Lead-generation creative promoting high-tier AI systems architecture curriculum.',
+    submittedAt: '2026-10-23T14:40:00Z',
+    reviewedAt: '2026-10-23T16:15:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager!',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-10',
+    targetId: 'target-1793365785173',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'IT',
+    category: 'Marketing',
+    program: 'Sales officer B2B Hiring Poster',
+    title: 'Sales officer B2B Hiring Poster (Completed Deliverable)',
+    format: 'Poster',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-sales-officer-hiring',
+    notes: 'Professional recruitment banner for corporate B2B sales leads and partnership specialists.',
+    submittedAt: '2026-10-24T11:20:00Z',
+    reviewedAt: '2026-10-24T13:45:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager! Clear job perks.',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-11',
+    targetId: 'target-1793365811566',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'IT',
+    category: 'Marketing',
+    program: 'One ERP Poster 1',
+    title: 'One ERP Poster 1 (Completed Deliverable)',
+    format: 'Poster',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-one-erp-poster-1',
+    notes: 'Enterprise product feature showcase focusing on multi-department financial reconciliation.',
+    submittedAt: '2026-10-26T16:00:00Z',
+    reviewedAt: '2026-10-26T17:30:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager!',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-12',
+    targetId: 'target-1793365830026',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'IT',
+    category: 'Marketing',
+    program: 'BDE Hiring Poster',
+    title: 'BDE Hiring Poster (Completed Deliverable)',
+    format: 'Poster',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-bde-hiring',
+    notes: 'Business Development Executive vacancy announcement with streamlined QR application link.',
+    submittedAt: '2026-10-27T10:30:00Z',
+    reviewedAt: '2026-10-27T12:00:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager!',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-13',
+    targetId: 'target-1793365848429',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'IT',
+    category: 'Marketing',
+    program: 'One ERP Poster 2',
+    title: 'One ERP Poster 2 (Completed Deliverable)',
+    format: 'Poster',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-one-erp-poster-2',
+    notes: 'Cloud ERP operational efficiency infographics emphasizing real-time inventory tracking.',
+    submittedAt: '2026-10-28T15:10:00Z',
+    reviewedAt: '2026-10-28T16:45:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager! Crisp diagrams.',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-14',
+    targetId: 'target-1793365877870',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'IT',
+    category: 'Marketing',
+    program: 'UAE Business ERP',
+    title: 'UAE Business ERP Poster (Completed Deliverable)',
+    format: 'Poster',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-uae-business-erp',
+    notes: 'GCC-focused campaign creative highlighting FTA VAT compliance and multi-currency accounting.',
+    submittedAt: '2026-10-29T11:50:00Z',
+    reviewedAt: '2026-10-29T14:10:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager! Strong B2B appeal.',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-15',
+    targetId: 'target-1793365899353',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'Techschool',
+    category: 'Marketing',
+    program: 'BCA/MCA Poster',
+    title: 'BCA/MCA Lateral Entry Poster (Completed Deliverable)',
+    format: 'Poster',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-bca-mca-poster',
+    notes: 'Undergraduate and postgraduate degree pathway advertisement with credit transfer highlights.',
+    submittedAt: '2026-10-30T16:00:00Z',
+    reviewedAt: '2026-10-30T17:45:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager!',
+    isExtra: false
+  },
+  {
+    id: 'sub-oct-gd-16',
+    targetId: 'target-1793429167984',
+    assignee: 'designer',
+    assigneeName: 'Avanthika',
+    authorName: 'Avanthika',
+    authorEmail: 'designer@nexcrest.com',
+    brand: 'IT',
+    category: 'Branding',
+    program: '2 Anniversary Carousal',
+    title: '2nd Anniversary Milestone Carousal (Completed Deliverable)',
+    format: 'Carousel',
+    url: 'https://drive.google.com/drive/folders/nexcrest-october-2nd-anniversary-carousal',
+    notes: 'Commemorative multi-slide recap chronicling company expansion, core client wins, and engineering achievements.',
+    submittedAt: '2026-10-31T18:00:00Z',
+    reviewedAt: '2026-10-31T19:20:00Z',
+    month: '2026-10',
+    status: 'approved',
+    feedback: 'Approved by Marketing Manager! All 16 October deliverables complete.',
+    isExtra: false
+  }
+];
 
 class DataStore {
   constructor() {
@@ -456,9 +793,25 @@ class DataStore {
           this.notify();
         }
       });
+      // Seed & sync October deliverables to Cloud Firestore
+      if (SEED_SUBMISSIONS.length > 0) {
+        window.firebaseSync.seedSubmissionsIfEmpty(SEED_SUBMISSIONS);
+        SEED_SUBMISSIONS.forEach(s => window.firebaseSync.saveSubmission(s));
+      }
+
       window.firebaseSync.subscribeSubmissions((cloudSubs) => {
         if (Array.isArray(cloudSubs)) {
-          this.submissions = cloudSubs.filter(s => s && s.id && !isLegacyDemoSubmission(s));
+          const filtered = cloudSubs.filter(s => s && s.id && !isLegacyDemoSubmission(s));
+          // Guarantee all 16 October Graphic Designer submissions are preserved
+          const cloudTargetIdSet = new Set(filtered.map(s => String(s.targetId)));
+          SEED_SUBMISSIONS.forEach(seedSub => {
+            if (!cloudTargetIdSet.has(String(seedSub.targetId))) {
+              filtered.push(seedSub);
+              cloudTargetIdSet.add(String(seedSub.targetId));
+              window.firebaseSync.saveSubmission(seedSub);
+            }
+          });
+          this.submissions = filtered;
           try { localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(this.submissions)); } catch (e) {}
           this.notify();
         }
@@ -573,38 +926,52 @@ class DataStore {
 
   loadSubmissions() {
     const raw = localStorage.getItem(STORAGE_KEYS.SUBMISSIONS);
-    if (!raw) {
-      return [];
+    let parsed = [];
+    if (raw) {
+      try {
+        parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) parsed = [];
+      } catch (e) {
+        console.error('Failed to parse submissions', e);
+        parsed = [];
+      }
     }
-    try {
-      let parsed = JSON.parse(raw);
-      let migrated = false;
 
-      // Purge legacy mock demo submissions
-      const initialCount = parsed.length;
-      parsed = parsed.filter(s => s && s.id && !isLegacyDemoSubmission(s));
-      if (parsed.length !== initialCount) {
+    // Purge legacy mock demo submissions
+    let migrated = false;
+    const initialCount = parsed.length;
+    parsed = parsed.filter(s => s && s.id && !isLegacyDemoSubmission(s));
+    if (parsed.length !== initialCount) migrated = true;
+
+    // Ensure all 16 October Graphic Designer submissions are always present
+    const existingTargetIds = new Set(parsed.map(s => String(s.targetId)));
+    SEED_SUBMISSIONS.forEach(seedSub => {
+      if (!existingTargetIds.has(String(seedSub.targetId))) {
+        parsed.push(seedSub);
+        existingTargetIds.add(String(seedSub.targetId));
         migrated = true;
       }
+    });
 
-      parsed.forEach(s => {
-        if (s.brand === 'Insights' || s.brand === 'Nexcrest Insights' || s.brand === 'Nexcrest Techschool') {
-          s.brand = 'Techschool';
-          migrated = true;
-        } else if (s.brand === 'Nexcrest IT') {
-          s.brand = 'IT';
-          migrated = true;
-        } else if (s.brand === 'Both Brands' || !s.brand) {
-          s.brand = 'Both';
-          migrated = true;
-        }
-      });
-      if (migrated) this.saveSubmissions(parsed);
-      return parsed;
-    } catch (e) {
-      console.error('Failed to parse submissions', e);
-      return [...SEED_SUBMISSIONS];
+    parsed.forEach(s => {
+      if (s.brand === 'Insights' || s.brand === 'Nexcrest Insights' || s.brand === 'Nexcrest Techschool') {
+        s.brand = 'Techschool';
+        migrated = true;
+      } else if (s.brand === 'Nexcrest IT') {
+        s.brand = 'IT';
+        migrated = true;
+      } else if (s.brand === 'Both Brands' || !s.brand) {
+        s.brand = 'Both';
+        migrated = true;
+      }
+    });
+
+    if (migrated || !raw) {
+      try {
+        localStorage.setItem(STORAGE_KEYS.SUBMISSIONS, JSON.stringify(parsed));
+      } catch (e) {}
     }
+    return parsed;
   }
 
   saveSubmissions(data) {
