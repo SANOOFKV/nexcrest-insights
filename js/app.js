@@ -988,6 +988,7 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.authModal.classList.add('hidden');
     if (elements.headerUserProfileMenu) elements.headerUserProfileMenu.style.display = 'flex';
     if (elements.btnCalendarPicker) elements.btnCalendarPicker.style.display = 'inline-flex';
+    updateHeaderCycleDisplay();
 
     elements.headerUserName.textContent = user.name;
     if (elements.headerRoleBadge) elements.headerRoleBadge.textContent = user.title;
@@ -1083,11 +1084,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.ovMonthTag.addEventListener('click', openHistoricalCalendarModal);
       }
     }
-    const headerCycleText = document.getElementById('header-cycle-text');
-    if (headerCycleText) {
-      const isCur = ov.month === (typeof window.getCurrentMonthStr === 'function' ? window.getCurrentMonthStr() : '2026-11');
-      headerCycleText.textContent = `${getMonthFullName(ov.month)}${isCur ? ' (Active)' : ''}`;
-    }
+    updateHeaderCycleDisplay(ov.month);
 
     // 2. The 4 Hero Dark Cards (Kinetic Number Rollers)
     animateCounter(elements.ovMonthlyTarget, ov.totalTarget);
@@ -2968,6 +2965,40 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${monthFull[mIdx] || parts[1]} ${parts[0]}`;
   }
 
+  function getMonthShortName(ym) {
+    const monthShorts = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    if (!ym) return 'Current';
+    const parts = ym.split('-');
+    if (parts.length < 2) return ym;
+    const mIdx = parseInt(parts[1], 10) - 1;
+    const mName = monthShorts[mIdx] || parts[1];
+    const yr = parts[0].slice(-2);
+    return `${mName} '${yr}`;
+  }
+
+  function updateHeaderCycleDisplay(targetMonth = null) {
+    if (!elements.btnCalendarPicker) return;
+    const activeMonth = targetMonth || (window.dataStore && typeof window.dataStore.getActiveMonth === 'function' ? window.dataStore.getActiveMonth() : null) || ((typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11');
+    const curMonth = (typeof window.getCurrentMonthStr === 'function') ? window.getCurrentMonthStr() : '2026-11';
+    const isCur = activeMonth === curMonth;
+    const fullName = getMonthFullName(activeMonth);
+    const shortName = getMonthShortName(activeMonth);
+
+    const fullEl = document.getElementById('header-cycle-text-full');
+    const shortEl = document.getElementById('header-cycle-text-short');
+    const legacyEl = document.getElementById('header-cycle-text');
+
+    if (fullEl && shortEl) {
+      fullEl.textContent = `${fullName}${isCur ? ' (Active)' : ''}`;
+      shortEl.textContent = `${shortName}${isCur ? ' •' : ''}`;
+    } else if (legacyEl) {
+      legacyEl.textContent = `${fullName}${isCur ? ' (Active)' : ''}`;
+    }
+
+    elements.btnCalendarPicker.title = `Switch Month Cycle (Currently ${fullName})`;
+    elements.btnCalendarPicker.setAttribute('aria-label', `Switch Month Cycle (Currently ${fullName})`);
+  }
+
   function openMemberReportModal(preselectedMonth = null, targetUser = null) {
     state.memberReportActiveUser = targetUser || state.user;
     if (!state.memberReportActiveUser) return;
@@ -3381,10 +3412,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (memberCycleText) {
       memberCycleText.textContent = `${getMonthFullName(activeMonth)} Cycle${isCur ? ' (Current)' : ''}`;
     }
-    const headerCycleText = document.getElementById('header-cycle-text');
-    if (headerCycleText) {
-      headerCycleText.textContent = `${getMonthFullName(activeMonth)}${isCur ? ' (Active)' : ''}`;
-    }
+    updateHeaderCycleDisplay(activeMonth);
 
     // Load Stats for this user (Kinetic Number Rollers)
     const stats = window.dataStore.getEmployeeStats(user);
@@ -4399,19 +4427,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateCalendarBtnTooltip() {
-    if (!elements.btnCalendarPicker) return;
-    const activeMonth = window.dataStore.getActiveMonth();
-    const monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    if (activeMonth) {
-      const [y, mStr] = activeMonth.split('-');
-      const mIdx = parseInt(mStr, 10) - 1;
-      const mName = monthNames[mIdx] || activeMonth;
-      elements.btnCalendarPicker.title = `Cycle Calendar (${mName} ${y})`;
-      elements.btnCalendarPicker.setAttribute('aria-label', `Cycle Calendar (${mName} ${y})`);
-    }
+    updateHeaderCycleDisplay();
   }
 
   // Master Render Loop

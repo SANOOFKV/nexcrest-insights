@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=100">
+  <link rel="stylesheet" href="css/styles.css?v=101">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -59,10 +59,13 @@
 
       <!-- Header Actions: Calendar & User Profile -->
       <div class="header-actions">
-
-        <button type="button" id="btn-calendar-picker" class="cycle-calendar-btn" title="Switch Month Cycle" aria-label="Cycle Calendar" style="display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; background: rgba(0, 139, 165, 0.12); border: 1px solid rgba(0, 139, 165, 0.35); border-radius: var(--radius-sm); color: var(--teal-light); cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s ease;">
-          <i data-lucide="calendar" style="width: 15px; height: 15px;"></i>
-          <span id="header-cycle-text">Cycle Calendar</span>
+        <button type="button" id="btn-calendar-picker" class="cycle-calendar-btn" title="Switch Month Cycle" aria-label="Cycle Calendar" style="display: none;">
+          <i data-lucide="calendar" class="cycle-calendar-icon"></i>
+          <span id="header-cycle-text" class="cycle-calendar-label">
+            <span class="cycle-text-full" id="header-cycle-text-full">November 2026 (Active)</span>
+            <span class="cycle-text-short" id="header-cycle-text-short">Nov '26 •</span>
+          </span>
+          <i data-lucide="chevron-down" class="cycle-calendar-chevron"></i>
         </button>
         <div class="user-profile-menu" id="header-user-profile-menu" style="display: none;">
           <button type="button" id="btn-open-user-profile" class="user-profile-chip-btn" title="Profile Settings">
@@ -2137,10 +2140,10 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=100"></script>
-  <script src="js/data.js?v=100"></script>
-  <script src="js/auth.js?v=100"></script>
-  <script src="js/app.js?v=100"></script>
+  <script src="js/firebase-config.js?v=101"></script>
+  <script src="js/data.js?v=101"></script>
+  <script src="js/auth.js?v=101"></script>
+  <script src="js/app.js?v=101"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
