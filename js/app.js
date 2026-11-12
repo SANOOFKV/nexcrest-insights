@@ -4857,23 +4857,80 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    const panelDetails = document.getElementById('profile-tab-details');
-    const panelSecurity = document.getElementById('profile-tab-security');
+    const panels = {
+      details: document.getElementById('profile-tab-details'),
+      security: document.getElementById('profile-tab-security'),
+      notifications: document.getElementById('profile-tab-notifications')
+    };
 
-    if (panelDetails && panelSecurity) {
-      if (tabName === 'details') {
-        panelDetails.classList.remove('hidden');
-        panelDetails.classList.add('active');
-        panelSecurity.classList.add('hidden');
-        panelSecurity.classList.remove('active');
-      } else {
-        panelSecurity.classList.remove('hidden');
-        panelSecurity.classList.add('active');
-        panelDetails.classList.add('hidden');
-        panelDetails.classList.remove('active');
+    Object.entries(panels).forEach(([key, panel]) => {
+      if (panel) {
+        if (key === tabName) {
+          panel.classList.remove('hidden');
+          panel.classList.add('active');
+        } else {
+          panel.classList.add('hidden');
+          panel.classList.remove('active');
+        }
       }
+    });
+
+    if (tabName === 'notifications') {
+      populateNotificationSettingsForm();
     }
     refreshIcons();
+  }
+
+  function updateWebhookBadge(url) {
+    const badge = document.getElementById('webhook-provider-badge');
+    if (!badge) return;
+    const provider = window.webhookAlerts ? window.webhookAlerts.detectProvider(url) : 'universal';
+    badge.className = 'badge-webhook-provider ' + provider;
+    if (provider === 'slack') {
+      badge.textContent = 'Slack Webhook (Block Kit)';
+    } else if (provider === 'discord') {
+      badge.textContent = 'Discord Webhook (Rich Embed)';
+    } else if (provider === 'whatsapp') {
+      badge.textContent = 'WhatsApp Cloud API Gateway';
+    } else {
+      badge.textContent = 'Universal JSON Webhook';
+    }
+  }
+
+  function populateNotificationSettingsForm() {
+    if (!window.webhookAlerts) return;
+    const cfg = window.webhookAlerts.config;
+    const enableToggle = document.getElementById('webhook-enable-toggle');
+    const urlInput = document.getElementById('webhook-url-input');
+    const chanInput = document.getElementById('webhook-channel-input');
+    const evSubmit = document.getElementById('webhook-event-submit');
+    const evApprove = document.getElementById('webhook-event-approve');
+    const evReject = document.getElementById('webhook-event-reject');
+    const btnNotif = document.getElementById('browser-notif-btn-text');
+
+    if (enableToggle) enableToggle.checked = !!cfg.enabled;
+    if (urlInput) {
+      urlInput.value = cfg.webhookUrl || '';
+      updateWebhookBadge(cfg.webhookUrl);
+    }
+    if (chanInput) chanInput.value = cfg.channelName || '#nexcrest-approvals';
+    if (evSubmit) evSubmit.checked = cfg.events ? cfg.events.submit !== false : true;
+    if (evApprove) evApprove.checked = cfg.events ? cfg.events.approve !== false : true;
+    if (evReject) evReject.checked = cfg.events ? cfg.events.reject !== false : true;
+
+    if (btnNotif) {
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        if (Notification.permission === 'granted') {
+          btnNotif.textContent = 'Active ✅';
+        } else if (Notification.permission === 'denied') {
+          btnNotif.textContent = 'Blocked 🔒';
+        } else {
+          btnNotif.textContent = 'Enable';
+        }
+      } else {
+        btnNotif.textContent = 'Unsupported';
+      }
+    }
   }
 
   // Open / Close Profile Modal triggers
@@ -4992,6 +5049,83 @@ document.addEventListener('DOMContentLoaded', () => {
       elements.profileConfirmPass.value = '';
       closeProfileModal();
       showToast('🔒 Password changed successfully! Keep it safe.', 'success');
+    });
+  }
+
+  // Webhook and Multi-Channel Notification Form Listeners
+  const profileNotifForm = document.getElementById('profile-notifications-form');
+  const webhookUrlInput = document.getElementById('webhook-url-input');
+  const btnTestWebhook = document.getElementById('btn-test-webhook');
+  const btnRequestBrowserNotif = document.getElementById('btn-request-browser-notif');
+
+  if (webhookUrlInput) {
+    webhookUrlInput.addEventListener('input', (e) => {
+      updateWebhookBadge(e.target.value.trim());
+    });
+  }
+
+  if (btnRequestBrowserNotif) {
+    btnRequestBrowserNotif.addEventListener('click', async () => {
+      if (window.webhookAlerts) {
+        const res = await window.webhookAlerts.requestBrowserPermission();
+        populateNotificationSettingsForm();
+        if (res === 'granted') {
+          showToast('🔔 Browser push notifications enabled!', 'success');
+        } else if (res === 'denied') {
+          showToast('Notifications are blocked by your browser settings.', 'warning');
+        }
+      }
+    });
+  }
+
+  if (btnTestWebhook) {
+    btnTestWebhook.addEventListener('click', async () => {
+      if (!window.webhookAlerts) return;
+      const urlInput = document.getElementById('webhook-url-input');
+      const url = urlInput ? urlInput.value.trim() : '';
+      if (!url) {
+        showToast('Please enter a Webhook URL first.', 'warning');
+        return;
+      }
+
+      window.webhookAlerts.config.webhookUrl = url;
+      window.webhookAlerts.config.enabled = true;
+
+      showToast('🚀 Dispatching test ping...', 'info');
+      const res = await window.webhookAlerts.sendTestPing();
+      if (res.success) {
+        showToast('✅ Webhook verified! Test alert arrived successfully.', 'success');
+      } else {
+        showToast(`⚠️ Ping notice: ${res.reason || res.error || 'Check webhook URL'}`, 'warning');
+      }
+    });
+  }
+
+  if (profileNotifForm) {
+    profileNotifForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!window.webhookAlerts) return;
+
+      const enableToggle = document.getElementById('webhook-enable-toggle');
+      const urlInput = document.getElementById('webhook-url-input');
+      const chanInput = document.getElementById('webhook-channel-input');
+      const evSubmit = document.getElementById('webhook-event-submit');
+      const evApprove = document.getElementById('webhook-event-approve');
+      const evReject = document.getElementById('webhook-event-reject');
+
+      window.webhookAlerts.saveConfig({
+        enabled: enableToggle ? enableToggle.checked : false,
+        webhookUrl: urlInput ? urlInput.value.trim() : '',
+        channelName: chanInput ? chanInput.value.trim() : '#nexcrest-approvals',
+        events: {
+          submit: evSubmit ? evSubmit.checked : true,
+          approve: evApprove ? evApprove.checked : true,
+          reject: evReject ? evReject.checked : true
+        }
+      });
+
+      showToast('💾 Notification settings saved & synced to cloud!', 'success');
+      closeProfileModal();
     });
   }
 
@@ -5274,6 +5408,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     window.dataStore.addSubmission(submissionData);
+    if (window.webhookAlerts) {
+      window.webhookAlerts.dispatch('deliverable_submitted', {
+        title: submissionData.title,
+        assigneeName: state.user ? state.user.name : (submissionData.assigneeName || submissionData.assignee || 'Team Member'),
+        assigneeRole: state.user ? state.user.title : 'Team Member',
+        month: submissionData.month || window.dataStore.getActiveMonth(),
+        proofUrl: submissionData.url || submissionData.proofUrl || ''
+      });
+    }
     elements.logWorkModal.classList.add('hidden');
     const toastMsg = mode === 'extra'
       ? '⭐ Task submitted! Sent to Admin for review. Once approved, it will be counted.'
@@ -5863,6 +6006,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const isExtra = sub && sub.isExtra;
     const feedback = elements.reviewFeedbackInput.value.trim() || (isExtra ? '⭐ Extra work approved! Over-achievement bonus counted.' : 'Approved by Marketing Manager!');
     window.dataStore.updateSubmissionStatus(subId, 'approved', feedback);
+    if (window.webhookAlerts) {
+      window.webhookAlerts.dispatch('deliverable_approved', {
+        title: sub ? sub.title : 'Deliverable',
+        assigneeName: sub ? (sub.authorName || sub.assigneeName || sub.assignee || 'Member') : 'Member',
+        reviewerName: state.user ? state.user.name : 'Marketing Manager',
+        feedback: feedback
+      });
+    }
     elements.reviewActionModal.classList.add('hidden');
     showToast(isExtra ? '⭐ Extra work deliverable approved! Over-achievement bonus counted.' : 'Deliverable approved! Target count updated.', 'success');
     renderApp();
@@ -5870,8 +6021,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   elements.btnRequestRework.addEventListener('click', () => {
     const subId = elements.reviewSubmissionId.value;
+    const sub = window.dataStore.getSubmissions().find(s => s.id === subId);
     const feedback = elements.reviewFeedbackInput.value.trim() || 'Revisions required. Please review notes.';
     window.dataStore.updateSubmissionStatus(subId, 'revision', feedback);
+    if (window.webhookAlerts) {
+      window.webhookAlerts.dispatch('deliverable_rejected', {
+        title: sub ? sub.title : 'Deliverable',
+        assigneeName: sub ? (sub.authorName || sub.assigneeName || sub.assignee || 'Member') : 'Member',
+        reviewerName: state.user ? state.user.name : 'Marketing Manager',
+        feedback: feedback
+      });
+    }
     elements.reviewActionModal.classList.add('hidden');
     showToast('Feedback sent back to team member for revision.', 'warning');
     renderApp();
@@ -5888,6 +6048,14 @@ document.addEventListener('DOMContentLoaded', () => {
       pendingSubs.forEach(s => {
         window.dataStore.updateSubmissionStatus(s.id, 'approved', 'Batch approved by Marketing Manager');
       });
+      if (window.webhookAlerts) {
+        window.webhookAlerts.dispatch('deliverable_approved', {
+          title: `${pendingSubs.length} Deliverables (Batch Approved)`,
+          assigneeName: 'Assigned Team Members',
+          reviewerName: state.user ? state.user.name : 'Marketing Manager',
+          feedback: 'Batch approved by Marketing Manager'
+        });
+      }
       showToast(`Approved ${pendingSubs.length} deliverables!`, 'success');
       renderApp();
     }

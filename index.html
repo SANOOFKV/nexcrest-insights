@@ -22,7 +22,7 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <link rel="icon" type="image/png" href="assets/nexcrest_icon.png">
-  <link rel="stylesheet" href="css/styles.css?v=102">
+  <link rel="stylesheet" href="css/styles.css?v=103">
   <!-- Frame-Busting Clickjacking Mitigation -->
   <script>
     if (window.top !== window.self) {
@@ -1755,7 +1755,7 @@
           </button>
         </div>
 
-        <!-- Tabs: Personal Info & Security -->
+        <!-- Tabs: Personal Info, Security & Webhooks -->
         <div class="profile-modal-tabs">
           <button type="button" class="profile-tab-btn active" data-profile-tab="details">
             <i data-lucide="user"></i>
@@ -1763,7 +1763,11 @@
           </button>
           <button type="button" class="profile-tab-btn" data-profile-tab="security">
             <i data-lucide="key"></i>
-            <span>Change Password</span>
+            <span>Password</span>
+          </button>
+          <button type="button" class="profile-tab-btn" data-profile-tab="notifications">
+            <i data-lucide="bell"></i>
+            <span>Alerts & Webhooks</span>
           </button>
         </div>
 
@@ -1847,6 +1851,85 @@
               <button type="submit" class="btn btn-primary" id="btn-submit-change-password">
                 <i data-lucide="shield-check"></i>
                 <span>Update Password</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- TAB PANEL 3: Webhook Alerts & Multi-Channel Notifications -->
+        <div id="profile-tab-notifications" class="profile-tab-panel hidden">
+          <form id="profile-notifications-form" class="modal-form">
+            <div class="webhook-banner-hint" style="margin-bottom: 14px; padding: 10px 14px; background: rgba(0, 139, 165, 0.1); border: 1px solid rgba(0, 139, 165, 0.3); border-radius: var(--radius-sm); font-size: 12.5px; color: var(--teal-light);">
+              <i data-lucide="info" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
+              Connect Slack, WhatsApp, Discord, or Zapier webhooks to receive real-time alerts whenever deliverables are submitted, approved, or rejected.
+            </div>
+
+            <div class="form-group">
+              <label for="webhook-enable-toggle" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
+                <span style="font-weight: 600;">Enable Webhook Alerts</span>
+                <input type="checkbox" id="webhook-enable-toggle" style="width: 18px; height: 18px; accent-color: var(--teal-primary); cursor: pointer;">
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label for="webhook-url-input">Webhook URL</label>
+              <div class="input-with-icon">
+                <i data-lucide="link"></i>
+                <input type="url" id="webhook-url-input" placeholder="https://hooks.slack.com/services/... or Discord/Make URL">
+              </div>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 5px;">
+                <span id="webhook-provider-badge" class="badge-webhook-provider">Universal Webhook</span>
+                <span style="font-size: 11px; color: #A7B4BE;">Auto-formats Block Kit / Discord embeds</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="webhook-channel-input">Target Channel / Chat Identifier</label>
+              <div class="input-with-icon">
+                <i data-lucide="hash"></i>
+                <input type="text" id="webhook-channel-input" placeholder="#nexcrest-approvals or Marketing Team">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label style="margin-bottom: 6px; display: block; font-weight: 600;">Notify on Events:</label>
+              <div style="display: flex; flex-direction: column; gap: 8px; padding: 10px 14px; background: rgba(0, 0, 0, 0.2); border-radius: 8px; border: 1px solid var(--border-subtle);">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer;">
+                  <input type="checkbox" id="webhook-event-submit" checked style="accent-color: var(--teal-primary);">
+                  <span>🔔 New Deliverable Submissions (Sent for Review)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer;">
+                  <input type="checkbox" id="webhook-event-approve" checked style="accent-color: var(--teal-primary);">
+                  <span>✅ Deliverable Approvals (Marked Delivered)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; cursor: pointer;">
+                  <input type="checkbox" id="webhook-event-reject" checked style="accent-color: var(--teal-primary);">
+                  <span>⚠️ Deliverable Revisions & Manager Feedback</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 10px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(0, 139, 165, 0.08); border-radius: 8px; border: 1px solid rgba(0, 139, 165, 0.25);">
+                <div>
+                  <div style="font-size: 13px; font-weight: 600; color: #FFFFFF;">Browser Push Notifications</div>
+                  <div style="font-size: 11.5px; color: #A7B4BE;">Receive native desktop alerts when tab is in background</div>
+                </div>
+                <button type="button" class="btn btn-outline" id="btn-request-browser-notif" style="padding: 6px 12px; font-size: 12px; min-width: 90px;">
+                  <i data-lucide="bell"></i>
+                  <span id="browser-notif-btn-text">Enable</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+              <button type="button" class="btn btn-outline" id="btn-test-webhook" style="border-color: var(--teal-primary); color: var(--teal-light);">
+                <i data-lucide="send"></i>
+                <span>Test Webhook Ping</span>
+              </button>
+              <button type="submit" class="btn btn-primary">
+                <i data-lucide="check"></i>
+                <span>Save Webhook Settings</span>
               </button>
             </div>
           </form>
@@ -2135,10 +2218,11 @@
   <!-- Firebase SDK for Real-Time Multi-Device Cloud Synchronization -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-config.js?v=102"></script>
-  <script src="js/data.js?v=102"></script>
-  <script src="js/auth.js?v=102"></script>
-  <script src="js/app.js?v=102"></script>
+  <script src="js/firebase-config.js?v=103"></script>
+  <script src="js/data.js?v=103"></script>
+  <script src="js/auth.js?v=103"></script>
+  <script src="js/webhook-service.js?v=103"></script>
+  <script src="js/app.js?v=103"></script>
   <!-- Progressive Web App Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {

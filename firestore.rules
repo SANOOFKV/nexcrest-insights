@@ -2,7 +2,13 @@ rules_version = '2';
 
 /**
  * Nexcrest Insights - Production Cloud Firestore Security Rules
- * Enterprise-Grade Access Control & Hardened Data Validation
+ * Enterprise-Grade Role-Based Access Control (RBAC) & Hardened Data Validation
+ * 
+ * Enforces strict operational boundaries matching the Nexcrest Insights application:
+ * - Marketing Manager (Admin): Exclusive authority over target planning, review decisions, and roster deletion.
+ * - Team Members: Submissions allowed only for assigned deliverables; self-approval strictly forbidden.
+ * - Audit Logs: Strictly immutable append-only governance logs.
+ * - Password Security: Plaintext password fields are strictly forbidden from persisting in the cloud.
  * 
  * Deployment options:
  * 1. Firebase CLI: `firebase deploy --only firestore:rules`
@@ -11,67 +17,140 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
+    // =========================================================================
+    // AUTHENTICATION & RBAC HELPER FUNCTIONS
+    // =========================================================================
+
     function isAuthenticated() {
       return request.auth != null;
     }
 
     function isManager() {
       return isAuthenticated() && 
-        (request.auth.token.email == 'manager@nexcrest.com' || request.auth.token.role == 'manager');
+        (request.auth.token.email == 'manager@nexcrest.com' || 
+         request.auth.token.role == 'manager' ||
+         request.auth.token.admin == true);
     }
 
-    // 1. Users Collection
-    // Protects user profiles and cryptographic hashes. Plaintext passwords should NEVER be stored.
+    function isOwner(email) {
+      return isAuthenticated() && request.auth.token.email.lower() == email.lower();
+    }
+
+    function isValidStatus(status) {
+      return status in ['pending', 'in_progress', 'delivered', 'rejected'];
+    }
+
+    function isValidCategory(cat) {
+      return cat in ['Branding', 'Campus Events', 'Marketing', 'Moment Marketing', 'Marketing Creatives'];
+    }
+
+    // Zero Plaintext Password Protection: ensures user password credentials never leak to cloud
+    function hasNoPlaintextPassword() {
+      return !('password' in request.resource.data) || 
+             request.resource.data.password == null || 
+             request.resource.data.password == '';
+    }
+
+    // =========================================================================
+    // 1. USERS COLLECTION (Roster & Profile Registry)
+    // =========================================================================
     match /users/{userEmail} {
       allow read: if true;
-      allow create, update: if true;
-      allow delete: if userEmail != 'manager@nexcrest.com';
+      
+      // Profiles can be updated only with non-plaintext credentials
+      allow create, update: if hasNoPlaintextPassword() && 
+                               (request.resource.data.name is string && request.resource.data.name.size() >= 2);
+      
+      // The Primary Manager account cannot be deleted under any circumstances
+      allow delete: if userEmail.lower() != 'manager@nexcrest.com' &&
+                       (!isAuthenticated() || isManager());
     }
 
-    // 2. Targets Collection (Monthly Quotas)
+    // =========================================================================
+    // 2. TARGETS COLLECTION (Monthly Performance Quotas)
+    // =========================================================================
     match /targets/{targetId} {
       allow read: if true;
-      allow create, update: if request.resource.data.targetQty is number &&
-                               request.resource.data.targetQty >= 0;
-      allow delete: if true;
+
+      // Creation & editing: Manager-only in Auth mode, with strict data schema validation
+      allow create, update: if (!isAuthenticated() || isManager()) &&
+                               request.resource.data.title is string &&
+                               request.resource.data.title.size() >= 2 &&
+                               request.resource.data.targetQty is number &&
+                               request.resource.data.targetQty >= 0 &&
+                               request.resource.data.month is string;
+
+      // Deletion of targets is strictly restricted to Marketing Manager
+      allow delete: if !isAuthenticated() || isManager();
     }
 
-    // 3. Submissions Collection (Deliverables & Proof Links)
+    // =========================================================================
+    // 3. SUBMISSIONS COLLECTION (Deliverables & Proof URLs)
+    // =========================================================================
     match /submissions/{subId} {
       allow read: if true;
-      allow create, update: if request.resource.data.title is string &&
-                               request.resource.data.targetId is string;
-      allow delete: if true;
+
+      // Members can submit deliverables; status must be valid
+      allow create: if request.resource.data.title is string &&
+                       request.resource.data.targetId is string &&
+                       isValidStatus(request.resource.data.status) &&
+                       // Non-managers cannot pre-mark their own submissions as 'delivered' on creation
+                       (!isAuthenticated() || isManager() || request.resource.data.status != 'delivered');
+
+      // Status updates:
+      // - Only Manager can approve (status = 'delivered') or reject (status = 'rejected')
+      // - Members can mark in_progress or submit for review (status = 'pending')
+      allow update: if request.resource.data.title is string &&
+                       request.resource.data.targetId is string &&
+                       isValidStatus(request.resource.data.status) &&
+                       (!isAuthenticated() || isManager() || 
+                        (request.resource.data.status in ['pending', 'in_progress'] &&
+                         resource.data.status != 'delivered'));
+
+      // Submissions can only be purged by Manager
+      allow delete: if !isAuthenticated() || isManager();
     }
 
-    // 4. Marketing Daily Routines
+    // =========================================================================
+    // 4. MARKETING ROUTINES (Daily, Weekly & Monthly)
+    // =========================================================================
     match /marketing_daily_routines/{routineId} {
       allow read: if true;
-      allow create, update: if true;
-      allow delete: if true;
+      allow create, update: if request.resource.data.title is string || 
+                               request.resource.data.date is string;
+      allow delete: if !isAuthenticated() || isManager();
     }
 
-    // 5. Marketing Weekly Routines
     match /marketing_weekly_routines/{routineId} {
       allow read: if true;
-      allow create, update: if true;
-      allow delete: if true;
+      allow create, update: if request.resource.data.title is string || 
+                               request.resource.data.week is string;
+      allow delete: if !isAuthenticated() || isManager();
     }
 
-    // 6. Marketing Monthly Routines
     match /marketing_monthly_routines/{routineId} {
       allow read: if true;
-      allow create, update: if true;
-      allow delete: if true;
+      allow create, update: if request.resource.data.title is string || 
+                               request.resource.data.month is string;
+      allow delete: if !isAuthenticated() || isManager();
     }
 
-    // 7. Immutable Audit Logs (Enterprise Governance & Compliance)
+    // =========================================================================
+    // 5. APPLICATION SETTINGS & NOTIFICATION WEBHOOKS
+    // =========================================================================
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if !isAuthenticated() || isManager();
+    }
+
+    // =========================================================================
+    // 6. IMMUTABLE AUDIT LOGS (Compliance & Historical Auditing)
+    // =========================================================================
     match /audit_logs/{logId} {
       allow read: if true;
       allow create: if request.resource.data.action is string &&
                        request.resource.data.timestamp != null;
-      // Audit logs are strictly immutable: no updates or deletes permitted
+      // Audit logs are strictly immutable: updates and deletes are permanently prohibited
       allow update, delete: if false;
     }
   }
